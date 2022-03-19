@@ -1,5 +1,6 @@
 #ifndef POOL_H
 #define POOL_H
+#include <string.h>
 #include "Parameters.h"
 //TODO: Maybe we'll switch to just integers, but plan with fixed point for
 //now. This header will need to define the fixed point type and some
@@ -20,8 +21,11 @@
 void max_pool(fixed_t* in, fixed_t* out) {
   //DATA_WIDTH_POOL needs to be defined in Parameters.h
   const int out_width = DATA_WIDTH_POOL / POOL_SIZE;
+
   for (int i = 0; i < out_width; i++) {
     for (int j = 0; j < out_width; j++) {
+      //TODO: If there are negative values we may need to adjust this
+      //and the max operation.
       fixed_t max = 0;
       //Helps de-clutter the in array access
       int start_idx = POOL_SIZE * (i * DATA_WIDTH_POOL + j);
@@ -33,6 +37,15 @@ void max_pool(fixed_t* in, fixed_t* out) {
       out[i * out_width + j] = max;
     }
   }
+  //Could alternatively do this, which is simpler but would be slow
+  //with a non po2 pool size due to division.
+  /*memset(out, 0, out_width * out_width * sizeof(fixed_t));
+  for (int i = 0; i < DATA_WIDTH_POOL; i++) {
+    for (int j = 0; j < DATA_WIDTH_POOL; j++) {
+      out[(i / DATA_WIDTH_POOL) * out_width + (j / DATA_WIDTH_POOL)] =
+        MAX(out[(i / DATA_WIDTH_POOL) * out_width + (j / DATA_WIDTH_POOL)],         in[i * DATA_WIDTH_POOL + j]);
+    }
+  }*/
 }
 
 //TODO: Could also develop a struct based interface instead where
