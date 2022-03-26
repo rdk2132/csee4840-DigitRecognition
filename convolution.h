@@ -1,6 +1,5 @@
 #ifndef _CONVOLUTION_H_
 #define _CONVOLUTION_H_
-#include <>
 
 #define KERNEL_SIZE 25
 #define MAX(a, b) (a > b ? a : b)
