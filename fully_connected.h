@@ -12,7 +12,7 @@ layer this is of size 10)
 */
 
 
-void fully_connected_layer(float *src, float *dst, float *bias, float *weights, int src_size, int dst_size)
+void fully_connected(float *src, float *dst, float *bias, float *weights, int src_size, int dst_size)
 {
     for (int src_index = 0; src_index < (src_size); src_index++) { // calculate the neuron vals w/o bias
         for (int dest_index = 0; dest_index < (dst_size); dest_index++) {
