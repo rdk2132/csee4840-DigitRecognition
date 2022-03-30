@@ -2,6 +2,9 @@
 #define POOL_H
 #include <string.h>
 #include "Parameters.h"
+
+//max pooling and fixed point support are not needed at this time.
+#if 0
 //TODO: Maybe we'll switch to just integers, but plan with fixed point for
 //now. This header will need to define the fixed point type and some
 //functions. Otherwise just use int or perhaps unsigned char types.
@@ -10,6 +13,8 @@
 //Implement 2x2 pooling for now – different pooling or adding padding is
 //not difficult to do
 #define POOL_SIZE 2
+
+//TODO: Consider https://graphics.stanford.edu/~seander/bithacks.html#IntegerMinOrMax for branchless max operation in hardware
 
 //This will compile and work correctly as long as fixed_t is an alias for
 //an integer type
@@ -53,6 +58,24 @@ void max_pool(fixed_t* in, fixed_t* out) {
 //Pool layer4(3);
 //...
 //fixed_t* pooled_data = layer4.process(relu_data);
+#endif
+
+#define POOL_SIZE 2
+
+//Need src_row_size to know where to read information from consecutive rows. Number of channels is not needed
+void avg_pool(float* in, float* out, int src_size, int src_row_size) {
+  for (int i = 0; i < src_size / src_row_size / POOL_SIZE; i++) {
+    for (int j = 0; j < src_row_size / POOL_SIZE; j++) {
+      float sum = 0.0;
+      for (int k = 0; k < POOL_SIZE; k++) {
+        for (int l = 0; l < POOL_SIZE; l++) {
+          sum += in[(i * POOL_SIZE + k) * (src_row_size) + j * POOL_SIZE + l];
+        }
+      }
+      out[i * (src_row_size / POOL_SIZE) + j] = sum / POOL_SIZE / POOL_SIZE;
+    }
+  }
+}
 
 #endif
 

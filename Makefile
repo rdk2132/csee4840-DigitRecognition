@@ -10,7 +10,7 @@ default: FacialRecognition
 
 FacialRecognition: Layers.o
 
-FacialRecognition.o: Layers.h
+FacialRecognition.o: Layers.h Pool.h
 
 Layers.o: Layers.h
 
