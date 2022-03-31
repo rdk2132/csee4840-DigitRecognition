@@ -1,7 +1,8 @@
 #ifndef _CONVOLUTION_H_
 #define _CONVOLUTION_H_
 
-#define KERNEL_SIZE 25
+#include "Parameters.h"
+
 #define MAX(a, b) (a > b ? a : b)
 
 /*
@@ -35,7 +36,7 @@ void conv_layer(float *src, float *dst, float *bias, float *weights, int num_src
             // Weight filter for this image
             // This calculation assumes that the weight vector only contains weights for
             // this specific layer.
-            float *weight = &weights[out *KERNEL_SIZE];
+            float *weight = &weights[out *CONV_KERNEL_SIZE];
 
             // Matrix dotsum
             for(int i = 2; i < src_size - 2; i++)
