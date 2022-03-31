@@ -16,8 +16,8 @@ struct weights {
 
 void classify(unsigned char* in_image, struct weights* w) {
   //We should have enough stack space for this on Linux, might just use malloc otherwise.
+  //TODO: Is the order of weights in here the same as in keras?
   //TODO: Add code to load weights, input image
-  //TODO: Model as it is rained right now uses ReLU for conv, sigmoid for fc, update fc
   //Some layers assume that their outputs are zeroed out, so do that here.
   float in_matrix [IMAGE_SIZE];
   float conv1_out [NUM_KERNELS_1 * CONV1_OUT_SIZE] = {0};

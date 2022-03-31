@@ -1,7 +1,8 @@
 #ifndef _FULLY_CONNECTED_H
 #define  _FULLY_CONNECTED_H
 
-#define MAX(a, b) (a > b ? a : b)
+#include "math.h"
+
 /*
 * src: the 1-d flattened array of all image features
 * dst: the array neurons in the next layer for which we are calculating
@@ -21,10 +22,10 @@ void fully_connected(float *src, float *dst, float *bias, float *weights, int sr
     }
 
     //add in the bias and apply the activation function
-    // will use relu here but could use sigmoid
+    //use sigmoid as the activation function for now
 
     for (int dst_index = 0; dst_index < (dst_size); dst_index++) {
-        dst[dst_index] = MAX(0, dst[dst_index] + bias[dst_index]);
+        dst[dst_index] = 1 / (1 + expf(dst[dst_index] + bias[dst_index]));
     }
 }
 

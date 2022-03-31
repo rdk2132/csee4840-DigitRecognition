@@ -3,14 +3,14 @@ CXX = g++
 INCLUDES =
 CFLAGS = -g -Wall $(INCLUDES)
 CXXFLAGS = -g -Wall $(INCLUDES)
-
+LDFLAGS = -lm
 
 .PHONY: default
 default: FacialRecognition
 
 FacialRecognition: Layers.o
 
-FacialRecognition.o: Layers.h Pool.h
+FacialRecognition.o: Layers.h Pool.h fully_connected.h convolution.h
 
 Layers.o: Layers.h
 
