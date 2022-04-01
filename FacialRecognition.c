@@ -37,11 +37,42 @@ void classify(unsigned char* in_image, struct weights* w) {
   avg_pool(conv2_out, pool2_out, NUM_KERNELS_2 * CONV2_OUT_SIZE, CONV2_OUT_WIDTH);
   fully_connected(pool2_out, classification_vector, fc_bias, w->fc_weights, NUM_KERNELS_2 * CONV2_OUT_SIZE / POOL_SIZE / POOL_SIZE, NUM_CLASSES);
 
+  float max = 0.0;
+  unsigned max_index = 0;
   for (int i = 0; i < NUM_CLASSES; i++) {
     printf("Class %d probability: %f\n", i, classification_vector[i]);
+    if (classification_vector[i] > max) {
+      max = classification_vector[i];
+      max_index = i;
+    }
   }
+  printf("Classified as %u\n", max_index);
+}
+
+void fill(const char* file, float* dst, unsigned size) {
+  FILE* fp = fopen(file, "rb");
+  if (!fp) {
+    fprintf(stderr, "Could not read %s\n", file);
+  }
+  fread(dst, sizeof(float), size, fp);
+  fclose(fp);
 }
 
 int main() {
-    return 0;
+  struct weights wt;
+  fill("conv1_weights.bin", wt.conv1_weights, NUM_KERNELS_1 * CONV_KERNEL_SIZE);
+  fill("conv1_bias.bin", wt.conv1_bias, NUM_KERNELS_1);
+  fill("conv2_weights.bin", wt.conv2_weights, NUM_KERNELS_2 * CONV_KERNEL_SIZE);
+  fill("conv2_bias.bin", wt.conv2_bias, NUM_KERNELS_2 * NUM_KERNELS_1 * CONV_KERNEL_SIZE);
+  fill("fc_weights.bin", wt.fc_weights, NUM_KERNELS_2 * CONV2_OUT_SIZE / POOL_SIZE / POOL_SIZE * NUM_CLASSES);
+#define NUM_IMAGES 100
+  unsigned char in_image[IMAGE_SIZE * NUM_IMAGES] = {0};
+  unsigned char in_labels[NUM_IMAGES];
+  fill("t10k-images-idx3-ubyte", in_image, NUM_IMAGES * IMAGE_SIZE / sizeof(float));
+  fill("t10k-labels-idx1-ubyte", in_labels, NUM_IMAGES / sizeof(float));
+  for (int i = 0; i < NUM_IMAGES; i++) {
+    classify(&(in_image[i * IMAGE_SIZE]), &wt);
+    printf("Actual label: %u\n", in_labels[i]);
+  }
+  return 0;
 }
