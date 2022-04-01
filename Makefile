@@ -1,8 +1,8 @@
 CC = gcc
 CXX = g++
 INCLUDES =
-CFLAGS = -g -Wall $(INCLUDES)
-CXXFLAGS = -g -Wall $(INCLUDES)
+CFLAGS = -g -std=c99 -Wall $(INCLUDES)
+CXXFLAGS = -g -std=c99 -Wall $(INCLUDES)
 LDFLAGS = -lm
 
 .PHONY: default
