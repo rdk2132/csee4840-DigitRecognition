@@ -12,20 +12,23 @@ size 192 and the next layer is 10 this weight vector is of length 1920)
 layer this is of size 10)
 */
 
-
 void fully_connected(float *src, float *dst, float *bias, float *weights, int src_size, int dst_size)
 {
-    for (int src_index = 0; src_index < (src_size); src_index++) { // calculate the neuron vals w/o bias
-        for (int dest_index = 0; dest_index < (dst_size); dest_index++) {
-            dst[dest_index] += weights[(src_index * dst_size) + dest_index] * src[src_index];
+    //TODO: Make the number of in images a parameter instead of a magic number
+    //TODO: Need to transform order of the input data as the weights expect a different order.
+    //TODO: might be somewhat inaccurate due to float type
+    for (int dest_index = 0; dest_index < (dst_size); dest_index++) {
+      for (int image = 0; image < 12; image++) {
+        for (int pos = 0; pos < src_size / 12; pos++) {
+          dst[dest_index] += weights[(pos * (12) + image) * dst_size + dest_index] * src[image * (src_size / 12) + pos];
         }
+      }
     }
 
     //add in the bias and apply the activation function
     //use sigmoid as the activation function for now
-
     for (int dst_index = 0; dst_index < (dst_size); dst_index++) {
-        dst[dst_index] = 1 / (1 + expf(dst[dst_index] + bias[dst_index]));
+        dst[dst_index] = 1 / (1 + expf(-1.0 * dst[dst_index] + bias[dst_index]));
     }
 }
 

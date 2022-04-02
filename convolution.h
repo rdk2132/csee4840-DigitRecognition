@@ -15,28 +15,35 @@
  * src_size: the size of each image from the previous layer C1 = 28 
  *
  */
-void conv_layer(float *src, float *dst, float *bias, float *weights, int num_src, int num_dst, int src_size)
+void conv_layer(float *src, float *dst, float *bias, float *_weights, int num_src, int num_dst, int src_size)
 {
     int dst_size =  src_size - 4;
     int dst_index, src_index;
+
+    //need to transpose the weights, keras puts them in a order that's hard to work with
  
+    float weights[CONV_KERNEL_SIZE * num_src * num_dst];
+    for(int in = 0; in < num_src; in++) {
+      for(int out = 0; out < num_dst; out++) {
+        for (int i = 0; i < CONV_KERNEL_SIZE; i++) {
+          weights[(in * num_dst + out) * CONV_KERNEL_SIZE + i] = _weights[(i * num_dst * num_src) + in * num_dst + out];
+        }
+      }
+    }
     for(int in = 0; in < num_src; in++)
     {
         // The image that will be convolved
-        const float *image = &src[in * src_size];
+        const float *image = &src[in * src_size * src_size];
 
         for(int out = 0; out < num_dst; out++)
         {
             // Pointer to where to store the output image
             float *output = &dst[out * dst_size * dst_size];
 
-            // Bias value for this image
-            float bi = bias[out];
-
             // Weight filter for this image
             // This calculation assumes that the weight vector only contains weights for
             // this specific layer.
-            float *weight = &weights[out *CONV_KERNEL_SIZE];
+            float *weight = &weights[(in * num_dst + out) * CONV_KERNEL_SIZE];
 
             // Matrix dotsum
             for(int i = 2; i < src_size - 2; i++)
@@ -67,13 +74,25 @@ void conv_layer(float *src, float *dst, float *bias, float *weights, int num_src
                         //Row 5
                         image[src_index + 4 * src_size] * weight[20] + image[src_index + 4 * src_size + 1] * weight[21] + image[src_index + 4 * src_size + 2] * weight[22] + 
                         image[src_index + 4 * src_size + 3] * weight[23] + image[src_index + 4 * src_size + 4] * weight[24];
-
-                        // Activation (ReLU function)
-                        // Could also try sigmoid function
-                        output[dst_index] = MAX(0, output[dst_index] + bi);
-
-
                 }
+            }
+        }
+    }
+    for(int out = 0; out < num_dst; out++) {
+        // Pointer to where to store the output image
+        float *output = &dst[out * dst_size * dst_size];
+        // Bias value for this image
+        float bi = bias[out];
+        for(int i = 2; i < src_size - 2; i++)
+        {
+            for(int j = 2; j < src_size - 2; j++)
+            {
+                // Index for output value
+                // Activation (ReLU function)
+                // Could also try sigmoid function
+                //output[dst_index] = MAX(0, output[dst_index] + bi);
+                dst_index = ((i - 2)*dst_size) + j - 2;
+                output[dst_index] = MAX(0, output[dst_index] + bi);
             }
         }
     }

@@ -24,12 +24,17 @@ void classify(unsigned char* in_image, struct weights* w) {
   float pool1_out [NUM_KERNELS_1 * CONV1_OUT_SIZE / POOL_SIZE / POOL_SIZE] = {0};
   float conv2_out [NUM_KERNELS_2 * CONV2_OUT_SIZE] = {0};
   float pool2_out [NUM_KERNELS_2 * CONV2_OUT_SIZE / POOL_SIZE / POOL_SIZE] = {0};
-  float classification_vector[NUM_CLASSES] = {0};
+  float classification_vector[NUM_CLASSES];
+  //not using bias for fc layer
+  float fc_bias [NUM_CLASSES];
+
+  for (int i = 0; i < NUM_CLASSES; i++) {
+    classification_vector[i] = 0.0;
+    fc_bias[i] = 0.0;
+  }
   for (int i = 0; i < IMAGE_SIZE; i++) {
     in_matrix[i] = in_image[i];
   }
-  //not using bias for fc layer
-  float fc_bias [NUM_CLASSES] = {0};
 
   conv_layer(in_matrix, conv1_out, w->conv1_bias, w->conv1_weights, 1, NUM_KERNELS_1, IMAGE_WIDTH);
   avg_pool(conv1_out, pool1_out, NUM_KERNELS_1 * CONV1_OUT_SIZE, CONV1_OUT_WIDTH);
@@ -40,7 +45,7 @@ void classify(unsigned char* in_image, struct weights* w) {
   float max = 0.0;
   unsigned max_index = 0;
   for (int i = 0; i < NUM_CLASSES; i++) {
-    printf("Class %d probability: %f\n", i, classification_vector[i]);
+    //printf("Class %d probability: %f\n", i, classification_vector[i]);
     if (classification_vector[i] > max) {
       max = classification_vector[i];
       max_index = i;
@@ -62,17 +67,19 @@ int main() {
   struct weights wt;
   fill("conv1_weights.bin", wt.conv1_weights, NUM_KERNELS_1 * CONV_KERNEL_SIZE);
   fill("conv1_bias.bin", wt.conv1_bias, NUM_KERNELS_1);
-  fill("conv2_weights.bin", wt.conv2_weights, NUM_KERNELS_2 * CONV_KERNEL_SIZE);
-  fill("conv2_bias.bin", wt.conv2_bias, NUM_KERNELS_2 * NUM_KERNELS_1 * CONV_KERNEL_SIZE);
+  fill("conv2_weights.bin", wt.conv2_weights, NUM_KERNELS_2 * NUM_KERNELS_1 * CONV_KERNEL_SIZE);
+  fill("conv2_bias.bin", wt.conv2_bias, NUM_KERNELS_2);
   fill("fc_weights.bin", wt.fc_weights, NUM_KERNELS_2 * CONV2_OUT_SIZE / POOL_SIZE / POOL_SIZE * NUM_CLASSES);
-#define NUM_IMAGES 100
-  unsigned char in_image[IMAGE_SIZE * NUM_IMAGES] = {0};
-  unsigned char in_labels[NUM_IMAGES];
-  fill("t10k-images-idx3-ubyte", in_image, NUM_IMAGES * IMAGE_SIZE / sizeof(float));
-  fill("t10k-labels-idx1-ubyte", in_labels, NUM_IMAGES / sizeof(float));
+#define NUM_IMAGES 32
+#define IMAGE_METADATA_OFFSET 16
+#define LABEL_METADATA_OFFSET 8
+  unsigned char in_image[IMAGE_SIZE * NUM_IMAGES + IMAGE_METADATA_OFFSET] = {0};
+  unsigned char in_labels[NUM_IMAGES + LABEL_METADATA_OFFSET] = {0};
+  fill("t10k-images-idx3-ubyte", in_image, (NUM_IMAGES * IMAGE_SIZE + IMAGE_METADATA_OFFSET) / sizeof(float));
+  fill("t10k-labels-idx1-ubyte", in_labels, (NUM_IMAGES + LABEL_METADATA_OFFSET) / sizeof(float));
   for (int i = 0; i < NUM_IMAGES; i++) {
-    classify(&(in_image[i * IMAGE_SIZE]), &wt);
-    printf("Actual label: %u\n", in_labels[i]);
+    classify(&(in_image[i * IMAGE_SIZE + IMAGE_METADATA_OFFSET]), &wt);
+    printf("Actual label: %u\n", in_labels[i + LABEL_METADATA_OFFSET]);
   }
   return 0;
 }
