@@ -1,0 +1,21 @@
+The list of corrupted images from the Yale faces extended b cropped images.
+The name of the file corresponds to the type of lightining for the image.
+
+Person11_P00A+050E-40.pgm bad
+Person11_P00A+095E+00.pgm bad
+Person11_P00A-050E-40.pgm bad
+Person11_P00A-110E+15.pgm bad
+Person12_P00A+050E-40.pgm bad
+Person12_P00A+095E+00.pgm bad
+Person12_P00A-050E-40.pgm bad
+Person12_P00A-110E+15.pgm bad
+Person12_P00A-110E-20.pgm bad
+Person13_P00A+050E-40.pgm bad
+Person13_P00A+095E+00.pgm bad
+Person13_P00A-050E-40.pgm bad
+Person13_P00A-110E+15.pgm bad
+Person15_P00A-035E+40.pgm bad
+Person16_P00A+095E+00.pgm bad
+Person16_P00A-010E+00.pgm bad
+Person17_P00A-010E+00.pgm bad
+Person18_P00A-010E+00.pgm bad
