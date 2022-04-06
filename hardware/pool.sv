@@ -12,5 +12,4 @@ module avg2x2
   //logic signed [WORD_SIZE - 1:0] imm;
   //assign imm = (a0 + a1 + b0 + b1);
   //assign poolavg = {imm[WORD_SIZE - 1], 2'b0, imm[WORD_SIZE - 4 : 0]};
-  //
 endmodule
