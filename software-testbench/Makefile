@@ -8,11 +8,10 @@ LDFLAGS = -lm
 .PHONY: default
 default: FacialRecognition
 
-FacialRecognition: Layers.o
+FacialRecognition:
 
-FacialRecognition.o: Layers.h Pool.h fully_connected.h convolution.h
+FacialRecognition.o: Pool.h fully_connected.h convolution.h
 
-Layers.o: Layers.h
 
 .PHONY: clean
 clean:
