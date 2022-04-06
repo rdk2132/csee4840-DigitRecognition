@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "Layers.h"
 #include "Parameters.h"
 #include "Pool.h"
 #include "convolution.h"
@@ -65,18 +64,18 @@ void fill(const char* file, float* dst, unsigned size) {
 
 int main() {
   struct weights wt;
-  fill("./mnist/conv1_weights.bin", wt.conv1_weights, NUM_KERNELS_1 * CONV_KERNEL_SIZE);
-  fill("./mnist/conv1_bias.bin", wt.conv1_bias, NUM_KERNELS_1);
-  fill("./mnist/conv2_weights.bin", wt.conv2_weights, NUM_KERNELS_2 * NUM_KERNELS_1 * CONV_KERNEL_SIZE);
-  fill("./mnist/conv2_bias.bin", wt.conv2_bias, NUM_KERNELS_2);
-  fill("./mnist/fc_weights.bin", wt.fc_weights, NUM_KERNELS_2 * CONV2_OUT_SIZE / POOL_SIZE / POOL_SIZE * NUM_CLASSES);
+  fill("../mnist/conv1_weights.bin", wt.conv1_weights, NUM_KERNELS_1 * CONV_KERNEL_SIZE);
+  fill("../mnist/conv1_bias.bin", wt.conv1_bias, NUM_KERNELS_1);
+  fill("../mnist/conv2_weights.bin", wt.conv2_weights, NUM_KERNELS_2 * NUM_KERNELS_1 * CONV_KERNEL_SIZE);
+  fill("../mnist/conv2_bias.bin", wt.conv2_bias, NUM_KERNELS_2);
+  fill("../mnist/fc_weights.bin", wt.fc_weights, NUM_KERNELS_2 * CONV2_OUT_SIZE / POOL_SIZE / POOL_SIZE * NUM_CLASSES);
 #define NUM_IMAGES 32
 #define IMAGE_METADATA_OFFSET 16
 #define LABEL_METADATA_OFFSET 8
   unsigned char in_image[IMAGE_SIZE * NUM_IMAGES + IMAGE_METADATA_OFFSET] = {0};
   unsigned char in_labels[NUM_IMAGES + LABEL_METADATA_OFFSET] = {0};
-  fill("./mnist/t10k-images-idx3-ubyte", in_image, (NUM_IMAGES * IMAGE_SIZE + IMAGE_METADATA_OFFSET) / sizeof(float));
-  fill("./mnist/t10k-labels-idx1-ubyte", in_labels, (NUM_IMAGES + LABEL_METADATA_OFFSET) / sizeof(float));
+  fill("../mnist/t10k-images-idx3-ubyte", in_image, (NUM_IMAGES * IMAGE_SIZE + IMAGE_METADATA_OFFSET) / sizeof(float));
+  fill("../mnist/t10k-labels-idx1-ubyte", in_labels, (NUM_IMAGES + LABEL_METADATA_OFFSET) / sizeof(float));
   for (int i = 0; i < NUM_IMAGES; i++) {
     classify(&(in_image[i * IMAGE_SIZE + IMAGE_METADATA_OFFSET]), &wt);
     printf("Actual label: %u\n", in_labels[i + LABEL_METADATA_OFFSET]);
