@@ -10,7 +10,7 @@ default: FacialRecognition
 
 FacialRecognition:
 
-FacialRecognition.o: Pool.h fully_connected.h convolution.h
+FacialRecognition.o: Parameters.h Pool.h fully_connected.h convolution.h
 
 
 .PHONY: clean

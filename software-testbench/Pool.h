@@ -63,10 +63,10 @@ void max_pool(fixed_t* in, fixed_t* out) {
 #define POOL_SIZE 2
 
 //Need src_row_size to know where to read information from consecutive rows. Number of channels is not needed
-void avg_pool(float* in, float* out, int src_size, int src_row_size) {
+void avg_pool(fixed_t* in, fixed_t* out, int src_size, int src_row_size) {
   for (int i = 0; i < src_size / src_row_size / POOL_SIZE; i++) {
     for (int j = 0; j < src_row_size / POOL_SIZE; j++) {
-      float sum = 0.0;
+      fixed_t sum = 0;
       for (int k = 0; k < POOL_SIZE; k++) {
         for (int l = 0; l < POOL_SIZE; l++) {
           sum += in[(i * POOL_SIZE + k) * (src_row_size) + j * POOL_SIZE + l];
