@@ -16,7 +16,7 @@
 #define CONV2_OUT_SIZE (CONV2_OUT_WIDTH * CONV2_OUT_WIDTH)
 
 typedef short fixed_t;
-#define FIXED_SCALE_LOG 5
+#define FIXED_SCALE_LOG 4
 #define FIXED_SCALE (1 << FIXED_SCALE_LOG)
 #define FIXED_MIN (fixed_t)(SHRT_MIN)
 #endif
