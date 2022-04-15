@@ -15,21 +15,11 @@
  * src_size: the size of each image from the previous layer C1 = 28 
  *
  */
-void conv_layer(fixed_t *src, fixed_t *dst, fixed_t *bias, fixed_t *_weights, int num_src, int num_dst, int src_size)
+void conv_layer(fixed_t *src, fixed_t *dst, const fixed_t *bias, const fixed_t *weights, int num_src, int num_dst, int src_size)
 {
     int dst_size =  src_size - 4;
     int dst_index, src_index;
 
-    //need to transpose the weights, keras puts them in a order that's hard to work with
- 
-    fixed_t weights[CONV_KERNEL_SIZE * num_src * num_dst];
-    for(int in = 0; in < num_src; in++) {
-      for(int out = 0; out < num_dst; out++) {
-        for (int i = 0; i < CONV_KERNEL_SIZE; i++) {
-          weights[(in * num_dst + out) * CONV_KERNEL_SIZE + i] = _weights[(i * num_dst * num_src) + in * num_dst + out];
-        }
-      }
-    }
     for(int in = 0; in < num_src; in++)
     {
         // The image that will be convolved
@@ -43,7 +33,7 @@ void conv_layer(fixed_t *src, fixed_t *dst, fixed_t *bias, fixed_t *_weights, in
             // Weight filter for this image
             // This calculation assumes that the weight vector only contains weights for
             // this specific layer.
-            fixed_t *weight = &weights[(in * num_dst + out) * CONV_KERNEL_SIZE];
+            const fixed_t *weight = &weights[(in * num_dst + out) * CONV_KERNEL_SIZE];
 
             // Matrix dotsum
             for(int i = 2; i < src_size - 2; i++)
@@ -80,22 +70,16 @@ void conv_layer(fixed_t *src, fixed_t *dst, fixed_t *bias, fixed_t *_weights, in
             }
         }
     }
+
+    //This loop is needed when num_src > 1, since in this case output[dst_index] will be modified several times and we need to do ReLU on the final values
     for(int out = 0; out < num_dst; out++) {
         // Pointer to where to store the output image
         fixed_t *output = &dst[out * dst_size * dst_size];
         // Bias value for this image
         fixed_t bi = bias[out];
-        for(int i = 2; i < src_size - 2; i++)
-        {
-            for(int j = 2; j < src_size - 2; j++)
-            {
-                // Index for output value
-                // Activation (ReLU function)
-                // Could also try sigmoid function
-                //output[dst_index] = MAX(0, output[dst_index] + bi);
-                dst_index = ((i - 2)*dst_size) + j - 2;
-                output[dst_index] = MAX(0, output[dst_index] + bi);
-            }
+        for (int i = 0; i < dst_size * dst_size; i++) {
+            // Activation (ReLU function), easier to implement than sigmoid
+            output[i] = MAX(0, output[i] + bi);
         }
     }
 }

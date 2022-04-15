@@ -12,7 +12,7 @@ size 192 and the next layer is 10 this weight vector is of length 1920)
 layer this is of size 10)
 */
 
-void fully_connected(fixed_t *src, fixed_t *dst, fixed_t *weights, int src_size, int dst_size)
+void fully_connected(fixed_t *src, fixed_t *dst, const fixed_t *weights, int src_size, int dst_size)
 {
     //TODO: Make the number of in images a parameter instead of a magic number
     //TODO: Need to transform order of the input data as the weights expect a different order.

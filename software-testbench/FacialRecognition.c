@@ -47,7 +47,7 @@ unsigned classify(unsigned char* in_image, struct weights* w) {
   return max_index;
 }
 
-void fill(const char* file, float* dst, unsigned size) {
+void fill(const char* file, void* dst, unsigned size) {
   FILE* fp = fopen(file, "rb");
   if (!fp) {
     fprintf(stderr, "Could not read %s\n", file);
@@ -64,25 +64,42 @@ void fill_fixed(const char* file, fixed_t* dst, unsigned size) {
   float imm[size];
   fread(imm, sizeof(float), size, fp);
   fclose(fp);
-  for (int i = 0; i < size; i++) {
+  for (unsigned i = 0; i < size; i++) {
     dst[i] = (fixed_t)roundf(imm[i] * FIXED_SCALE);
   }
 }
 
 int main() {
   struct weights wt;
-  fill_fixed("../mnist/conv1_weights.bin", wt.conv1_weights, NUM_KERNELS_1 * CONV_KERNEL_SIZE);
+  fixed_t conv1_weights[CONV_KERNEL_SIZE * NUM_KERNELS_1];
+  fixed_t conv2_weights[CONV_KERNEL_SIZE * NUM_KERNELS_1 * NUM_KERNELS_2];
+  fill_fixed("../mnist/conv1_weights.bin", conv1_weights, NUM_KERNELS_1 * CONV_KERNEL_SIZE);
   fill_fixed("../mnist/conv1_bias.bin", wt.conv1_bias, NUM_KERNELS_1);
-  fill_fixed("../mnist/conv2_weights.bin", wt.conv2_weights, NUM_KERNELS_2 * NUM_KERNELS_1 * CONV_KERNEL_SIZE);
+  fill_fixed("../mnist/conv2_weights.bin", conv2_weights, NUM_KERNELS_2 * NUM_KERNELS_1 * CONV_KERNEL_SIZE);
   fill_fixed("../mnist/conv2_bias.bin", wt.conv2_bias, NUM_KERNELS_2);
   fill_fixed("../mnist/fc_weights.bin", wt.fc_weights, NUM_KERNELS_2 * CONV2_OUT_SIZE / POOL_SIZE / POOL_SIZE * NUM_CLASSES);
+
+  //need to transpose some weights, keras puts them in a order that's hard to work with
+  for(int out = 0; out < NUM_KERNELS_1; out++) {
+    for (int i = 0; i < CONV_KERNEL_SIZE; i++) {
+      wt.conv1_weights[out * CONV_KERNEL_SIZE + i] = conv1_weights[(i * NUM_KERNELS_1) + out];
+    }
+  }
+  for(int in = 0; in < NUM_KERNELS_1; in++) {
+    for(int out = 0; out < NUM_KERNELS_2; out++) {
+      for (int i = 0; i < CONV_KERNEL_SIZE; i++) {
+        wt.conv2_weights[(in * NUM_KERNELS_2 + out) * CONV_KERNEL_SIZE + i] = conv2_weights[(i * NUM_KERNELS_2 * NUM_KERNELS_1) + in * NUM_KERNELS_2 + out];
+      }
+    }
+  }
+
 #define NUM_IMAGES 32
 #define IMAGE_METADATA_OFFSET 16
 #define LABEL_METADATA_OFFSET 8
   unsigned char in_image[IMAGE_SIZE * NUM_IMAGES + IMAGE_METADATA_OFFSET] = {0};
   unsigned char in_labels[NUM_IMAGES + LABEL_METADATA_OFFSET] = {0};
-  fill("../mnist/t10k-images-idx3-ubyte", in_image, (NUM_IMAGES * IMAGE_SIZE + IMAGE_METADATA_OFFSET) / sizeof(float));
-  fill("../mnist/t10k-labels-idx1-ubyte", in_labels, (NUM_IMAGES + LABEL_METADATA_OFFSET) / sizeof(float));
+  fill("../mnist/t10k-images-idx3-ubyte", (void*)in_image, (NUM_IMAGES * IMAGE_SIZE + IMAGE_METADATA_OFFSET) / sizeof(float));
+  fill("../mnist/t10k-labels-idx1-ubyte", (void*)in_labels, (NUM_IMAGES + LABEL_METADATA_OFFSET) / sizeof(float));
   unsigned correct_classifications = 0;
   for (int i = 0; i < NUM_IMAGES; i++) {
     unsigned prediction = classify(&(in_image[i * IMAGE_SIZE + IMAGE_METADATA_OFFSET]), &wt);
