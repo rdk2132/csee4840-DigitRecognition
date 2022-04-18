@@ -69,6 +69,12 @@ void fill_fixed(const char* file, fixed_t* dst, unsigned size) {
   }
 }
 
+void write_fixed(const char* file, fixed_t* ptr, unsigned count) {
+  FILE* fp = fopen(file, "wb");
+  fwrite(ptr, sizeof(signed short), count, fp);
+  fclose(fp);
+}
+
 int main() {
   struct weights wt;
   fixed_t conv1_weights[CONV_KERNEL_SIZE * NUM_KERNELS_1];
@@ -92,6 +98,15 @@ int main() {
       }
     }
   }
+
+  //Should not be needed as long as weights are stable.
+#if 0
+  write_fixed("../mnist/conv1_weights-16.bin", wt.conv1_weights, NUM_KERNELS_1 * CONV_KERNEL_SIZE);
+  write_fixed("../mnist/conv1_bias-16.bin", wt.conv1_bias, NUM_KERNELS_1);
+  write_fixed("../mnist/conv2_weights-16.bin", wt.conv2_weights, NUM_KERNELS_1 * NUM_KERNELS_2 * CONV_KERNEL_SIZE);
+  write_fixed("../mnist/conv2_bias-16.bin", wt.conv2_bias, NUM_KERNELS_2);
+  write_fixed("../mnist/fc_weights-16.bin", wt.fc_weights, NUM_KERNELS_2 * CONV2_OUT_SIZE / POOL_SIZE / POOL_SIZE * NUM_CLASSES);
+#endif
 
 #define NUM_IMAGES 32
 #define IMAGE_METADATA_OFFSET 16
