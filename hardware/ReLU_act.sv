@@ -1,4 +1,4 @@
-module signmoid_act
+module ReLU_act
     #(parameter WORD_SIZE = 16)
     (input logic signed [WORD_SIZE -1]:0 in
     output logic signed [WORD_SIZE -1]:0 out);
