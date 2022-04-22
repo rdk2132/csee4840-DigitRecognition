@@ -19,4 +19,10 @@ typedef short fixed_t;
 #define FIXED_SCALE_LOG 4
 #define FIXED_SCALE (1 << FIXED_SCALE_LOG)
 #define FIXED_MIN (fixed_t)(SHRT_MIN)
+
+typedef struct {
+  fixed_t in_image[IMAGE_SIZE];
+  fixed_t classification_vector[NUM_CLASSES];
+} cnn_arg_t;
+
 #endif
