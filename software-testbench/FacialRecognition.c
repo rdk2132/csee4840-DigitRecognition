@@ -47,6 +47,26 @@ unsigned classify(unsigned char* in_image, struct weights* w) {
   return max_index;
 }
 
+unsigned classify_fpga(int fpga_fd, unsigned char* in_image) {
+  cnn_arg_t cnn_io;
+  for (int i = 0; i < IMAGE_SIZE; i++) {
+    cnn_io.in_image[i] = ((fixed_t)in_image[i]) * FIXED_SCALE;
+  }
+  ioctl(fpga_fd, CNN_CLASSIFY, cnn_io);
+
+  fixed_t max = FIXED_MIN;
+  unsigned max_index = 0;
+  for (int i = 0; i < NUM_CLASSES; i++) {
+    printf("Class %d probability: %.9g\n", i, 1 / (1 + exp(-1.0 * ((double)cnn_io.classification_vector[i]) / FIXED_SCALE)));
+    if (cnn_io.classification_vector[i] > max) {
+      max = cnn_io.classification_vector[i];
+      max_index = i;
+    }
+  }
+  printf("Classified as %u\n", max_index);
+  return max_index;
+}
+
 void fill(const char* file, void* dst, unsigned size) {
   FILE* fp = fopen(file, "rb");
   if (!fp) {
@@ -76,6 +96,13 @@ void write_fixed(const char* file, fixed_t* ptr, unsigned count) {
 }
 
 int main() {
+#ifdef USE_FPGA
+  int fpga_io = open(CNN_IO_FILE,  O_RDWR);
+  if (fpga_io == -1) {
+    fprintf(stderr, "Could not open CNN I/O file\n");
+  }
+#endif
+
   struct weights wt;
   fixed_t conv1_weights[CONV_KERNEL_SIZE * NUM_KERNELS_1];
   fixed_t conv2_weights[CONV_KERNEL_SIZE * NUM_KERNELS_1 * NUM_KERNELS_2];
@@ -117,10 +144,18 @@ int main() {
   fill("../mnist/t10k-labels-idx1-ubyte", (void*)in_labels, (NUM_IMAGES + LABEL_METADATA_OFFSET) / sizeof(float));
   unsigned correct_classifications = 0;
   for (int i = 0; i < NUM_IMAGES; i++) {
+#ifdef USE_FPGA
+    unsigned prediction = classify_fpga(fpga_io, &(in_image[i * IMAGE_SIZE + IMAGE_METADATA_OFFSET]));
+#else
     unsigned prediction = classify(&(in_image[i * IMAGE_SIZE + IMAGE_METADATA_OFFSET]), &wt);
+#endif
     printf("Actual label: %u\n", in_labels[i + LABEL_METADATA_OFFSET]);
     correct_classifications += (in_labels[i + LABEL_METADATA_OFFSET] == prediction);
   }
   fprintf(stderr, "Correct classifications: %u / %u\n", correct_classifications, NUM_IMAGES);
+
+#ifdef USE_FPGA
+  close(fpga_io);
+#endif
   return 0;
 }

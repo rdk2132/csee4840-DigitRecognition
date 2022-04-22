@@ -1,6 +1,13 @@
 #ifndef PARAMETER_H
 #define PARAMETER_H
 #include <limits.h>
+#include <fcntl.h>
+#include <unistd.h>
+#if defined(__APPLE__) && defined(__MACH__)
+#include <sys/ioctl.h>
+#else
+#include <linux/ioctl.h>
+#endif
 #define FIXED_POINT_SIZE
 #define IMAGE_WIDTH 28
 #define IMAGE_SIZE (IMAGE_WIDTH * IMAGE_WIDTH)
@@ -25,4 +32,7 @@ typedef struct {
   fixed_t classification_vector[NUM_CLASSES];
 } cnn_arg_t;
 
+#define CNN_IO_FILE "/dev/fpga_cnn"
+#define CNN_DRIVER_MAGIC 'c'
+#define CNN_CLASSIFY _IOWR(CNN_DRIVER_MAGIC, 1, cnn_arg_t*)
 #endif
