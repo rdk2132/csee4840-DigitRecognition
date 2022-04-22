@@ -47,12 +47,16 @@ unsigned classify(unsigned char* in_image, struct weights* w) {
   return max_index;
 }
 
+#ifdef USE_FPGA
 unsigned classify_fpga(int fpga_fd, unsigned char* in_image) {
   cnn_arg_t cnn_io;
   for (int i = 0; i < IMAGE_SIZE; i++) {
     cnn_io.in_image[i] = ((fixed_t)in_image[i]) * FIXED_SCALE;
   }
-  ioctl(fpga_fd, CNN_CLASSIFY, cnn_io);
+  if (ioctl(fpga_fd, CNN_CLASSIFY, cnn_io) == -1) {
+    perror("ioctl(CNN_CLASSIFY) failed");
+    return 0;
+  }
 
   fixed_t max = FIXED_MIN;
   unsigned max_index = 0;
@@ -66,6 +70,7 @@ unsigned classify_fpga(int fpga_fd, unsigned char* in_image) {
   printf("Classified as %u\n", max_index);
   return max_index;
 }
+#endif
 
 void fill(const char* file, void* dst, unsigned size) {
   FILE* fp = fopen(file, "rb");
@@ -100,6 +105,7 @@ int main() {
   int fpga_io = open(CNN_IO_FILE,  O_RDWR);
   if (fpga_io == -1) {
     fprintf(stderr, "Could not open CNN I/O file\n");
+    return EXIT_FAILURE;
   }
 #endif
 
