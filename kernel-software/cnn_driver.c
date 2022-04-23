@@ -20,6 +20,11 @@
 #include "software-testbench/Parameters.h"
 
 #define DRIVER_NAME "cnn_fpga"
+#define CONTROL_OUT_REG(x) (x)
+#define CONTROL_IN_REG(x) ((x) + 2)
+#define INPUT_REG(x) ((x) + 4)
+#define OUTPUT_BASE_REG(x) ((x) + 6)
+#define WRITE_READY(x) (x & 0x1000)
 
 struct cnn_dev {
     struct resource res; // Registers
@@ -27,15 +32,61 @@ struct cnn_dev {
     cnn_arg_t data;
 } dev;
 
-static void send_image(cnn_arg_t cnn_data)
+static fixed_t *read_output(fixed_t *vector)
+{
+    //TODO: Check to ensure that the hardware has finished calculations
+    // read the data from 
+    int addr = OUTPUT_BASE_REG(dev.virtbase);
+
+    for (int i = 0; i < NUM_CLASSES; i++)
+    {
+        vector[i] = ioread16((void *)addr);
+        addr += 2;
+    }
+}
+
+static void send_image(fixed_t *image)
 {
     //TODO: Extract data from struct and send to fpga
     // after each send wait to read ack from fpga
+    fixed_t
+
+    for (int i = 0; i < IMAGE_SIZE; i++)
+    {
+        iowrite16(image[i], INPUT_REG(dev.virtbase));
+
+        // WAIT FOR HANDSHAKE
+        while (!WRITE_READY(ioread16(CONTROL_IN_REG(dev.virtbase))))
+            ;
+        
+    }
+    
 }
 
 static long cnn_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
 {
     //TODO: One function uses CNN_CLASSIFY
+    cnn_arg_t in_data;
+
+    switch (cmd)
+    {
+    case CNN_CLASSIFY:
+        if (copy_from_user(&in_data, (cnn_arg_t *)arg, sizeof(cnn_arg_t)))
+            return -EACCES;
+        send_image(in_data.in_image);
+
+        // control stuff
+
+        in_data.classification_vector = read_output();
+        if (copy_to_user((cnn_arg_t *)arg, &in_data, sizeof(cnn_arg_t)))
+            return -EACCES;
+        break;
+    
+    default:
+        break;
+    }
+    
+
 }
 
 static const struct file_operations cnn_fops = {
