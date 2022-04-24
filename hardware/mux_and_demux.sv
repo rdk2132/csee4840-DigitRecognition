@@ -16,6 +16,18 @@ module mux4to1 (input logic [15:0] data_in_0, data_in_1, data_in_2, data_in_3
     end
 endmodule
 
+module mux2to1 (input logic [15:0] data_in_0, data_in_1
+                input logic sel
+                output logic [15:0] data_out);
+    alway_comb begin
+        case (sel)
+            1'd0: data_out = data_in_0;
+            1'd1: data_out = data_in_1;
+            default: data_out = 16'b0000000000000000
+        endcase
+    end
+endmodule
+
 //1to4 demux
 module demux1to4 (input logic [15:0] data_in
                   input logic [1:0] sel
@@ -28,6 +40,19 @@ module demux1to4 (input logic [15:0] data_in
             2'd2: data_out_2 = data_in;
             2'd3: data_out_3 = data_in;
             default: data_out_0 = data_out_1 = data_out_2 = data_out_3 = 16'b0000000000000000;
+        endcase
+    end
+endmodule
+
+module demux1to2 (input logic [15:0] data_in
+                  input logic sel
+                  output logic [15:0] data_out_0, data_out_1;
+
+    always_comb begin
+        case (sel)
+            2'd0: data_out_0 = data_in;
+            2'd1: data_out_1 = data_in;
+            default: data_out_0 = data_out_1 = 16'b0000000000000000;
         endcase
     end
 endmodule
