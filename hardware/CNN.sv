@@ -18,7 +18,6 @@ module CNN( input logic clk, load, start
     mac MAC();
 
     always_ff @(posedge clk) begin
-        //my money dont jiggle jiggle, it folds
-        //I'd like to see you wiggle wiggle, fo sho
+        
 
     end
