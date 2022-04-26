@@ -4,7 +4,7 @@
 // MODULE: altsyncram 
 
 // ============================================================
-// File Name: conv1_k_g3_mem.v
+// File Name: conv1_k_g0_mem.v
 // Megafunction Name(s):
 // 			altsyncram
 //
@@ -37,7 +37,7 @@
 // synopsys translate_off
 `timescale 1 ps / 1 ps
 // synopsys translate_on
-module conv1_k_g3_mem (
+module conv1_k_g0_mem (
 	address_a,
 	address_b,
 	clock,
@@ -105,7 +105,7 @@ module conv1_k_g3_mem (
 		altsyncram_component.clock_enable_output_a = "BYPASS",
 		altsyncram_component.clock_enable_output_b = "BYPASS",
 		altsyncram_component.indata_reg_b = "CLOCK0",
-		altsyncram_component.init_file = "init/conv1_k_g3.mif",
+		altsyncram_component.init_file = "init/conv1_k_g0.mif",
 		altsyncram_component.intended_device_family = "Cyclone V",
 		altsyncram_component.lpm_type = "altsyncram",
 		altsyncram_component.numwords_a = 50,
@@ -163,7 +163,7 @@ endmodule
 // Retrieval info: PRIVATE: MAXIMUM_DEPTH NUMERIC "0"
 // Retrieval info: PRIVATE: MEMSIZE NUMERIC "800"
 // Retrieval info: PRIVATE: MEM_IN_BITS NUMERIC "0"
-// Retrieval info: PRIVATE: MIFfilename STRING "init/conv1_k_g3.mif"
+// Retrieval info: PRIVATE: MIFfilename STRING "init/conv1_k_g0.mif"
 // Retrieval info: PRIVATE: OPERATION_MODE NUMERIC "3"
 // Retrieval info: PRIVATE: OUTDATA_ACLR_B NUMERIC "0"
 // Retrieval info: PRIVATE: OUTDATA_REG_B NUMERIC "1"
@@ -195,7 +195,7 @@ endmodule
 // Retrieval info: CONSTANT: CLOCK_ENABLE_OUTPUT_A STRING "BYPASS"
 // Retrieval info: CONSTANT: CLOCK_ENABLE_OUTPUT_B STRING "BYPASS"
 // Retrieval info: CONSTANT: INDATA_REG_B STRING "CLOCK0"
-// Retrieval info: CONSTANT: INIT_FILE STRING "init/conv1_k_g3.mif"
+// Retrieval info: CONSTANT: INIT_FILE STRING "init/conv1_k_g0.mif"
 // Retrieval info: CONSTANT: INTENDED_DEVICE_FAMILY STRING "Cyclone V"
 // Retrieval info: CONSTANT: LPM_TYPE STRING "altsyncram"
 // Retrieval info: CONSTANT: NUMWORDS_A NUMERIC "50"
@@ -232,9 +232,9 @@ endmodule
 // Retrieval info: CONNECT: @wren_b 0 0 0 0 GND 0 0 0 0
 // Retrieval info: CONNECT: q_a 0 0 16 0 @q_a 0 0 16 0
 // Retrieval info: CONNECT: q_b 0 0 16 0 @q_b 0 0 16 0
-// Retrieval info: GEN_FILE: TYPE_NORMAL conv1_k_g3_mem.v TRUE
-// Retrieval info: GEN_FILE: TYPE_NORMAL conv1_k_g3_mem.inc FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL conv1_k_g3_mem.cmp FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL conv1_k_g3_mem.bsf FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL conv1_k_g3_mem_inst.v FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL conv1_k_g3_mem_bb.v TRUE
+// Retrieval info: GEN_FILE: TYPE_NORMAL conv1_k_g0_mem.v TRUE
+// Retrieval info: GEN_FILE: TYPE_NORMAL conv1_k_g0_mem.inc FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL conv1_k_g0_mem.cmp FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL conv1_k_g0_mem.bsf FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL conv1_k_g0_mem_inst.v FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL conv1_k_g0_mem_bb.v TRUE
