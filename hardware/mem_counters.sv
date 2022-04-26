@@ -30,7 +30,7 @@ module conv1_k_mem_counter (input logic clk, start,
 endmodule
 
 // counter/addresser for Convolution 1 layer output memory
-module c1O_mem_counter (input logic clk, start
+module conv1_mem_counter (input logic clk, start
                         output logic [9:0] addr1, addr2
                         output logic done);
 
@@ -54,7 +54,7 @@ module P1_mem_counter (input logic clk, start
 endmodule
 
 // counter/addresser for Convolution 2 layer weight memory
-module c2W_mem_counter (input logic clk, start
+module conv2_k_mem_counter (input logic clk, start
                         output logic [4:0] addr1, addr2
                         output logic done);
 
@@ -67,7 +67,7 @@ module c2W_mem_counter (input logic clk, start
 endmodule
 
 // counter/addresser for Convolution 2 layer output memory
-module c2O_mem_counter (input logic clk, start
+module conv2_mem_counter (input logic clk, start
                         output logic [6:0] addr1, addr2
                         output logic done);
 
@@ -92,7 +92,7 @@ module P2_mem_counter (input logic clk, start
 endmodule
 
 // counter/addresser for Fully connected layer weight memory (Might need serious thought)
-module FCW_mem_counter (input logic clk, start, 
+module fc_mem_counter (input logic clk, start, 
                         output reg [8:0] addr1 = 9'b000000000, 
                         output reg [8:0] addr2 = 9'b011000000, 
                         output logic done);
