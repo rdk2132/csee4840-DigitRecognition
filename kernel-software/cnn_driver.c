@@ -17,7 +17,7 @@
 #include <linux/fs.h>
 #include <linux/uaccess.h>
 
-#include "software-testbench/Parameters.h"
+#include "Parameters.h"
 
 #define DRIVER_NAME "cnn_fpga"
 #define CONTROL_OUT_REG(x) (x)
@@ -32,7 +32,7 @@ struct cnn_dev {
     cnn_arg_t data;
 } dev;
 
-static fixed_t *read_output(fixed_t *vector)
+static void read_output(fixed_t *vector)
 {
     //TODO: Check to ensure that the hardware has finished calculations
     // read the data from 
@@ -42,7 +42,7 @@ static fixed_t *read_output(fixed_t *vector)
     {
         vector[i] = ioread16((void *)addr);
         addr += 2;
-    }
+    }    
 }
 
 static void send_image(fixed_t *image)

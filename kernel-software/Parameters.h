@@ -1,9 +1,6 @@
 #ifndef PARAMETER_H
 #define PARAMETER_H
 
-#include <limits.h>
-#include <fcntl.h>
-#include <unistd.h>
 #if defined(__APPLE__) && defined(__MACH__)
 #include <sys/ioctl.h>
 #else
