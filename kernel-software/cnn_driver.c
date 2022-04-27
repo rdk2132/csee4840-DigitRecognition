@@ -36,23 +36,19 @@ static void read_output(fixed_t *vector)
 {
     //TODO: Check to ensure that the hardware has finished calculations
     // read the data from 
-    int addr = OUTPUT_BASE_REG(dev.virtbase);
-    int i = 0;
+    int i;
 
-    for (i < NUM_CLASSES; i++)
-    {
-        vector[i] = ioread16((void *)addr);
-        addr += 2;
-    }    
+    for (i = 0; i < NUM_CLASSES; i++)
+        vector[i] = ioread16(OUTPUT_BASE_REG(dev.virtbase) + (2 * i));
 }
 
 static void send_image(fixed_t *image)
 {
     //TODO: Extract data from struct and send to fpga
     // after each send wait to read ack from fpga
-    int i = 0;
+    int i;
 
-    for (i < IMAGE_SIZE; i++)
+    for (i = 0; i < IMAGE_SIZE; i++)
     {
         iowrite16(image[i], INPUT_REG(dev.virtbase));
 
@@ -78,7 +74,7 @@ static long cnn_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
 
         // control stuff
 
-        in_data.classification_vector = read_output(in_data.classification_vector);
+        read_output(in_data.classification_vector);
         if (copy_to_user((cnn_arg_t *)arg, &in_data, sizeof(cnn_arg_t)))
             return -EACCES;
         break;
