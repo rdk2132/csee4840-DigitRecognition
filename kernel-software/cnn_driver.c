@@ -80,10 +80,10 @@ static long cnn_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
         break;
     
     default:
-        break;
+        return -EINVAL;
     }
     
-
+    return 0;
 }
 
 static const struct file_operations cnn_fops = {
@@ -155,7 +155,7 @@ static struct platform_driver cnn_driver = {
     .remove = __exit_p(cnn_remove),
 };
 
-static void __init cnn_driver_init(void)
+static int __init cnn_driver_init(void)
 {
     pr_info(DRIVER_NAME ": init\n");
     return platform_driver_probe(&cnn_driver, cnn_probe);
@@ -168,7 +168,7 @@ static void __exit cnn_driver_exit(void)
 }
 
 module_init(cnn_driver_init);
-moodule_exit(cnn_driver_exit);
+module_exit(cnn_driver_exit);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Liam Bishop");
