@@ -37,8 +37,9 @@ static void read_output(fixed_t *vector)
     //TODO: Check to ensure that the hardware has finished calculations
     // read the data from 
     int addr = OUTPUT_BASE_REG(dev.virtbase);
+    int i = 0;
 
-    for (int i = 0; i < NUM_CLASSES; i++)
+    for (i < NUM_CLASSES; i++)
     {
         vector[i] = ioread16((void *)addr);
         addr += 2;
@@ -49,9 +50,9 @@ static void send_image(fixed_t *image)
 {
     //TODO: Extract data from struct and send to fpga
     // after each send wait to read ack from fpga
-    fixed_t
+    int i = 0;
 
-    for (int i = 0; i < IMAGE_SIZE; i++)
+    for (i < IMAGE_SIZE; i++)
     {
         iowrite16(image[i], INPUT_REG(dev.virtbase));
 
@@ -77,7 +78,7 @@ static long cnn_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
 
         // control stuff
 
-        in_data.classification_vector = read_output();
+        in_data.classification_vector = read_output(in_data.classification_vector);
         if (copy_to_user((cnn_arg_t *)arg, &in_data, sizeof(cnn_arg_t)))
             return -EACCES;
         break;
@@ -161,10 +162,12 @@ static struct platform_driver cnn_driver = {
 static void __init cnn_driver_init(void)
 {
     pr_info(DRIVER_NAME ": init\n");
+    return platform_driver_probe(&cnn_driver, cnn_probe);
 }
 
 static void __exit cnn_driver_exit(void)
 {
+    platform_driver_unregister(&cnn_driver);
     pr_info(DRIVER_NAME ": exit\n");
 }
 
