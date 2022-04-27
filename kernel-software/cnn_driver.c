@@ -17,7 +17,7 @@
 #include <linux/fs.h>
 #include <linux/uaccess.h>
 
-#include "software-testbench/Parameters.h"
+#include "Parameters.h"
 
 #define DRIVER_NAME "cnn_fpga"
 #define CONTROL_OUT_REG(x) (x)
@@ -32,26 +32,23 @@ struct cnn_dev {
     cnn_arg_t data;
 } dev;
 
-static fixed_t *read_output(fixed_t *vector)
+static void read_output(fixed_t *vector)
 {
     //TODO: Check to ensure that the hardware has finished calculations
     // read the data from 
-    int addr = OUTPUT_BASE_REG(dev.virtbase);
+    int i;
 
-    for (int i = 0; i < NUM_CLASSES; i++)
-    {
-        vector[i] = ioread16((void *)addr);
-        addr += 2;
-    }
+    for (i = 0; i < NUM_CLASSES; i++)
+        vector[i] = ioread16(OUTPUT_BASE_REG(dev.virtbase) + (2 * i));
 }
 
 static void send_image(fixed_t *image)
 {
     //TODO: Extract data from struct and send to fpga
     // after each send wait to read ack from fpga
-    fixed_t
+    int i;
 
-    for (int i = 0; i < IMAGE_SIZE; i++)
+    for (i = 0; i < IMAGE_SIZE; i++)
     {
         iowrite16(image[i], INPUT_REG(dev.virtbase));
 
@@ -77,16 +74,16 @@ static long cnn_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
 
         // control stuff
 
-        in_data.classification_vector = read_output();
+        read_output(in_data.classification_vector);
         if (copy_to_user((cnn_arg_t *)arg, &in_data, sizeof(cnn_arg_t)))
             return -EACCES;
         break;
     
     default:
-        break;
+        return -EINVAL;
     }
     
-
+    return 0;
 }
 
 static const struct file_operations cnn_fops = {
@@ -158,18 +155,20 @@ static struct platform_driver cnn_driver = {
     .remove = __exit_p(cnn_remove),
 };
 
-static void __init cnn_driver_init(void)
+static int __init cnn_driver_init(void)
 {
     pr_info(DRIVER_NAME ": init\n");
+    return platform_driver_probe(&cnn_driver, cnn_probe);
 }
 
 static void __exit cnn_driver_exit(void)
 {
+    platform_driver_unregister(&cnn_driver);
     pr_info(DRIVER_NAME ": exit\n");
 }
 
 module_init(cnn_driver_init);
-moodule_exit(cnn_driver_exit);
+module_exit(cnn_driver_exit);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Liam Bishop");

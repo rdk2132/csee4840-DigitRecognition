@@ -2,7 +2,7 @@
  * Tester for device driver for cnn
  */
 
-#include "/software-testbench/Parameters.h"
+#include "../software-testbench/Parameters.h"
 
 int cnn_fd;
 
