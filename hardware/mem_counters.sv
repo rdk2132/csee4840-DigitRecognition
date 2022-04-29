@@ -117,8 +117,7 @@ module conv1_mem_read (input logic clk, reset, enable,
                         output reg [9:0] addr0, addr1, addr2, addr3, 
                         output logic done);
 
-    reg [3:0] row, count;
-
+    reg [3:0] count;
     always_ff @(posedge clk or posedge reset) begin
         if (reset == 1'b1) begin
             addr0 <= 10'b0000000000;
@@ -128,17 +127,22 @@ module conv1_mem_read (input logic clk, reset, enable,
             row <= 4'b0000;
             count <= 4'b0000;
         end
-        wire [9:0] intermed;
+        
         else if (enable == 1'b1 && done == 1'b0) begin
             if(count == 4'b1100) begin
-                row <= row + 1;
                 count <= 4'b0000;
+                addr0 <= addr0 + 26;
+                addr1 <= addr1 + 26;
+                addr2 <= addr2 + 26;
+                addr3 <= addr3 + 26;
             end
-            addr0 <= addr0 + 2 + intermed;
-            addr1 <= addr1 + 2 + intermed;
-            addr2 <= addr2 + 2 + intermed;
-            addr3 <= addr3 + 2 + intermed;
-            count <= count + 1;
+            else begin    
+                addr0 <= addr0 + 2;
+                addr1 <= addr1 + 2;
+                addr2 <= addr2 + 2;
+                addr3 <= addr3 + 2;
+                count <= count + 1;
+            end
         end
     end
     
