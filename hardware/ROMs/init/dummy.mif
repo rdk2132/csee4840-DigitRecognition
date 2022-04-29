@@ -1,7 +1,7 @@
 --dummy file used to create ROMs without knowing the contents yet
 
 WIDTH=16;
-DEPTH=75;
+DEPTH=150;
 
 ADDRESS_RADIX=HEX;
 DATA_RADIX=HEX;

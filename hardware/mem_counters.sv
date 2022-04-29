@@ -21,11 +21,11 @@ module img_mem_write (input logic clk, reset, enable, next,
         if (reset == 1'b1) begin
             addr0 <= 10'b0000000000;
         end
-        else if (enable == 1'b1 & done == 1'b0) begin
+        else if (enable == 1'b1 && done == 1'b0) begin
             addr0 <= addr0 + 1;
             ack <= 1'b1;
         end
-        else if(next == 1'b1 & ack == 1'b1) begin
+        else if(next == 1'b1 && ack == 1'b1) begin
             ack <= 1'b0;
     end
 
@@ -51,7 +51,7 @@ module img_mem_read (input logic clk, reset, enable,
             addr2 <= 10'b0101010000;
             addr3 <= 10'b0111111000;
         end
-        else if (enable == 1'b1 & done == 1'b0) begin
+        else if (enable == 1'b1 && done == 1'b0) begin
 
         end
     end
@@ -74,7 +74,7 @@ module conv1_k_mem_read (input logic clk, reset, enable,
             addr0 <= 6'b000000;
             addr1 <= 6'b011001;
         end
-        else if (enable == 1'b1 & done == 1'b0) begin
+        else if (enable == 1'b1 && done == 1'b0) begin
             addr0 <= addr1 + 1;
             addr1 <= addr2 + 1;
         end
@@ -98,7 +98,7 @@ module conv1_mem_write (input logic clk, reset, enable,
             addr0 <= 10'b0000000000;
             addr1 <= 10'b0010010000;
         end
-        else if (enable == 1'b1 & done == 1'b0) begin
+        else if (enable == 1'b1 && done == 1'b0) begin
             addr0 <= addr0 + 1;
             addr1 <= addr1 + 1;
         end
@@ -129,7 +129,7 @@ module conv1_mem_read (input logic clk, reset, enable,
             count <= 4'b0000;
         end
         wire [9:0] intermed;
-        else if (enable == 1'b1 & done == 1'b0) begin
+        else if (enable == 1'b1 && done == 1'b0) begin
             if(count == 4'b1100) begin
                 row <= row + 1;
                 count <= 4'b0000;
@@ -161,7 +161,7 @@ module P1_mem_write (input logic clk, reset, enable,
             addr0 <= 8'b00000000;
             addr1 <= 8'b00000001;
         end
-        else if (enable == 1'b1 & done == 1'b0) begin
+        else if (enable == 1'b1 && done == 1'b0) begin
             addr0 <= addr0 + 2;
             addr1 <= addr1 + 2;
         end
@@ -185,7 +185,7 @@ module P1_mem_read (input logic clk, reset, enable,
             addr0 <=;
             addr1 <=;
         end
-        else if (enable == 1'b1 & done == 1'b0) begin
+        else if (enable == 1'b1 && done == 1'b0) begin
 
         end
     end
@@ -209,7 +209,7 @@ module conv2_k_mem_read (input logic clk, reset, enable,
             addr0 <=;
             addr1 <=;
         end
-        else if (enable == 1'b1 & done == 1'b0) begin
+        else if (enable == 1'b1 && done == 1'b0) begin
 
         end
     end
@@ -232,7 +232,7 @@ module conv2_mem_write (input logic clk, reset, enable,
             addr0 <=;
             addr1 <=;
         end
-        else if (enable == 1'b1 & done == 1'b0) begin
+        else if (enable == 1'b1 && done == 1'b0) begin
 
         end
     end
@@ -255,7 +255,7 @@ module conv2_mem_read (input logic clk, reset, enable,
             addr0 <=;
             addr1 <=;
         end
-        else if (enable == 1'b1 & done == 1'b0) begin
+        else if (enable == 1'b1 && done == 1'b0) begin
 
         end
     end
@@ -278,7 +278,7 @@ module P2_mem_write (input logic clk, reset, enable,
             addr0 <=;
             addr1 <=;
         end
-        else if (enable == 1'b1 & done == 1'b0) begin
+        else if (enable == 1'b1 && done == 1'b0) begin
 
         end
     end
@@ -301,7 +301,7 @@ module P2_mem_read (input logic clk, reset, enable,
             addr0 <=;
             addr1 <=;
         end
-        else if (enable == 1'b1 & done == 1'b0) begin
+        else if (enable == 1'b1 && done == 1'b0) begin
 
         end
     end
@@ -324,7 +324,7 @@ module fc_mem_read (input logic clk, reset, enable,
             addr0 <= 9'b000000000;
             addr1 <= 9'b011000000;
         end
-        else if (enable == 1'b1 & done == 1'b0) begin
+        else if (enable == 1'b1 && done == 1'b0) begin
             addr0 <= addr0 + 1;
             addr1 <= addr1 + 1;
         end
