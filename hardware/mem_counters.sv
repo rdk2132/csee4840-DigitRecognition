@@ -27,6 +27,7 @@ module img_mem_write (input logic clk, reset, enable, next,
         end
         else if(next == 1'b1 && ack == 1'b1) begin
             ack <= 1'b0;
+        end
     end
 
     always_comb begin
@@ -57,7 +58,7 @@ module img_mem_read (input logic clk, reset, enable,
     end
 
     always_comb begin
-        if(addr3 == == 10'b1100010000) begin
+        if(addr3 == 10'b1100010000) begin
             done = 1'b1;
         end
     end
@@ -124,7 +125,6 @@ module conv1_mem_read (input logic clk, reset, enable,
             addr1 <= 10'b0000000001;
             addr2 <= 10'b0000011000;
             addr3 <= 10'b0000011001;
-            row <= 4'b0000;
             count <= 4'b0000;
         end
         
@@ -147,17 +147,17 @@ module conv1_mem_read (input logic clk, reset, enable,
     end
     
     always_comb begin
-        if(addr3 == 10'b1001000000) begin
+        //stop when addr3 == 24^2 - 1, i.e. we have processed the entire image
+        if(addr3 == 10'b1000111111) begin
             done = 1'b1;
         end
-        intermed = row * 24;
     end
 
 endmodule
 
 // counter/addresser for pooling 1 layer output memory write (done)
 module P1_mem_write (input logic clk, reset, enable,
-                        output reg [7:0] addr0, addr1
+                        output reg [7:0] addr0, addr1,
                         output logic done);
 
     always_ff @(posedge clk or posedge reset) begin
@@ -172,7 +172,8 @@ module P1_mem_write (input logic clk, reset, enable,
     end
     
     always_comb begin
-        if(addr1 == 8'b10010000) begin
+        //stop when addr1 == 12^2 - 1, i.e. we have processed the entire image
+        if(addr1 == 8'b10001111) begin
             done = 1'b1;
         end
     end
@@ -181,7 +182,7 @@ endmodule
 
 // counter/addresser for pooling 1 layer output memory read
 module P1_mem_read (input logic clk, reset, enable,
-                        output reg [7:0] addr0, addr1
+                        output reg [7:0] addr0, addr1,
                         output logic done);
 
     always_ff @(posedge clk or posedge reset) begin
@@ -249,46 +250,67 @@ module conv2_mem_write (input logic clk, reset, enable,
 
 endmodule
 
-// counter/addresser for Convolution 2 layer output memory read
+// counter/addresser for Convolution 2 layer output memory read (done)
 module conv2_mem_read (input logic clk, reset, enable,
-                       output reg [6:0] addr0, addr1
-                       output logic done);
+                        output reg [5:0] addr0, addr1, addr2, addr3,
+                        output logic done);
 
+    reg [2:0] count;
     always_ff @(posedge clk or posedge reset) begin
         if (reset == 1'b1) begin
-            addr0 <=;
-            addr1 <=;
+            addr0 <= 6'b000000;
+            addr1 <= 6'b000001;
+            addr2 <= 6'b001000;
+            addr3 <= 6'b001001;
+            count <= 3'b000;
         end
-        else if (enable == 1'b1 && done == 1'b0) begin
 
+        else if (enable == 1'b1 && done == 1'b0) begin
+            if(count == 3'b100) begin
+                count <= 3'b000;
+                addr0 <= addr0 + 10;
+                addr1 <= addr1 + 10;
+                addr2 <= addr2 + 10;
+                addr3 <= addr3 + 10;
+            end
+            else begin
+                addr0 <= addr0 + 2;
+                addr1 <= addr1 + 2;
+                addr2 <= addr2 + 2;
+                addr3 <= addr3 + 2;
+                count <= count + 1;
+            end
         end
     end
     
     always_comb begin
-        if() begin
+        //stop when addr3 == 8^2 - 1, i.e. we have processed the entire image
+        if(addr3 == 6'b111111) begin
             done = 1'b1;
         end
     end
 
 endmodule
 
-// counter/addresser for pooling 2 layer output memory write
+// counter/addresser for pooling 2 layer output memory write (done)
 module P2_mem_write (input logic clk, reset, enable,
-                        output reg [4:0] addr0, addr1, addr2, addr3,
+                        output reg [3:0] addr0, addr1,
                         output logic done);
 
     always_ff @(posedge clk or posedge reset) begin
         if (reset == 1'b1) begin
-            addr0 <=;
-            addr1 <=;
+            addr0 <= 4'b0000;
+            addr1 <= 4'b0001;
         end
         else if (enable == 1'b1 && done == 1'b0) begin
-
+            addr0 <= addr0 + 2;
+            addr1 <= addr1 + 2;
         end
     end
     
     always_comb begin
-        if() begin
+        //stop when addr1 == 4^2 - 1, i.e. we have processed the entire image
+        if(addr1 == 4'b1111) begin
             done = 1'b1;
         end
     end
