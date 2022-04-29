@@ -23,7 +23,7 @@
 #define CONTROL_OUT_REG(x) (x)
 #define CONTROL_IN_REG(x) ((x) + 2)
 #define INPUT_REG(x) ((x) + 4)
-#define OUTPUT_BASE_REG(x) ((x) + 6)
+#define OUTPUT_REG(x) ((x) + 6)
 #define WRITE_READY(x) (x & 0x1000)
 
 struct cnn_dev {
@@ -39,7 +39,7 @@ static void read_output(fixed_t *vector)
     int i;
 
     for (i = 0; i < NUM_CLASSES; i++)
-        vector[i] = ioread16(OUTPUT_BASE_REG(dev.virtbase) + (2 * i));
+        vector[i] = ioread16(OUTPUT_REG(dev.virtbase));
 }
 
 static void send_image(fixed_t *image)
@@ -49,14 +49,7 @@ static void send_image(fixed_t *image)
     int i;
 
     for (i = 0; i < IMAGE_SIZE; i++)
-    {
         iowrite16(image[i], INPUT_REG(dev.virtbase));
-
-        // WAIT FOR HANDSHAKE
-        while (!WRITE_READY(ioread16(CONTROL_IN_REG(dev.virtbase))))
-            ;
-        
-    }
     
 }
 
@@ -171,5 +164,5 @@ module_init(cnn_driver_init);
 module_exit(cnn_driver_exit);
 
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Liam Bishop");
+MODULE_AUTHOR("Liam Bishop and Ryan Kennedy");
 MODULE_DESCRIPTION("CNN driver for fpga");
