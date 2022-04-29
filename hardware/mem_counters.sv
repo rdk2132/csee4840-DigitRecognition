@@ -128,15 +128,16 @@ module conv1_mem_read (input logic clk, reset, enable,
             row <= 4'b0000;
             count <= 4'b0000;
         end
+        wire [9:0] intermed;
         else if (enable == 1'b1 & done == 1'b0) begin
             if(count == 4'b1100) begin
                 row <= row + 1;
                 count <= 4'b0000;
             end
-            addr0 <= addr0 + 2 + (row * 24);
-            addr1 <= addr1 + 2 + (row * 24);
-            addr2 <= addr2 + 2 + (row * 24);
-            addr3 <= addr3 + 2 + (row * 24);
+            addr0 <= addr0 + 2 + intermed;
+            addr1 <= addr1 + 2 + intermed;
+            addr2 <= addr2 + 2 + intermed;
+            addr3 <= addr3 + 2 + intermed;
             count <= count + 1;
         end
     end
@@ -145,6 +146,7 @@ module conv1_mem_read (input logic clk, reset, enable,
         if(addr3 == 10'b1001000000) begin
             done = 1'b1;
         end
+        intermed = row * 24;
     end
 
 endmodule
