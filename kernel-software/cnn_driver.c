@@ -17,7 +17,7 @@
 #include <linux/fs.h>
 #include <linux/uaccess.h>
 
-#include "Parameters.h"
+#include "../software-testbench/Parameters.h"
 
 #define DRIVER_NAME "cnn_fpga"
 #define CONTROL_OUT_REG(x) (x)

@@ -3,6 +3,7 @@
  */
 
 #include "../software-testbench/Parameters.h"
+#include <stdio.h>
 
 int cnn_fd;
 
@@ -17,9 +18,10 @@ int main()
 
     printf("Starting device driver test\n");
 
-    if (cnn_fd = open(filename, O_RDWR) == -1) {
+    if ((cnn_fd = open(filename, O_RDWR)) == -1) {
         fprintf(stderr, "Could not open %s\n", filename);
         return -1;
     }
 
+    return 0;
 }
