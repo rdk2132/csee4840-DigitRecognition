@@ -38,7 +38,7 @@ module img_mem_write (input logic clk, reset, enable, next,
 
 endmodule
 
-//img_mem_read is responsible for one output image and uses four output addresses in parallel. Each processes a quarter of the image, the offset between addresses is 28 * 24 / 4 = 168
+//img_mem_read is responsible for one conv1 output image and uses four output addresses in parallel. Each processes a quarter of the image, the offset between addresses is 28 * 24 / 4 = 168
 // counter/addresser for input image memory read
 module img_mem_read (input logic clk, reset, enable,
                      output reg [9:0] addr0, addr1, addr2, addr3, 
@@ -221,23 +221,57 @@ module P1_mem_write (input logic clk, reset, enable,
 
 endmodule
 
+//P1_mem_read is responsible for one conv2 output image and uses two output addresses in parallel. Each processes half of the image, the offset between addresses is 12 * 8 / 2 = 48
 // counter/addresser for pooling 1 layer output memory read
 module P1_mem_read (input logic clk, reset, enable,
                         output reg [7:0] addr0, addr1,
                         output logic done);
+    //kernel row and column count
+    logic [2:0] rowcount, columncount;
+    //counter for position within image row
+    logic [2:0] i_count;
 
     always_ff @(posedge clk or posedge reset) begin
         if (reset == 1'b1) begin
-            addr0 <=;
-            addr1 <=;
+            addr0 <= 8'b00000000;
+            addr1 <= 8'b00110000;
+            i_count <= 3'b0;
         end
         else if (enable == 1'b1 && done == 1'b0) begin
-
+            if (i_count == 3'b111 && rowcount == 3'b100 && columncount == 3'b100) begin
+                //done with applying the kernel over an entire image row, go to the next row
+                //Move addresses 4 rows up, 11 pixels back and 1 row down, i.e. -47
+                i_count <= 3'b0;
+                columncount <= 3'b0;
+                rowcount <= 3'b0;
+                addr0 <= addr0 - 8'b00101111;
+                addr1 <= addr1 - 8'b00101111;
+            end
+            else if (rowcount == 3'b100 && columncount == 3'b100) begin
+                //done with a position for the kernel, move forward to the next position. Move 4 rows up, 4 pixels back and 1 pixel forward, i.e. -51
+                columncount <= 3'b0;
+                rowcount <= 3'b0;
+                addr0 <= addr0 - 8'b00110011;
+                addr1 <= addr1 - 8'b00110011;
+                i_count <= i_count + 1;
+            end
+            else if (columncount == 3'b100) begin
+                //kernel row has been processed, move addresses one row down and 4 pixels back, i.e. + 8
+                columncount <= 3'b0;
+                rowcount <= rowcount + 1;
+                addr0 <= addr0 + 8'b00001000;
+                addr1 <= addr1 + 8'b00001000;
+            end
+            else begin
+                addr0 <= addr0 + 1;
+                addr1 <= addr1 + 1;
+                columncount <= columncount + 1;
+            end
         end
     end
     
     always_comb begin
-        if() begin
+        if(addr1 == 8'b10001111) begin
             done = 1'b1;
         end
     end
@@ -246,7 +280,7 @@ endmodule
 
 // counter/addresser for Convolution 2 layer weight memory read
 module conv2_k_mem_read (input logic clk, reset, enable,
-                        output reg [4:0] addr0, addr1
+                        output reg [4:0] addr0, addr1,
                         output logic done);
 
     logic[1:0] section
