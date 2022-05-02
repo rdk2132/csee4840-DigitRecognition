@@ -34,8 +34,6 @@ struct cnn_dev {
 
 static void read_output(fixed_t *vector)
 {
-    //TODO: Check to ensure that the hardware has finished calculations
-    // read the data from 
     int i;
 
     for (i = 0; i < NUM_CLASSES; i++)
@@ -44,11 +42,9 @@ static void read_output(fixed_t *vector)
 
 static void send_image(fixed_t *image)
 {
-    //TODO: Extract data from struct and send to fpga
-    // after each send wait to read ack from fpga
     int i;
 
-    for (i = 0; i < IMAGE_SIZE; i++)
+    for (i = 0; i < 25/*TEST PLACEHOLDER*/; i++)
         iowrite16(image[i], INPUT_REG(dev.virtbase));
     
 }
