@@ -67,9 +67,9 @@ module MAC (input logic clk, enable, reset, ReLU, bias_sel,
 			ReLU_out = MAC_out;
 		end
 		if(bias_sel == 1'b1) begin
-			out = ReLU_out[15:0] + bias >> 4;
+			out = (ReLU_out[15:0] + bias) >> 4;
 		end
 		else begin
-			out = ReLU_out[15:0] + bias >> 4;
+			out = ReLU_out[15:0] >> 4;
 	end
 endmodule
