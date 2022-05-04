@@ -1,67 +1,123 @@
-module CNN( input logic clk, load, start
-            input logic [15:0] data_in
-            output logic done
-            output logic [15:0] data_out);
-    
-    logic [9:0] addr1_img, addr2_img;
+module CNN();
 
-    logic [4:0] addr1_c1W, addr2_c1W;
-    logic [2:0] addr1_c1B, addr2_c1B;
-    logic [9:0] addr1_c1O, addr2_c1O;
+//image memory. They are redundant to allow for 4 accesses
+img_mem img_mem_0();
+img_mem img_mem_1();
 
-    logic [4:0] addr1_c2W, addr2_c2W;
-    logic [6:0] addr1_c2B, addr2_c2B;
-    logic [6:0] addr1_c1O, addr2_c1O;
+//Conv1 output image 0. Each stores half of the image to allow for 8 accesses. _0 _1 and _2 _3 are redundant
+conv1_mem conv1_mem_0_0();
+conv1_mem conv1_mem_0_1();
+conv1_mem conv1_mem_0_2();
+conv1_mem conv1_mem_0_3();
+//Conv1 output image 1. Each stores half of the image to allow for 8 accesses. _0 _1 and _2 _3 are redundant
+conv1_mem conv1_mem_1_0();
+conv1_mem conv1_mem_1_1();
+conv1_mem conv1_mem_1_2();
+conv1_mem conv1_mem_1_3();
+//Conv1 output image 2. Each stores half of the image to allow for 8 accesses. _0 _1 and _2 _3 are redundant
+conv1_mem conv1_mem_2_0();
+conv1_mem conv1_mem_2_1();
+conv1_mem conv1_mem_2_2();
+conv1_mem conv1_mem_2_3();
+//Conv1 output image 3. Each stores half of the image to allow for 8 accesses. _0 _1 and _2 _3 are redundant
+conv1_mem conv1_mem_3_0();
+conv1_mem conv1_mem_3_1();
+conv1_mem conv1_mem_3_2();
+conv1_mem conv1_mem_3_3();
+//Conv1 output image 4. Each stores half of the image to allow for 8 accesses. _0 _1 and _2 _3 are redundant
+conv1_mem conv1_mem_4_0();
+conv1_mem conv1_mem_4_1();
+conv1_mem conv1_mem_4_2();
+conv1_mem conv1_mem_4_3();
+//Conv1 output image 5. Each stores half of the image to allow for 8 accesses. _0 _1 and _2 _3 are redundant
+conv1_mem conv1_mem_5_0();
+conv1_mem conv1_mem_5_1();
+conv1_mem conv1_mem_5_2();
+conv1_mem conv1_mem_5_3();
 
-    logic [10:0] addr1_P1, addr2_P1;
-    logic [10:0] addr1_P2, addr2_P2;
+//Memories for conv1 kernels. Each holds 2 25x25 kernels.
+conv1_k_g0_mem conv1_k_g0_mem();
+conv1_k_g1_mem conv1_k_g1_mem();
+conv1_k_g2_mem conv1_k_g2_mem();
 
-    logic [4:0] done, load;
-    img_mem_counter img_mem_counter1(   .clk(clk), .start(load[0]), 
-                                        .addr1(addr_img), .addr2(addr2_img), 
-                                        .done(done[0]));
+//Memories for the 6 outputs of p1. Each is unique
+p1_mem p1_mem_0();
+p1_mem p1_mem_1();
+p1_mem p1_mem_2();
+p1_mem p1_mem_3();
+p1_mem p1_mem_4();
+p1_mem p1_mem_5();
 
-    c1W_mem_counter c1W_mem_counter1(   .clk(clk), .start(load[1]), 
-                                        .addr1(addr1_c1W), .addr2(addr2_c1W), 
-                                        .done(done[1]));
-    c1B_mem_counter c1B_mem_counter1(   .clk(clk), .start(load[2]),
-                                        .addr1(addr1_c1B), .addr2(addr2_c1B)
-                                        .done(done[2]));
-    c1O_mem_counter c1O_mem_counter1(   .clk(clk), .start(load[3]),
-                                        .addr1(addr1_c1O), .addr2(addr2_c1O)
-                                        .done(done[3]));
+//Conv2 output 0. They are redundant to allow for 4 accesses
+conv2_mem conv2_mem_0_0();
+conv2_mem conv2_mem_0_1();
+//Conv2 output 1. They are redundant to allow for 4 accesses
+conv2_mem conv2_mem_1_0();
+conv2_mem conv2_mem_1_1();
+//Conv2 output 2. They are redundant to allow for 4 accesses
+conv2_mem conv2_mem_2_0();
+conv2_mem conv2_mem_2_1();
+//Conv2 output 3. They are redundant to allow for 4 accesses
+conv2_mem conv2_mem_3_0();
+conv2_mem conv2_mem_3_1();
+//Conv2 output 4. They are redundant to allow for 4 accesses
+conv2_mem conv2_mem_4_0();
+conv2_mem conv2_mem_4_1();
+//Conv2 output 5. They are redundant to allow for 4 accesses
+conv2_mem conv2_mem_5_0();
+conv2_mem conv2_mem_5_1();
+//Conv2 output 6. They are redundant to allow for 4 accesses
+conv2_mem conv2_mem_6_0();
+conv2_mem conv2_mem_6_1();
+//Conv2 output 7. They are redundant to allow for 4 accesses
+conv2_mem conv2_mem_7_0();
+conv2_mem conv2_mem_7_1();
+//Conv2 output 8. They are redundant to allow for 4 accesses
+conv2_mem conv2_mem_8_0();
+conv2_mem conv2_mem_8_1();
+//Conv2 output 9. They are redundant to allow for 4 accesses
+conv2_mem conv2_mem_9_0();
+conv2_mem conv2_mem_9_1();
+//Conv2 output 10. They are redundant to allow for 4 accesses
+conv2_mem conv2_mem_10_0();
+conv2_mem conv2_mem_10_1();
+//Conv2 output 11. They are redundant to allow for 4 accesses
+conv2_mem conv2_mem_11_0();
+conv2_mem conv2_mem_11_1();
 
-    c2B_mem_counter c2B_mem_counter1(   .clk(clk), .start(load[4]),
-                                        .addr1(addr1_c2B), .addr2(addr2_c2B)
-                                        .done(done[4]));                           
-    c2W_mem_counter c2W_mem_counter1(   .clk(clk), .start(load[5]), 
-                                        .addr1(addr1_c2W), .addr2(addr2_c2W), 
-                                        .done(done[5]));
-    c2O_mem_counter c2O_mem_counter1(   .clk(clk), .start(load[6]),
-                                        .addr1(addr1_c2O), .addr2(addr2_c2O)
-                                        .done(done[6]));
+//Memories for conv2 kernels. Each holds 6 25x25 kernels.
+conv2_k_g0_mem conv2_k_g0_mem();
+conv2_k_g1_mem conv2_k_g1_mem();
+conv2_k_g2_mem conv2_k_g2_mem();
+conv2_k_g3_mem conv2_k_g3_mem();
+conv2_k_g4_mem conv2_k_g4_mem();
+conv2_k_g5_mem conv2_k_g5_mem();
+conv2_k_g6_mem conv2_k_g6_mem();
+conv2_k_g7_mem conv2_k_g7_mem();
+conv2_k_g8_mem conv2_k_g8_mem();
+conv2_k_g9_mem conv2_k_g9_mem();
+conv2_k_g10_mem conv2_k_g10_mem();
+conv2_k_g11_mem conv2_k_g011mem();
 
-    P1_mem_counter  P1_mem_counter1(   .clk(clk), .start(load[7]), 
-                                        .addr1(addr1_P1), .addr2(addr2_P1), 
-                                        .done(done[7]));
-    P2_mem_counter  P2_mem_counter1(   .clk(clk), .start(load[8]),
-                                        .addr1(addr1_P2), .addr2(addr2_P2)
-                                        .done(done[8]));
+//Memories for the 12 outputs of p2. Each is unique
+p_2_mem p_2_mem_0();
+p_2_mem p_2_mem_1();
+p_2_mem p_2_mem_2();
+p_2_mem p_2_mem_3();
+p_2_mem p_2_mem_4();
+p_2_mem p_2_mem_5();
+p_2_mem p_2_mem_6();
+p_2_mem p_2_mem_7();
+p_2_mem p_2_mem_8();
+p_2_mem p_2_mem_9();
+p_2_mem p_2_mem_10();
+p_2_mem p_2_mem_11();
 
-    FCW_mem_counter FCW_mem_counter1(   .clk(clk), .start(load[9]),
-                                        .addr1(addr1_FCW), .addr2(addr2_FCW)
-                                        .done(done[9]));
-    FCB_mem_counter FCB_mem_counter1(   .clk(clk), .start(load[10]),
-                                        .addr1(addr1_FCB), .addr2(addr2_FCB)
-                                        .done(done[10]));                                       
-    
-    
-    P1_mem param1mem(.clk(clk), );
-    P2_mem param2mem(.clk(clk), );
-    mac MAC();
+//Memories for FC weights. Each holds 2 neurons's 192 weights(384 in total)
+fc_g0_mem fc_g0_mem();
+fc_g1_mem fc_g1_mem();
+fc_g2_mem fc_g2_mem();
+fc_g3_mem fc_g3_mem();
+fc_g4_mem fc_g4_mem();
 
-    always_ff @(posedge clk) begin
-        
-
-    end
 endmodule

@@ -111,7 +111,6 @@ module conv2_mem (
 		altsyncram_component.indata_reg_b = "CLOCK0",
 		altsyncram_component.intended_device_family = "Cyclone V",
 		altsyncram_component.lpm_type = "altsyncram",
-		altsyncram_component.maximum_depth = 256,
 		altsyncram_component.numwords_a = 64,
 		altsyncram_component.numwords_b = 64,
 		altsyncram_component.operation_mode = "BIDIR_DUAL_PORT",
@@ -167,7 +166,7 @@ endmodule
 // Retrieval info: PRIVATE: INTENDED_DEVICE_FAMILY STRING "Cyclone V"
 // Retrieval info: PRIVATE: JTAG_ENABLED NUMERIC "0"
 // Retrieval info: PRIVATE: JTAG_ID STRING "NONE"
-// Retrieval info: PRIVATE: MAXIMUM_DEPTH NUMERIC "256"
+// Retrieval info: PRIVATE: MAXIMUM_DEPTH NUMERIC "0"
 // Retrieval info: PRIVATE: MEMSIZE NUMERIC "1024"
 // Retrieval info: PRIVATE: MEM_IN_BITS NUMERIC "0"
 // Retrieval info: PRIVATE: MIFfilename STRING ""
@@ -206,7 +205,6 @@ endmodule
 // Retrieval info: CONSTANT: INDATA_REG_B STRING "CLOCK0"
 // Retrieval info: CONSTANT: INTENDED_DEVICE_FAMILY STRING "Cyclone V"
 // Retrieval info: CONSTANT: LPM_TYPE STRING "altsyncram"
-// Retrieval info: CONSTANT: MAXIMUM_DEPTH NUMERIC "256"
 // Retrieval info: CONSTANT: NUMWORDS_A NUMERIC "64"
 // Retrieval info: CONSTANT: NUMWORDS_B NUMERIC "64"
 // Retrieval info: CONSTANT: OPERATION_MODE STRING "BIDIR_DUAL_PORT"
