@@ -31,7 +31,7 @@ module img_mem_write (input logic clk, reset, enable, next,
     end
 
     always_comb begin
-        if(addr0 == 10'b1100010000) begin
+        if(addr0 == 10'b1100001111) begin
             done = 1'b1;
         end
     end
@@ -147,7 +147,7 @@ module conv1_mem_write (input logic clk, reset, enable,
     end
 
     always_comb begin
-        if(addr1 == 10'b1001000000) begin
+        if(addr1 == 10'b1000111111) begin
             done = 1'b1;
         end
     end
@@ -278,47 +278,57 @@ module P1_mem_read (input logic clk, reset, enable,
 
 endmodule
 
+//Module used to provide access to 6 kernels with two counters at once
 // counter/addresser for Convolution 2 layer weight memory read
 module conv2_k_mem_read (input logic clk, reset, enable,
-                        output reg [4:0] addr0, addr1,
+                        output reg [7:0] addr0, addr1,
                         output logic done);
 
-    logic[1:0] section
     always_ff @(posedge clk or posedge reset) begin
         if (reset == 1'b1) begin
-            addr0 <=;
-            addr1 <=;
+            addr0 <= 0;
+            addr1 <= 8'b01001011;
         end
         else if (enable == 1'b1 && done == 1'b0) begin
-
+            addr0 <= addr0 + 1;
+            addr1 <= addr1 + 1;
         end
     end
     
     always_comb begin
-        if() begin
+        //Count until addr1 reaches end of 6th kernel, i.e. 6 * 25 - 1 = 149
+        if(addr1 == 8'b10010101) begin
             done = 1'b1;
         end
     end
 
 endmodule
 
+//Go through an 8x8 output image 3 times
 // counter/addresser for Convolution 2 layer output memory write
 module conv2_mem_write (input logic clk, reset, enable,
-                        output reg [6:0] addr0, addr1
+                        output reg [5:0] addr0,
                         output logic done);
+    reg [1:0] count;
 
     always_ff @(posedge clk or posedge reset) begin
         if (reset == 1'b1) begin
-            addr0 <=;
-            addr1 <=;
+            addr0 <= 0;
+            count <= 0;
         end
         else if (enable == 1'b1 && done == 1'b0) begin
-
+            if(addr0 == 6'b111111) begin
+                count <= count + 1;
+                addr0 <= 0;
+            end
+            else begin
+                addr0 <= addr0 + 1;
+            end
         end
     end
     
     always_comb begin
-        if() begin
+        if(count == 2'b10 && addr0 == 6'b111111) begin
             done = 1'b1;
         end
     end
@@ -392,23 +402,31 @@ module P2_mem_write (input logic clk, reset, enable,
 
 endmodule
 
+//cycle through 4x4 input images 12 times
 // counter/addresser for pooling 2 layer output memory read
 module P2_mem_read (input logic clk, reset, enable,
-                        output reg [4:0] addr0, addr1, addr2, addr3,
+                        output reg [3:0] addr0,
                         output logic done);
+    reg [3:0] count;
 
     always_ff @(posedge clk or posedge reset) begin
         if (reset == 1'b1) begin
-            addr0 <=;
-            addr1 <=;
+            count <= 0;
+            addr0 <= 0;
         end
         else if (enable == 1'b1 && done == 1'b0) begin
-
+            if(addr0 == 4'b1111) begin
+                count <= count + 1;
+                addr0 <= 0;
+            end
+            else begin
+                addr0 <= addr0 + 1;
+            end
         end
     end
-    
+
     always_comb begin
-        if() begin
+        if(count == 4'b1011 && addr0 == 4'b1111) begin
             done = 1'b1;
         end
     end
