@@ -32,7 +32,7 @@ module testbench (
                 5'h3: begin
                     if (write && (done == 0)) begin
                         wren <= 1;
-                        waddr <= waddr + 1;
+                        waddr <= waddr + 16'd1;
                     end
                     else wren <= 0;
                     if (waddr == 16'd25) begin
@@ -42,7 +42,7 @@ module testbench (
                 end
                 5'h4: begin
                     if (read && done) begin
-                        raddr <= raddr + 1;
+                        raddr <= raddr + 16'd1;
                     end
                     if (raddr == 16'd10) begin
                         done <= 0;
