@@ -51,7 +51,6 @@ static void send_image(fixed_t *image)
 
 static long cnn_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
 {
-    //TODO: One function uses CNN_CLASSIFY
     cnn_arg_t in_data;
 
     switch (cmd)
@@ -92,21 +91,25 @@ static int __init cnn_probe(struct platform_device *pdev)
 
     /* Register as misc device, also creates /dev/cnn/ */
     ret = misc_register(&cnn_misc_device);
-    if(ret)
-        goto out_deregister; 
 
     // Obtain address of the registers from device tree
     ret = of_address_to_resource(pdev->dev.of_node, 0, &dev.res);
     if(ret)
     {
-        ret = -EBUSY;
+        ret = -ENOENT;
         goto out_deregister;
     }
 
+    if (request_mem_region(dev.res.start, resource_size(&dev.res), 
+                        	DRIVER_NAME) == NULL) {
+      ret = -EBUSY;
+      goto out_deregister;
+    }
+
+
     // Arrange access to registers
     dev.virtbase = of_iomap(pdev->dev.of_node, 0);
-    if(dev.virtbase ==  NULL)
-    {
+    if(dev.virtbase ==  NULL) {
         ret = -ENOMEM;
         goto out_release_mem_region;
     }
@@ -133,6 +136,7 @@ static const struct of_device_id cnn_of_match[] = {
     {.compatible = "csee4840,cnn-1.0"},
     {},
 };
+MODULE_DEVICE_TABLE(of, cnn_of_match);
 #endif
 
 static struct platform_driver cnn_driver = {
