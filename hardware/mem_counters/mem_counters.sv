@@ -393,7 +393,7 @@ module P2_mem_write (input logic clk, reset, enable,
     
     always_comb begin
         //stop when addr1 == 4^2 - 1, i.e. we have processed the entire image
-        if(addr1 == 4'b1111) begin
+        if(addr0 == 4'b1111) begin
             done = 1'b1;
         end
     end
