@@ -41,8 +41,8 @@ module signed_multiply_accumulate (input clk, aclr, clken, sload,
 	end
 endmodule
 
-module MAC (input logic clk, enable, reset, conv, fc
-			input signed [15:0] A, B 
+module MAC (input logic clk, enable, reset, conv, fc, 
+			input signed [15:0] A, B,  
 			output signed logic [31:0] out);
 	
 	reg signed [31:0] MAC_out;
@@ -65,8 +65,8 @@ module MAC (input logic clk, enable, reset, conv, fc
 	end
 endmodule
 
-module after_MAC (input logic conv1, conv2, fc
-				  input [31:0] MAC_out_0, MAC_out_1, MAC_out_2, MAC_out_3, MAC_out_4, MAC_out_5, bias_0, bias_1, bias_2, bias_3, bias_4, bias_5, FC_bias
+module after_MAC (input logic conv1, conv2, fc, b
+				  input [31:0] MAC_out_0, MAC_out_1, MAC_out_2, MAC_out_3, MAC_out_4, MAC_out_5, bias_0, bias_1, bias_2, bias_3, bias_4, bias_5, FC_bias, 
 				  output [15:0] out_0, out_1, out_2, out_3, out_4, out_5, out_conv2);
 
 	//bias adding and adding of itermediates for conv1 and conv2

@@ -1,8 +1,28 @@
-module CNN();
+module CNN(input logic clk, reset, write, chipselect, 
+           input logic [15:0] writedata, 
+           input logic [1:0] address
+           output logic [15:0] return_ctrl, 
+           output signed logic [15:0] result_0, result_1, result_2, result_3, result_4, result_5, result_6, result_7, result_8, result_9);
+
+    logic [15:0] img_data;
+    logic [9:0] img_mem_addr;
+    logic [15:0] ctrl;
+    always_ff @(posedge clk) begin
+        if(chipselect == 1'b1 && write == 1'b1) begin
+            case (address)
+                2'b00 : img_data <= writedata;
+                2'b01 : img_mem_addr <= writedata[9:0];
+                2'b10 : ctrl <= writedata;
+            endcase
+        end
+    end
+
+//Control circuitry that runs the whole show
+CNN_ctrl CNN_ctrl();
 
 //image memory. They are redundant to allow for 4 accesses
-img_mem img_mem_0(.address_a(), .address_b(), .clock(clk), .data_a(), .data_b(), .rden_a(), .rden_b(), .wren_a(), .wren_b(), .q_a(), .q_b());
-img_mem img_mem_1(.address_a(), .address_b(), .clock(clk), .data_a(), .data_b(), .rden_a(), .rden_b(), .wren_a(), .wren_b(), .q_a(), .q_b());
+img_mem img_mem_0(.address_a(), .address_b(), .clock(clk), .data_a(img_data), .data_b(16'b0000000000000000), .rden_a(), .rden_b(), .wren_a(), .wren_b(1'b0), .q_a(), .q_b());
+img_mem img_mem_1(.address_a(), .address_b(), .clock(clk), .data_a(img_data), .data_b(16'b0000000000000000), .rden_a(), .rden_b(), .wren_a(), .wren_b(1'b0), .q_a(), .q_b());
 
 //Conv1 output image 0. Each stores half of the image to allow for 8 accesses. _0 _1 and _2 _3 are redundant
 conv1_mem conv1_mem_0_0(.address_a(), .address_b(), .clock(clk), .data_a(), .data_b(), .rden_a(), .rden_b(), .wren_a(), .wren_b(), .q_a(), .q_b());
@@ -119,5 +139,203 @@ fc_g1_mem fc_g1_mem(.address_a(), .address_b(), .clock(clk), .rden_a(), .rden_b(
 fc_g2_mem fc_g2_mem(.address_a(), .address_b(), .clock(clk), .rden_a(), .rden_b(), .q_a(), .q_b());
 fc_g3_mem fc_g3_mem(.address_a(), .address_b(), .clock(clk), .rden_a(), .rden_b(), .q_a(), .q_b());
 fc_g4_mem fc_g4_mem(.address_a(), .address_b(), .clock(clk), .rden_a(), .rden_b(), .q_a(), .q_b());
+
+//signals for input to MACs and to connect the MACs to the after MACs
+logic signed [15:0] MAC_in_data_0, MAC_in_data_1, MAC_in_data_2, MAC_in_data_3, MAC_in_data_4, MAC_in_data_5, 
+                    MAC_in_data_6, MAC_in_data_7, MAC_in_data_8, MAC_in_data_9, MAC_in_data_10, MAC_in_data_11, 
+                    MAC_in_data_12, MAC_in_data_13, MAC_in_data_14, MAC_in_data_15, MAC_in_data_16, MAC_in_data_17, 
+                    MAC_in_data_18, MAC_in_data_19, MAC_in_data_20, MAC_in_data_21, MAC_in_data_22, MAC_in_data_23, 
+                    MAC_in_para_0, MAC_in_para_1, MAC_in_para_2, MAC_in_para_3, MAC_in_para_4, MAC_in_para_5, 
+                    MAC_in_para_6, MAC_in_para_7, MAC_in_para_8, MAC_in_para_9, MAC_in_para_10, MAC_in_para_11, 
+                    MAC_in_para_12, MAC_in_para_13, MAC_in_para_14, MAC_in_para_15, MAC_in_para_16, MAC_in_para_17, 
+                    MAC_in_para_18, MAC_in_para_19, MAC_in_para_20, MAC_in_para_21, MAC_in_para_22, MAC_in_para_23, 
+logic signed [31:0] MAC_out_0, MAC_out_1, MAC_out_2, MAC_out_3, MAC_out_4, MAC_out_5, 
+                    MAC_out_6, MAC_out_7, MAC_out_8, MAC_out_9, MAC_out_10, MAC_out_11, 
+                    MAC_out_12, MAC_out_13, MAC_out_14, MAC_out_15, MAC_out_16, MAC_out_17, 
+                    MAC_out_18, MAC_out_19, MAC_out_20, MAC_out_21, MAC_out_22, MAC_out_23;
+
+//Muxes to make sure proper input data based on the memory block. 1 for conv1, 1 for conv2, 12 for fc.
+mux14to1 mux14to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
+                    .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
+                    .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
+                    .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_0));
+mux14to1 mux14to1_1(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
+                    .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
+                    .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
+                    .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_1));
+mux14to1 mux14to1_2(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
+                    .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
+                    .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
+                    .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_2));
+mux14to1 mux14to1_3(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
+                    .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
+                    .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
+                    .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_3));
+mux14to1 mux14to1_4(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
+                    .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
+                    .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
+                    .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_4));
+mux14to1 mux14to1_5(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
+                    .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
+                    .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
+                    .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_5));
+mux14to1 mux14to1_6(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
+                    .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
+                    .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
+                    .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_6));
+mux14to1 mux14to1_7(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
+                    .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
+                    .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
+                    .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_7));
+mux14to1 mux14to1_8(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
+                    .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
+                    .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
+                    .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_8));
+mux14to1 mux14to1_9(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
+                    .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
+                    .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
+                    .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_9));
+mux14to1 mux14to1_10(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
+                     .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
+                     .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
+                     .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_10));
+mux14to1 mux14to1_11(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
+                     .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
+                     .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
+                     .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_11));
+mux14to1 mux14to1_12(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
+                     .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
+                     .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
+                     .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_12));
+mux14to1 mux14to1_13(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
+                     .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
+                     .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
+                     .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_13));
+mux14to1 mux14to1_14(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
+                     .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
+                     .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
+                     .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_14));
+mux14to1 mux14to1_15(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
+                     .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
+                     .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
+                     .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_15));
+mux14to1 mux14to1_16(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
+                     .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
+                     .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
+                     .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_16));
+mux14to1 mux14to1_17(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
+                     .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
+                     .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
+                     .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_17));
+mux14to1 mux14to1_18(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
+                     .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
+                     .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
+                     .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_18));
+mux14to1 mux14to1_19(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
+                     .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
+                     .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
+                     .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_19));
+mux14to1 mux14to1_20(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
+                     .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
+                     .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
+                     .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_20));
+mux14to1 mux14to1_21(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
+                     .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
+                     .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
+                     .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_21));
+mux14to1 mux14to1_22(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
+                     .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
+                     .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
+                     .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_22));
+mux14to1 mux14to1_23(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
+                     .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
+                     .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
+                     .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_23));
+
+//Muxes to make sure proper input parameter based on the correct ROM. 1 for conv1, 1 for conv2, 1 for fc.
+mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_0));
+mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_1));
+mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_2));
+mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_3));
+mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_4));
+mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_5));
+mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_6));
+mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_7));
+mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_8));
+mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_9));
+mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_10));
+mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_11));
+mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_12));
+mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_13));
+mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_14));
+mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_15));
+mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_16));
+mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_17));
+mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_18));
+mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_19));
+mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_20));
+mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_21));
+mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_22));
+mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_23));
+
+//24 MAC modules
+MAC MAC_0(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_0), .B(MAC_in_para_0), .out(MAC_out_0));
+MAC MAC_1(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_1), .B(MAC_in_para_1), .out(MAC_out_1));
+MAC MAC_2(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_2), .B(MAC_in_para_2), .out(MAC_out_2));
+MAC MAC_3(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_3), .B(MAC_in_para_3), .out(MAC_out_3));
+MAC MAC_4(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_4), .B(MAC_in_para_4), .out(MAC_out_4));
+MAC MAC_5(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_5), .B(MAC_in_para_5), .out(MAC_out_5));
+MAC MAC_6(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_6), .B(MAC_in_para_6), .out(MAC_out_6));
+MAC MAC_7(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_7), .B(MAC_in_para_7), .out(MAC_out_7));
+MAC MAC_8(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_8), .B(MAC_in_para_8), .out(MAC_out_8));
+MAC MAC_9(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_9), .B(MAC_in_para_9), .out(MAC_out_9));
+MAC MAC_10(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_10), .B(MAC_in_para_10), .out(MAC_out_10));
+MAC MAC_11(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_11), .B(MAC_in_para_11), .out(MAC_out_11));
+MAC MAC_12(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_12), .B(MAC_in_para_12), .out(MAC_out_12));
+MAC MAC_13(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_13), .B(MAC_in_para_13), .out(MAC_out_13));
+MAC MAC_14(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_14), .B(MAC_in_para_14), .out(MAC_out_14));
+MAC MAC_15(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_15), .B(MAC_in_para_15), .out(MAC_out_15));
+MAC MAC_16(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_16), .B(MAC_in_para_16), .out(MAC_out_16));
+MAC MAC_17(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_17), .B(MAC_in_para_17), .out(MAC_out_17));
+MAC MAC_18(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_18), .B(MAC_in_para_18), .out(MAC_out_18));
+MAC MAC_19(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_19), .B(MAC_in_para_19), .out(MAC_out_19));
+MAC MAC_20(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_20), .B(MAC_in_para_20), .out(MAC_out_20));
+MAC MAC_21(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_21), .B(MAC_in_para_21), .out(MAC_out_21));
+MAC MAC_22(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_22), .B(MAC_in_para_22), .out(MAC_out_22));
+MAC MAC_23(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_23), .B(MAC_in_para_23), .out(MAC_out_23));
+
+//The after MAC does all subsequent operations needed after the MAC depending on the layer. ReLU, combination, biases, shifting, etc.
+after_MAC after_MAC_0(.conv1(), .conv2(), .fc(), .MAC_out_0(MAC_out_0), .MAC_out_1(MAC_out_1), .MAC_out_2(MAC_out_2), 
+                      .MAC_out_3(MAC_out_3), .MAC_out_4(MAC_out_4), .MAC_out_5(MAC_out_5), .bias_0(), .bias_1(), .bias_2(), 
+                      .bias_3(), .bias_4(), .bias_5(), .FC_bias(), .out_0(), .out_1(), 
+                      .out_2(), .out_3(), .out_4(), .out_5(), .out_conv2());
+after_MAC after_MAC_1(.conv1(), .conv2(), .fc(), .MAC_out_0(MAC_out_6), .MAC_out_1(MAC_out_7), .MAC_out_2(MAC_out_8), 
+                      .MAC_out_3(MAC_out_9), .MAC_out_4(MAC_out_10), .MAC_out_5(MAC_out_11), .bias_0(), .bias_1(), .bias_2(), 
+                      .bias_3(), .bias_4(), .bias_5(), .FC_bias(), .out_0(), .out_1(), 
+                      .out_2(), .out_3(), .out_4(), .out_5(), .out_conv2());
+after_MAC after_MAC_2(.conv1(), .conv2(), .fc(), .MAC_out_0(MAC_out_12), .MAC_out_1(MAC_out_13), .MAC_out_2(MAC_out_14), 
+                      .MAC_out_3(MAC_out_15), .MAC_out_4(MAC_out_16), .MAC_out_5(MAC_out_17), .bias_0(), .bias_1(), .bias_2(), 
+                      .bias_3(), .bias_4(), .bias_5(), .FC_bias(), .out_0(), .out_1(), 
+                      .out_2(), .out_3(), .out_4(), .out_5(), .out_conv2());
+after_MAC after_MAC_3(.conv1(), .conv2(), .fc(), .MAC_out_0(MAC_out_18), .MAC_out_1(MAC_out_19), .MAC_out_2(MAC_out_20), 
+                      .MAC_out_3(MAC_out_21), .MAC_out_4(MAC_out_22), .MAC_out_5(MAC_out_23), .bias_0(), .bias_1(), .bias_2(), 
+                      .bias_3(), .bias_4(), .bias_5(), .FC_bias(), .out_0(), .out_1(), 
+                      .out_2(), .out_3(), .out_4(), .out_5(), .out_conv2());
+
+//12 pooling modules to be used by pooling layers
+pooling pooling_0(.a_0(), .a_1(), .b_0(), .b_1(), .out());
+pooling pooling_1(.a_0(), .a_1(), .b_0(), .b_1(), .out());
+pooling pooling_2(.a_0(), .a_1(), .b_0(), .b_1(), .out());
+pooling pooling_3(.a_0(), .a_1(), .b_0(), .b_1(), .out());
+pooling pooling_4(.a_0(), .a_1(), .b_0(), .b_1(), .out());
+pooling pooling_5(.a_0(), .a_1(), .b_0(), .b_1(), .out());
+pooling pooling_6(.a_0(), .a_1(), .b_0(), .b_1(), .out());
+pooling pooling_7(.a_0(), .a_1(), .b_0(), .b_1(), .out());
+pooling pooling_8(.a_0(), .a_1(), .b_0(), .b_1(), .out());
+pooling pooling_9(.a_0(), .a_1(), .b_0(), .b_1(), .out());
+pooling pooling_10(.a_0(), .a_1(), .b_0(), .b_1(), .out());
+pooling pooling_11(.a_0(), .a_1(), .b_0(), .b_1(), .out());
+
+//still need to add muxes and demuxes
 
 endmodule
