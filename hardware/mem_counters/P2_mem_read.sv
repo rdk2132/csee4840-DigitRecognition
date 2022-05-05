@@ -1,9 +1,8 @@
 //cycle through 4x4 input images 12 times
 // counter/addresser for pooling 2 layer output memory read
 module P2_mem_read (input logic clk, reset, enable,
-                        output logic [3:0] addr0,
+                        output logic [3:0] addr0, count, 
                         output logic done);
-    logic [3:0] count;
 
     always_ff @(posedge clk or posedge reset) begin
         if (reset == 1'b1) begin

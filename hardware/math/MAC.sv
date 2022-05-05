@@ -41,7 +41,8 @@ module signed_multiply_accumulate (input clk, aclr, clken, sload,
 	end
 endmodule
 
-module MAC (input logic clk, enable, reset, conv, fc, 
+module MAC (input logic clk, enable, reset, 
+			input logic [2:0] layer, 
 			input signed [15:0] A, B,  
 			output signed logic [31:0] out);
 	
@@ -57,7 +58,7 @@ module MAC (input logic clk, enable, reset, conv, fc,
 			MAC_out <= MAC_out + (A * B); //does the MAC thing
 			count <= count + 1'b1;
 		end
-		if((count == 8'b00011001 && conv == 1'b1) || (count == 8'b11000000 && fc == 1'b1)) begin //if finished with a conv(count = 25) or one of the FC(count = 192) outputs the result
+		if((count == 8'b00011001 && (layer == 3'b000 || layer == 3'b010)) || (count == 8'b11000000 && layer == 3'b100)) begin //if finished with a conv(count = 25) or one of the FC(count = 192) outputs the result
 			out = MAC_out;
 			MAC_out <= 32'b00000000000000000000000000000000;
 			count <= 8'b00000000;
@@ -65,9 +66,9 @@ module MAC (input logic clk, enable, reset, conv, fc,
 	end
 endmodule
 
-module after_MAC (input logic conv1, conv2, fc, b
-				  input [31:0] MAC_out_0, MAC_out_1, MAC_out_2, MAC_out_3, MAC_out_4, MAC_out_5, bias_0, bias_1, bias_2, bias_3, bias_4, bias_5, FC_bias, 
-				  output [15:0] out_0, out_1, out_2, out_3, out_4, out_5, out_conv2);
+module after_MAC (input logic [2:0] layer,
+				  input logic [31:0] MAC_out_0, MAC_out_1, MAC_out_2, MAC_out_3, MAC_out_4, MAC_out_5, bias_0, bias_1, bias_2, bias_3, bias_4, bias_5, FC_bias, 
+				  output logic [15:0] out_0, out_1, out_2, out_3, out_4, out_5, out_conv2);
 
 	//bias adding and adding of itermediates for conv1 and conv2
 	wire signed [31:0] conv1_interm_0;
@@ -87,7 +88,7 @@ module after_MAC (input logic conv1, conv2, fc, b
 
 	always_comb begin
 
-		if(conv1 == 1'b1) begin //if conv1 preforms ReLU and shifts intermediate
+		if(layer = 3'b000) begin //if conv1 preforms ReLU and shifts intermediate
 			if(conv1_interm_0[31] == 1'b1) begin
 				out_0[15:0] = 16'b0000000000000000;
 			end
@@ -126,7 +127,7 @@ module after_MAC (input logic conv1, conv2, fc, b
 			end
 		end
 
-		if(conv2 == 1'b1) begin //if conv2 preforms ReLU and shifts intermediate
+		if(layer = 3'b010) begin //if conv2 preforms ReLU and shifts intermediate
 			if(conv2_interm[31] == 1'b1) begin
 				out_conv2[15:0] = 16'b0000000000000000;
 			end
@@ -135,7 +136,7 @@ module after_MAC (input logic conv1, conv2, fc, b
 			end
 		end
 
-		if(fc == 1'b1) begin //if Fully connected layer just shifts
+		if(layer = 3'b100) begin //if Fully connected layer just shifts
 			out_0[15:0] = MAC_out_0[18:3];
 			out_1[15:0] = MAC_out_1[18:3];
 			out_2[15:0] = MAC_out_2[18:3];

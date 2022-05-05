@@ -119,19 +119,28 @@ conv2_k_g9_mem conv2_k_g9_mem(.address_a(), .address_b(), .clock(clk), .rden_a()
 conv2_k_g10_mem conv2_k_g10_mem(.address_a(), .address_b(), .clock(clk), .rden_a(), .rden_b(), .q_a(), .q_b());
 conv2_k_g11_mem conv2_k_g011mem(.address_a(), .address_b(), .clock(clk), .rden_a(), .rden_b(), .q_a(), .q_b());
 
+//wires that go from P2 memories/addressers
+logic [3:0] P2_mem_sel; //wire that will control the muxes thta make sure the P2 memory is read squentially block by block
+logic [15:0] P2_mem_0_q, P2_mem_1_q, P2_mem_2_q, P2_mem_3_q, P2_mem_4_q, P2_mem_5_q, 
+             P2_mem_6_q, P2_mem_7_q, P2_mem_8_q, P2_mem_9_q, P2_mem_10_q, P2_mem_11_q; //q lines for p2 memory block
+
 //Memories for the 12 outputs of p2. Each is unique
-p_2_mem p_2_mem_0(.address_a(), .address_b(), .clock(clk), .data_a(), .data_b(), .rden_a(), .rden_b(), .wren_a(), .wren_b(), .q_a(), .q_b());
-p_2_mem p_2_mem_1(.address_a(), .address_b(), .clock(clk), .data_a(), .data_b(), .rden_a(), .rden_b(), .wren_a(), .wren_b(), .q_a(), .q_b());
-p_2_mem p_2_mem_2(.address_a(), .address_b(), .clock(clk), .data_a(), .data_b(), .rden_a(), .rden_b(), .wren_a(), .wren_b(), .q_a(), .q_b());
-p_2_mem p_2_mem_3(.address_a(), .address_b(), .clock(clk), .data_a(), .data_b(), .rden_a(), .rden_b(), .wren_a(), .wren_b(), .q_a(), .q_b());
-p_2_mem p_2_mem_4(.address_a(), .address_b(), .clock(clk), .data_a(), .data_b(), .rden_a(), .rden_b(), .wren_a(), .wren_b(), .q_a(), .q_b());
-p_2_mem p_2_mem_5(.address_a(), .address_b(), .clock(clk), .data_a(), .data_b(), .rden_a(), .rden_b(), .wren_a(), .wren_b(), .q_a(), .q_b());
-p_2_mem p_2_mem_6(.address_a(), .address_b(), .clock(clk), .data_a(), .data_b(), .rden_a(), .rden_b(), .wren_a(), .wren_b(), .q_a(), .q_b());
-p_2_mem p_2_mem_7(.address_a(), .address_b(), .clock(clk), .data_a(), .data_b(), .rden_a(), .rden_b(), .wren_a(), .wren_b(), .q_a(), .q_b());
-p_2_mem p_2_mem_8(.address_a(), .address_b(), .clock(clk), .data_a(), .data_b(), .rden_a(), .rden_b(), .wren_a(), .wren_b(), .q_a(), .q_b());
-p_2_mem p_2_mem_9(.address_a(), .address_b(), .clock(clk), .data_a(), .data_b(), .rden_a(), .rden_b(), .wren_a(), .wren_b(), .q_a(), .q_b());
-p_2_mem p_2_mem_10(.address_a(), .address_b(), .clock(clk), .data_a(), .data_b(), .rden_a(), .rden_b(), .wren_a(), .wren_b(), .q_a(), .q_b());
-p_2_mem p_2_mem_11(.address_a(), .address_b(), .clock(clk), .data_a(), .data_b(), .rden_a(), .rden_b(), .wren_a(), .wren_b(), .q_a(), .q_b());
+p2_mem p2_mem_0(.address(), .clock(clk), .data(), .rden(), .wren(), .q(P2_mem_0_q));
+p2_mem p2_mem_1(.address(), .clock(clk), .data(), .rden(), .wren(), .q(P2_mem_1_q));
+p2_mem p2_mem_2(.address(), .clock(clk), .data(), .rden(), .wren(), .q(P2_mem_2_q));
+p2_mem p2_mem_3(.address(), .clock(clk), .data(), .rden(), .wren(), .q(P2_mem_3_q));
+p2_mem p2_mem_4(.address(), .clock(clk), .data(), .rden(), .wren(), .q(P2_mem_4_q));
+p2_mem p2_mem_5(.address(), .clock(clk), .data(), .rden(), .wren(), .q(P2_mem_5_q));
+p2_mem p2_mem_6(.address(), .clock(clk), .data(), .rden(), .wren(), .q(P2_mem_6_q));
+p2_mem p2_mem_7(.address(), .clock(clk), .data(), .rden(), .wren(), .q(P2_mem_7_q));
+p2_mem p2_mem_8(.address(), .clock(clk), .data(), .rden(), .wren(), .q(P2_mem_8_q));
+p2_mem p2_mem_9(.address(), .clock(clk), .data(), .rden(), .wren(), .q(P2_mem_9_q));
+p2_mem p2_mem_10(.address(), .clock(clk), .data(), .rden(), .wren(), .q(P2_mem_10_q));
+p2_mem p2_mem_11(.address(), .clock(clk), .data(), .rden(), .wren(), .q(P2_mem_11_q));
+
+//addressers for writing and reading the P2 memories
+P2_mem_write P2_mem_write_0(.clk(clk), .reset(), .enable(), .addr0(), .done());
+P2_mem_read P2_mem_read_0(.clk(clk), .reset(), .enable(), .addr0(), .count(P2_mem_sel), .done());
 
 //Memories for FC weights. Each holds 2 neurons's 192 weights(384 in total)
 fc_g0_mem fc_g0_mem(.address_a(), .address_b(), .clock(clk), .rden_a(), .rden_b(), .q_a(), .q_b());
@@ -148,179 +157,209 @@ logic signed [15:0] MAC_in_data_0, MAC_in_data_1, MAC_in_data_2, MAC_in_data_3, 
                     MAC_in_para_0, MAC_in_para_1, MAC_in_para_2, MAC_in_para_3, MAC_in_para_4, MAC_in_para_5, 
                     MAC_in_para_6, MAC_in_para_7, MAC_in_para_8, MAC_in_para_9, MAC_in_para_10, MAC_in_para_11, 
                     MAC_in_para_12, MAC_in_para_13, MAC_in_para_14, MAC_in_para_15, MAC_in_para_16, MAC_in_para_17, 
-                    MAC_in_para_18, MAC_in_para_19, MAC_in_para_20, MAC_in_para_21, MAC_in_para_22, MAC_in_para_23, 
+                    MAC_in_para_18, MAC_in_para_19, MAC_in_para_20, MAC_in_para_21, MAC_in_para_22, MAC_in_para_23,
+                    FC_in_data_0,  FC_in_data_1,  FC_in_data_2,  FC_in_data_3,  FC_in_data_4,  FC_in_data_5, 
+                    FC_in_data_6,  FC_in_data_7,  FC_in_data_8,  FC_in_data_9,  FC_in_data_10,  FC_in_data_11, 
+                    FC_in_data_12,  FC_in_data_13,  FC_in_data_14,  FC_in_data_15,  FC_in_data_16,  FC_in_data_17, 
+                    FC_in_data_18,  FC_in_data_19,  FC_in_data_20,  FC_in_data_21,  FC_in_data_22,  FC_in_data_23, 
 logic signed [31:0] MAC_out_0, MAC_out_1, MAC_out_2, MAC_out_3, MAC_out_4, MAC_out_5, 
                     MAC_out_6, MAC_out_7, MAC_out_8, MAC_out_9, MAC_out_10, MAC_out_11, 
                     MAC_out_12, MAC_out_13, MAC_out_14, MAC_out_15, MAC_out_16, MAC_out_17, 
                     MAC_out_18, MAC_out_19, MAC_out_20, MAC_out_21, MAC_out_22, MAC_out_23;
 
-//Muxes to make sure proper input data based on the memory block. 1 for conv1, 1 for conv2, 12 for fc.
-mux14to1 mux14to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
-                    .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
-                    .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
-                    .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_0));
-mux14to1 mux14to1_1(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
-                    .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
-                    .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
-                    .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_1));
-mux14to1 mux14to1_2(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
-                    .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
-                    .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
-                    .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_2));
-mux14to1 mux14to1_3(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
-                    .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
-                    .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
-                    .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_3));
-mux14to1 mux14to1_4(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
-                    .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
-                    .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
-                    .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_4));
-mux14to1 mux14to1_5(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
-                    .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
-                    .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
-                    .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_5));
-mux14to1 mux14to1_6(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
-                    .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
-                    .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
-                    .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_6));
-mux14to1 mux14to1_7(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
-                    .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
-                    .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
-                    .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_7));
-mux14to1 mux14to1_8(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
-                    .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
-                    .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
-                    .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_8));
-mux14to1 mux14to1_9(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
-                    .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
-                    .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
-                    .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_9));
-mux14to1 mux14to1_10(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
-                     .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
-                     .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
-                     .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_10));
-mux14to1 mux14to1_11(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
-                     .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
-                     .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
-                     .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_11));
-mux14to1 mux14to1_12(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
-                     .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
-                     .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
-                     .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_12));
-mux14to1 mux14to1_13(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
-                     .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
-                     .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
-                     .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_13));
-mux14to1 mux14to1_14(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
-                     .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
-                     .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
-                     .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_14));
-mux14to1 mux14to1_15(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
-                     .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
-                     .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
-                     .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_15));
-mux14to1 mux14to1_16(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
-                     .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
-                     .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
-                     .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_16));
-mux14to1 mux14to1_17(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
-                     .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
-                     .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
-                     .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_17));
-mux14to1 mux14to1_18(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
-                     .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
-                     .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
-                     .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_18));
-mux14to1 mux14to1_19(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
-                     .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
-                     .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
-                     .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_19));
-mux14to1 mux14to1_20(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
-                     .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
-                     .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
-                     .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_20));
-mux14to1 mux14to1_21(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
-                     .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
-                     .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
-                     .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_21));
-mux14to1 mux14to1_22(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
-                     .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
-                     .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
-                     .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_22));
-mux14to1 mux14to1_23(.data_in_0(), .data_in_1(), .data_in_2(), .data_in_3(), 
-                     .data_in_4(), .data_in_5(), .data_in_6(), .data_in_7(), 
-                     .data_in_8(), .data_in_9(), .data_in_10(), .data_in_11(), 
-                     .data_in_12(), .data_in_13(), .sel(), .data_out(MAC_in_data_23));
+//Data muxes for FC layer. Responsible for making sure each input is read sequentially by all MACs
+mux_12to1 data_mux_12to1_0(.data_in_0(P2_mem_0_q), .data_in_1(P2_mem_1_q), .data_in_2(P2_mem_2_q), .data_in_3(P2_mem_3_q), 
+                           .data_in_4(P2_mem_4_q), .data_in_5(P2_mem_5_q), .data_in_6(P2_mem_6_q), .data_in_7(P2_mem_7_q), 
+                           .data_in_8(P2_mem_8_q), .data_in_9(P2_mem_9_q), .data_in_10(P2_mem_10_q), .data_in_11(P2_mem_11_q), 
+                           .sel(P2_mem_sel), .data_out(FC_in_data_0));
+mux_12to1 data_mux_12to1_1(.data_in_0(P2_mem_0_q), .data_in_1(P2_mem_1_q), .data_in_2(P2_mem_2_q), .data_in_3(P2_mem_3_q), 
+                           .data_in_4(P2_mem_4_q), .data_in_5(P2_mem_5_q), .data_in_6(P2_mem_6_q), .data_in_7(P2_mem_7_q), 
+                           .data_in_8(P2_mem_8_q), .data_in_9(P2_mem_9_q), .data_in_10(P2_mem_10_q), .data_in_11(P2_mem_11_q), 
+                           .sel(P2_mem_sel), .data_out(FC_in_data_1));
+mux_12to1 data_mux_12to1_2(.data_in_0(P2_mem_0_q), .data_in_1(P2_mem_1_q), .data_in_2(P2_mem_2_q), .data_in_3(P2_mem_3_q), 
+                           .data_in_4(P2_mem_4_q), .data_in_5(P2_mem_5_q), .data_in_6(P2_mem_6_q), .data_in_7(P2_mem_7_q), 
+                           .data_in_8(P2_mem_8_q), .data_in_9(P2_mem_9_q), .data_in_10(P2_mem_10_q), .data_in_11(P2_mem_11_q),  
+                           .sel(P2_mem_sel), .data_out(FC_in_data_2));
+mux_12to1 data_mux_12to1_3(.data_in_0(P2_mem_0_q), .data_in_1(P2_mem_1_q), .data_in_2(P2_mem_2_q), .data_in_3(P2_mem_3_q), 
+                           .data_in_4(P2_mem_4_q), .data_in_5(P2_mem_5_q), .data_in_6(P2_mem_6_q), .data_in_7(P2_mem_7_q), 
+                           .data_in_8(P2_mem_8_q), .data_in_9(P2_mem_9_q), .data_in_10(P2_mem_10_q), .data_in_11(P2_mem_11_q),  
+                           .sel(P2_mem_sel), .data_out(FC_in_data_3));
+mux_12to1 data_mux_12to1_4(.data_in_0(P2_mem_0_q), .data_in_1(P2_mem_1_q), .data_in_2(P2_mem_2_q), .data_in_3(P2_mem_3_q), 
+                           .data_in_4(P2_mem_4_q), .data_in_5(P2_mem_5_q), .data_in_6(P2_mem_6_q), .data_in_7(P2_mem_7_q), 
+                           .data_in_8(P2_mem_8_q), .data_in_9(P2_mem_9_q), .data_in_10(P2_mem_10_q), .data_in_11(P2_mem_11_q),  
+                           .sel(P2_mem_sel), .data_out(FC_in_data_4));
+mux_12to1 data_mux_12to1_5(.data_in_0(P2_mem_0_q), .data_in_1(P2_mem_1_q), .data_in_2(P2_mem_2_q), .data_in_3(P2_mem_3_q), 
+                           .data_in_4(P2_mem_4_q), .data_in_5(P2_mem_5_q), .data_in_6(P2_mem_6_q), .data_in_7(P2_mem_7_q), 
+                           .data_in_8(P2_mem_8_q), .data_in_9(P2_mem_9_q), .data_in_10(P2_mem_10_q), .data_in_11(P2_mem_11_q),  
+                           .sel(P2_mem_sel), .data_out(FC_in_data_5));
+mux_12to1 data_mux_12to1_6(.data_in_0(P2_mem_0_q), .data_in_1(P2_mem_1_q), .data_in_2(P2_mem_2_q), .data_in_3(P2_mem_3_q), 
+                           .data_in_4(P2_mem_4_q), .data_in_5(P2_mem_5_q), .data_in_6(P2_mem_6_q), .data_in_7(P2_mem_7_q), 
+                           .data_in_8(P2_mem_8_q), .data_in_9(P2_mem_9_q), .data_in_10(P2_mem_10_q), .data_in_11(P2_mem_11_q),  
+                           .sel(P2_mem_sel), .data_out(FC_in_data_6));
+mux_12to1 data_mux_12to1_7(.data_in_0(P2_mem_0_q), .data_in_1(P2_mem_1_q), .data_in_2(P2_mem_2_q), .data_in_3(P2_mem_3_q), 
+                           .data_in_4(P2_mem_4_q), .data_in_5(P2_mem_5_q), .data_in_6(P2_mem_6_q), .data_in_7(P2_mem_7_q), 
+                           .data_in_8(P2_mem_8_q), .data_in_9(P2_mem_9_q), .data_in_10(P2_mem_10_q), .data_in_11(P2_mem_11_q),  
+                           .sel(P2_mem_sel), .data_out(FC_in_data_7));
+mux_12to1 data_mux_12to1_8(.data_in_0(P2_mem_0_q), .data_in_1(P2_mem_1_q), .data_in_2(P2_mem_2_q), .data_in_3(P2_mem_3_q), 
+                           .data_in_4(P2_mem_4_q), .data_in_5(P2_mem_5_q), .data_in_6(P2_mem_6_q), .data_in_7(P2_mem_7_q), 
+                           .data_in_8(P2_mem_8_q), .data_in_9(P2_mem_9_q), .data_in_10(P2_mem_10_q), .data_in_11(P2_mem_11_q),  
+                           .sel(P2_mem_sel), .data_out(FC_in_data_8));
+mux_12to1 data_mux_12to1_9(.data_in_0(P2_mem_0_q), .data_in_1(P2_mem_1_q), .data_in_2(P2_mem_2_q), .data_in_3(P2_mem_3_q), 
+                           .data_in_4(P2_mem_4_q), .data_in_5(P2_mem_5_q), .data_in_6(P2_mem_6_q), .data_in_7(P2_mem_7_q), 
+                           .data_in_8(P2_mem_8_q), .data_in_9(P2_mem_9_q), .data_in_10(P2_mem_10_q), .data_in_11(P2_mem_11_q),  
+                           .sel(P2_mem_sel), .data_out(FC_in_data_9));
+mux_12to1 data_mux_12to1_10(.data_in_0(P2_mem_0_q), .data_in_1(P2_mem_1_q), .data_in_2(P2_mem_2_q), .data_in_3(P2_mem_3_q), 
+                           .data_in_4(P2_mem_4_q), .data_in_5(P2_mem_5_q), .data_in_6(P2_mem_6_q), .data_in_7(P2_mem_7_q), 
+                           .data_in_8(P2_mem_8_q), .data_in_9(P2_mem_9_q), .data_in_10(P2_mem_10_q), .data_in_11(P2_mem_11_q),  
+                           .sel(P2_mem_sel), .data_out(FC_in_data_10));
+mux_12to1 data_mux_12to1_11(.data_in_0(P2_mem_0_q), .data_in_1(P2_mem_1_q), .data_in_2(P2_mem_2_q), .data_in_3(P2_mem_3_q), 
+                            .data_in_4(P2_mem_4_q), .data_in_5(P2_mem_5_q), .data_in_6(P2_mem_6_q), .data_in_7(P2_mem_7_q), 
+                            .data_in_8(P2_mem_8_q), .data_in_9(P2_mem_9_q), .data_in_10(P2_mem_10_q), .data_in_11(P2_mem_11_q),  
+                            .sel(P2_mem_sel), .data_out(FC_in_data_11));
+mux_12to1 data_mux_12to1_12(.data_in_0(P2_mem_0_q), .data_in_1(P2_mem_1_q), .data_in_2(P2_mem_2_q), .data_in_3(P2_mem_3_q), 
+                            .data_in_4(P2_mem_4_q), .data_in_5(P2_mem_5_q), .data_in_6(P2_mem_6_q), .data_in_7(P2_mem_7_q), 
+                            .data_in_8(P2_mem_8_q), .data_in_9(P2_mem_9_q), .data_in_10(P2_mem_10_q), .data_in_11(P2_mem_11_q),  
+                            .sel(P2_mem_sel), .data_out(FC_in_data_12));
+mux_12to1 data_mux_12to1_13(.data_in_0(P2_mem_0_q), .data_in_1(P2_mem_1_q), .data_in_2(P2_mem_2_q), .data_in_3(P2_mem_3_q), 
+                            .data_in_4(P2_mem_4_q), .data_in_5(P2_mem_5_q), .data_in_6(P2_mem_6_q), .data_in_7(P2_mem_7_q), 
+                            .data_in_8(P2_mem_8_q), .data_in_9(P2_mem_9_q), .data_in_10(P2_mem_10_q), .data_in_11(P2_mem_11_q),  
+                            .sel(P2_mem_sel), .data_out(FC_in_data_13));
+mux_12to1 data_mux_12to1_14(.data_in_0(P2_mem_0_q), .data_in_1(P2_mem_1_q), .data_in_2(P2_mem_2_q), .data_in_3(P2_mem_3_q), 
+                            .data_in_4(P2_mem_4_q), .data_in_5(P2_mem_5_q), .data_in_6(P2_mem_6_q), .data_in_7(P2_mem_7_q), 
+                            .data_in_8(P2_mem_8_q), .data_in_9(P2_mem_9_q), .data_in_10(P2_mem_10_q), .data_in_11(P2_mem_11_q),  
+                            .sel(P2_mem_sel), .data_out(FC_in_data_14));
+mux_12to1 data_mux_12to1_15(.data_in_0(P2_mem_0_q), .data_in_1(P2_mem_1_q), .data_in_2(P2_mem_2_q), .data_in_3(P2_mem_3_q), 
+                            .data_in_4(P2_mem_4_q), .data_in_5(P2_mem_5_q), .data_in_6(P2_mem_6_q), .data_in_7(P2_mem_7_q), 
+                            .data_in_8(P2_mem_8_q), .data_in_9(P2_mem_9_q), .data_in_10(P2_mem_10_q), .data_in_11(P2_mem_11_q),  
+                            .sel(P2_mem_sel), .data_out(FC_in_data_15));
+mux_12to1 data_mux_12to1_16(.data_in_0(P2_mem_0_q), .data_in_1(P2_mem_1_q), .data_in_2(P2_mem_2_q), .data_in_3(P2_mem_3_q), 
+                            .data_in_4(P2_mem_4_q), .data_in_5(P2_mem_5_q), .data_in_6(P2_mem_6_q), .data_in_7(P2_mem_7_q), 
+                            .data_in_8(P2_mem_8_q), .data_in_9(P2_mem_9_q), .data_in_10(P2_mem_10_q), .data_in_11(P2_mem_11_q),  
+                            .sel(P2_mem_sel), .data_out(FC_in_data_16));
+mux_12to1 data_mux_12to1_17(.data_in_0(P2_mem_0_q), .data_in_1(P2_mem_1_q), .data_in_2(P2_mem_2_q), .data_in_3(P2_mem_3_q), 
+                            .data_in_4(P2_mem_4_q), .data_in_5(P2_mem_5_q), .data_in_6(P2_mem_6_q), .data_in_7(P2_mem_7_q), 
+                            .data_in_8(P2_mem_8_q), .data_in_9(P2_mem_9_q), .data_in_10(P2_mem_10_q), .data_in_11(P2_mem_11_q),  
+                            .sel(P2_mem_sel), .data_out(FC_in_data_17));
+mux_12to1 data_mux_12to1_18(.data_in_0(P2_mem_0_q), .data_in_1(P2_mem_1_q), .data_in_2(P2_mem_2_q), .data_in_3(P2_mem_3_q), 
+                            .data_in_4(P2_mem_4_q), .data_in_5(P2_mem_5_q), .data_in_6(P2_mem_6_q), .data_in_7(P2_mem_7_q), 
+                            .data_in_8(P2_mem_8_q), .data_in_9(P2_mem_9_q), .data_in_10(P2_mem_10_q), .data_in_11(P2_mem_11_q),  
+                            .sel(P2_mem_sel), .data_out(FC_in_data_18));
+mux_12to1 data_mux_12to1_19(.data_in_0(P2_mem_0_q), .data_in_1(P2_mem_1_q), .data_in_2(P2_mem_2_q), .data_in_3(P2_mem_3_q), 
+                            .data_in_4(P2_mem_4_q), .data_in_5(P2_mem_5_q), .data_in_6(P2_mem_6_q), .data_in_7(P2_mem_7_q), 
+                            .data_in_8(P2_mem_8_q), .data_in_9(P2_mem_9_q), .data_in_10(P2_mem_10_q), .data_in_11(P2_mem_11_q),  
+                            .sel(P2_mem_sel), .data_out(FC_in_data_19));
+mux_12to1 data_mux_12to1_20(.data_in_0(P2_mem_0_q), .data_in_1(P2_mem_1_q), .data_in_2(P2_mem_2_q), .data_in_3(P2_mem_3_q), 
+                            .data_in_4(P2_mem_4_q), .data_in_5(P2_mem_5_q), .data_in_6(P2_mem_6_q), .data_in_7(P2_mem_7_q), 
+                            .data_in_8(P2_mem_8_q), .data_in_9(P2_mem_9_q), .data_in_10(P2_mem_10_q), .data_in_11(P2_mem_11_q),  
+                            .sel(P2_mem_sel), .data_out(FC_in_data_20));
+mux_12to1 data_mux_12to1_21(.data_in_0(P2_mem_0_q), .data_in_1(P2_mem_1_q), .data_in_2(P2_mem_2_q), .data_in_3(P2_mem_3_q), 
+                            .data_in_4(P2_mem_4_q), .data_in_5(P2_mem_5_q), .data_in_6(P2_mem_6_q), .data_in_7(P2_mem_7_q), 
+                            .data_in_8(P2_mem_8_q), .data_in_9(P2_mem_9_q), .data_in_10(P2_mem_10_q), .data_in_11(P2_mem_11_q),  
+                            .sel(P2_mem_sel), .data_out(FC_in_data_21));
+mux_12to1 data_mux_12to1_22(.data_in_0(P2_mem_0_q), .data_in_1(P2_mem_1_q), .data_in_2(P2_mem_2_q), .data_in_3(P2_mem_3_q), 
+                            .data_in_4(P2_mem_4_q), .data_in_5(P2_mem_5_q), .data_in_6(P2_mem_6_q), .data_in_7(P2_mem_7_q), 
+                            .data_in_8(P2_mem_8_q), .data_in_9(P2_mem_9_q), .data_in_10(P2_mem_10_q), .data_in_11(P2_mem_11_q),  
+                            .sel(P2_mem_sel), .data_out(FC_in_data_22));
+mux_12to1 data_mux_12to1_23(.data_in_0(P2_mem_0_q), .data_in_1(P2_mem_1_q), .data_in_2(P2_mem_2_q), .data_in_3(P2_mem_3_q), 
+                            .data_in_4(P2_mem_4_q), .data_in_5(P2_mem_5_q), .data_in_6(P2_mem_6_q), .data_in_7(P2_mem_7_q), 
+                            .data_in_8(P2_mem_8_q), .data_in_9(P2_mem_9_q), .data_in_10(P2_mem_10_q), .data_in_11(P2_mem_11_q),  
+                            .sel(P2_mem_sel), .data_out(FC_in_data_23));
+
+//Muxes to control the inputs to the MACs based on layer
+mux3to1 data_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(FC_in_data_0), .sel(), .data_out(MAC_in_data_0));
+mux3to1 data_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(FC_in_data_1), .sel(), .data_out(MAC_in_data_1));
+mux3to1 data_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(FC_in_data_2), .sel(), .data_out(MAC_in_data_2));
+mux3to1 data_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(FC_in_data_3), .sel(), .data_out(MAC_in_data_3));
+mux3to1 data_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(FC_in_data_4), .sel(), .data_out(MAC_in_data_4));
+mux3to1 data_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(FC_in_data_5), .sel(), .data_out(MAC_in_data_5));
+mux3to1 data_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(FC_in_data_6), .sel(), .data_out(MAC_in_data_6));
+mux3to1 data_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(FC_in_data_7), .sel(), .data_out(MAC_in_data_7));
+mux3to1 data_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(FC_in_data_8), .sel(), .data_out(MAC_in_data_8));
+mux3to1 data_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(FC_in_data_9), .sel(), .data_out(MAC_in_data_9));
+mux3to1 data_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(FC_in_data_10), .sel(), .data_out(MAC_in_data_10));
+mux3to1 data_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(FC_in_data_11), .sel(), .data_out(MAC_in_data_11));
+mux3to1 data_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(FC_in_data_12), .sel(), .data_out(MAC_in_data_12));
+mux3to1 data_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(FC_in_data_13), .sel(), .data_out(MAC_in_data_13));
+mux3to1 data_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(FC_in_data_14), .sel(), .data_out(MAC_in_data_14));
+mux3to1 data_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(FC_in_data_15), .sel(), .data_out(MAC_in_data_15));
+mux3to1 data_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(FC_in_data_16), .sel(), .data_out(MAC_in_data_16));
+mux3to1 data_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(FC_in_data_17), .sel(), .data_out(MAC_in_data_17));
+mux3to1 data_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(FC_in_data_18), .sel(), .data_out(MAC_in_data_18));
+mux3to1 data_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(FC_in_data_19), .sel(), .data_out(MAC_in_data_19));
+mux3to1 data_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(FC_in_data_20), .sel(), .data_out(MAC_in_data_20));
+mux3to1 data_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(FC_in_data_21), .sel(), .data_out(MAC_in_data_21));
+mux3to1 data_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(FC_in_data_22), .sel(), .data_out(MAC_in_data_22));
+mux3to1 data_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(FC_in_data_23), .sel(), .data_out(MAC_in_data_23));
 
 //Muxes to make sure proper input parameter based on the correct ROM. 1 for conv1, 1 for conv2, 1 for fc.
-mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_0));
-mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_1));
-mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_2));
-mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_3));
-mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_4));
-mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_5));
-mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_6));
-mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_7));
-mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_8));
-mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_9));
-mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_10));
-mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_11));
-mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_12));
-mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_13));
-mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_14));
-mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_15));
-mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_16));
-mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_17));
-mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_18));
-mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_19));
-mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_20));
-mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_21));
-mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_22));
-mux3to1 mux3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_23));
+mux3to1 para_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_0));
+mux3to1 para_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_1));
+mux3to1 para_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_2));
+mux3to1 para_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_3));
+mux3to1 para_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_4));
+mux3to1 para_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_5));
+mux3to1 para_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_6));
+mux3to1 para_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_7));
+mux3to1 para_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_8));
+mux3to1 para_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_9));
+mux3to1 para_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_10));
+mux3to1 para_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_11));
+mux3to1 para_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_12));
+mux3to1 para_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_13));
+mux3to1 para_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_14));
+mux3to1 para_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_15));
+mux3to1 para_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_16));
+mux3to1 para_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_17));
+mux3to1 para_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_18));
+mux3to1 para_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_19));
+mux3to1 para_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_20));
+mux3to1 para_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_21));
+mux3to1 para_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_22));
+mux3to1 para_mux_3to1_0(.data_in_0(), .data_in_1(), .data_in_2(), .sel(), .data_out(MAC_in_para_23));
 
 //24 MAC modules
-MAC MAC_0(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_0), .B(MAC_in_para_0), .out(MAC_out_0));
-MAC MAC_1(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_1), .B(MAC_in_para_1), .out(MAC_out_1));
-MAC MAC_2(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_2), .B(MAC_in_para_2), .out(MAC_out_2));
-MAC MAC_3(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_3), .B(MAC_in_para_3), .out(MAC_out_3));
-MAC MAC_4(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_4), .B(MAC_in_para_4), .out(MAC_out_4));
-MAC MAC_5(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_5), .B(MAC_in_para_5), .out(MAC_out_5));
-MAC MAC_6(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_6), .B(MAC_in_para_6), .out(MAC_out_6));
-MAC MAC_7(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_7), .B(MAC_in_para_7), .out(MAC_out_7));
-MAC MAC_8(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_8), .B(MAC_in_para_8), .out(MAC_out_8));
-MAC MAC_9(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_9), .B(MAC_in_para_9), .out(MAC_out_9));
-MAC MAC_10(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_10), .B(MAC_in_para_10), .out(MAC_out_10));
-MAC MAC_11(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_11), .B(MAC_in_para_11), .out(MAC_out_11));
-MAC MAC_12(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_12), .B(MAC_in_para_12), .out(MAC_out_12));
-MAC MAC_13(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_13), .B(MAC_in_para_13), .out(MAC_out_13));
-MAC MAC_14(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_14), .B(MAC_in_para_14), .out(MAC_out_14));
-MAC MAC_15(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_15), .B(MAC_in_para_15), .out(MAC_out_15));
-MAC MAC_16(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_16), .B(MAC_in_para_16), .out(MAC_out_16));
-MAC MAC_17(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_17), .B(MAC_in_para_17), .out(MAC_out_17));
-MAC MAC_18(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_18), .B(MAC_in_para_18), .out(MAC_out_18));
-MAC MAC_19(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_19), .B(MAC_in_para_19), .out(MAC_out_19));
-MAC MAC_20(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_20), .B(MAC_in_para_20), .out(MAC_out_20));
-MAC MAC_21(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_21), .B(MAC_in_para_21), .out(MAC_out_21));
-MAC MAC_22(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_22), .B(MAC_in_para_22), .out(MAC_out_22));
-MAC MAC_23(.clk(clk), .enable(), .reset(), .conv(), .fc(), .A(MAC_in_data_23), .B(MAC_in_para_23), .out(MAC_out_23));
+MAC MAC_0(.clk(clk), .enable(), .reset(), .layer(), .A(MAC_in_data_0), .B(MAC_in_para_0), .out(MAC_out_0));
+MAC MAC_1(.clk(clk), .enable(), .reset(), .layer(), .A(MAC_in_data_1), .B(MAC_in_para_1), .out(MAC_out_1));
+MAC MAC_2(.clk(clk), .enable(), .reset(), .layer(), .A(MAC_in_data_2), .B(MAC_in_para_2), .out(MAC_out_2));
+MAC MAC_3(.clk(clk), .enable(), .reset(), .layer(), .A(MAC_in_data_3), .B(MAC_in_para_3), .out(MAC_out_3));
+MAC MAC_4(.clk(clk), .enable(), .reset(), .layer(), .A(MAC_in_data_4), .B(MAC_in_para_4), .out(MAC_out_4));
+MAC MAC_5(.clk(clk), .enable(), .reset(), .layer(), .A(MAC_in_data_5), .B(MAC_in_para_5), .out(MAC_out_5));
+MAC MAC_6(.clk(clk), .enable(), .reset(), .layer(), .A(MAC_in_data_6), .B(MAC_in_para_6), .out(MAC_out_6));
+MAC MAC_7(.clk(clk), .enable(), .reset(), .layer(), .A(MAC_in_data_7), .B(MAC_in_para_7), .out(MAC_out_7));
+MAC MAC_8(.clk(clk), .enable(), .reset(), .layer(), .A(MAC_in_data_8), .B(MAC_in_para_8), .out(MAC_out_8));
+MAC MAC_9(.clk(clk), .enable(), .reset(), .layer(), .A(MAC_in_data_9), .B(MAC_in_para_9), .out(MAC_out_9));
+MAC MAC_10(.clk(clk), .enable(), .reset(), .layer(), .A(MAC_in_data_10), .B(MAC_in_para_10), .out(MAC_out_10));
+MAC MAC_11(.clk(clk), .enable(), .reset(), .layer(), .A(MAC_in_data_11), .B(MAC_in_para_11), .out(MAC_out_11));
+MAC MAC_12(.clk(clk), .enable(), .reset(), .layer(), .A(MAC_in_data_12), .B(MAC_in_para_12), .out(MAC_out_12));
+MAC MAC_13(.clk(clk), .enable(), .reset(), .layer(), .A(MAC_in_data_13), .B(MAC_in_para_13), .out(MAC_out_13));
+MAC MAC_14(.clk(clk), .enable(), .reset(), .layer(), .A(MAC_in_data_14), .B(MAC_in_para_14), .out(MAC_out_14));
+MAC MAC_15(.clk(clk), .enable(), .reset(), .layer(), .A(MAC_in_data_15), .B(MAC_in_para_15), .out(MAC_out_15));
+MAC MAC_16(.clk(clk), .enable(), .reset(), .layer(), .A(MAC_in_data_16), .B(MAC_in_para_16), .out(MAC_out_16));
+MAC MAC_17(.clk(clk), .enable(), .reset(), .layer(), .A(MAC_in_data_17), .B(MAC_in_para_17), .out(MAC_out_17));
+MAC MAC_18(.clk(clk), .enable(), .reset(), .layer(), .A(MAC_in_data_18), .B(MAC_in_para_18), .out(MAC_out_18));
+MAC MAC_19(.clk(clk), .enable(), .reset(), .layer(), .A(MAC_in_data_19), .B(MAC_in_para_19), .out(MAC_out_19));
+MAC MAC_20(.clk(clk), .enable(), .reset(), .layer(), .A(MAC_in_data_20), .B(MAC_in_para_20), .out(MAC_out_20));
+MAC MAC_21(.clk(clk), .enable(), .reset(), .layer(), .A(MAC_in_data_21), .B(MAC_in_para_21), .out(MAC_out_21));
+MAC MAC_22(.clk(clk), .enable(), .reset(), .layer(), .A(MAC_in_data_22), .B(MAC_in_para_22), .out(MAC_out_22));
+MAC MAC_23(.clk(clk), .enable(), .reset(), .layer(), .A(MAC_in_data_23), .B(MAC_in_para_23), .out(MAC_out_23));
 
 //The after MAC does all subsequent operations needed after the MAC depending on the layer. ReLU, combination, biases, shifting, etc.
-after_MAC after_MAC_0(.conv1(), .conv2(), .fc(), .MAC_out_0(MAC_out_0), .MAC_out_1(MAC_out_1), .MAC_out_2(MAC_out_2), 
-                      .MAC_out_3(MAC_out_3), .MAC_out_4(MAC_out_4), .MAC_out_5(MAC_out_5), .bias_0(), .bias_1(), .bias_2(), 
-                      .bias_3(), .bias_4(), .bias_5(), .FC_bias(), .out_0(), .out_1(), 
-                      .out_2(), .out_3(), .out_4(), .out_5(), .out_conv2());
-after_MAC after_MAC_1(.conv1(), .conv2(), .fc(), .MAC_out_0(MAC_out_6), .MAC_out_1(MAC_out_7), .MAC_out_2(MAC_out_8), 
-                      .MAC_out_3(MAC_out_9), .MAC_out_4(MAC_out_10), .MAC_out_5(MAC_out_11), .bias_0(), .bias_1(), .bias_2(), 
-                      .bias_3(), .bias_4(), .bias_5(), .FC_bias(), .out_0(), .out_1(), 
-                      .out_2(), .out_3(), .out_4(), .out_5(), .out_conv2());
-after_MAC after_MAC_2(.conv1(), .conv2(), .fc(), .MAC_out_0(MAC_out_12), .MAC_out_1(MAC_out_13), .MAC_out_2(MAC_out_14), 
-                      .MAC_out_3(MAC_out_15), .MAC_out_4(MAC_out_16), .MAC_out_5(MAC_out_17), .bias_0(), .bias_1(), .bias_2(), 
-                      .bias_3(), .bias_4(), .bias_5(), .FC_bias(), .out_0(), .out_1(), 
-                      .out_2(), .out_3(), .out_4(), .out_5(), .out_conv2());
-after_MAC after_MAC_3(.conv1(), .conv2(), .fc(), .MAC_out_0(MAC_out_18), .MAC_out_1(MAC_out_19), .MAC_out_2(MAC_out_20), 
-                      .MAC_out_3(MAC_out_21), .MAC_out_4(MAC_out_22), .MAC_out_5(MAC_out_23), .bias_0(), .bias_1(), .bias_2(), 
-                      .bias_3(), .bias_4(), .bias_5(), .FC_bias(), .out_0(), .out_1(), 
-                      .out_2(), .out_3(), .out_4(), .out_5(), .out_conv2());
+after_MAC after_MAC_0(.layer(), .MAC_out_0(MAC_out_0), .MAC_out_1(MAC_out_1), .MAC_out_2(MAC_out_2), .MAC_out_3(MAC_out_3), 
+                      .MAC_out_4(MAC_out_4), .MAC_out_5(MAC_out_5), .bias_0(), .bias_1(), .bias_2(), 
+                      .bias_3(), .bias_4(), .bias_5(), .FC_bias(), .out_0(), 
+                      .out_1(), .out_2(), .out_3(), .out_4(), .out_5(), .out_conv2());
+after_MAC after_MAC_1(.layer(), .MAC_out_0(MAC_out_6), .MAC_out_1(MAC_out_7), .MAC_out_2(MAC_out_8), .MAC_out_3(MAC_out_9), 
+                      .MAC_out_4(MAC_out_10), .MAC_out_5(MAC_out_11), .bias_0(), .bias_1(), .bias_2(), 
+                      .bias_3(), .bias_4(), .bias_5(), .FC_bias(), .out_0(), 
+                      .out_1(), .out_2(), .out_3(), .out_4(), .out_5(), .out_conv2());
+after_MAC after_MAC_2(.layer(), .MAC_out_0(MAC_out_12), .MAC_out_1(MAC_out_13), .MAC_out_2(MAC_out_14), .MAC_out_3(MAC_out_15), 
+                      .MAC_out_4(MAC_out_16), .MAC_out_5(MAC_out_17), .bias_0(), .bias_1(), .bias_2(), 
+                      .bias_3(), .bias_4(), .bias_5(), .FC_bias(), .out_0(), 
+                      .out_1(), .out_2(), .out_3(), .out_4(), .out_5(), .out_conv2());
+after_MAC after_MAC_3(.layer(), .MAC_out_0(MAC_out_18), .MAC_out_1(MAC_out_19), .MAC_out_2(MAC_out_20), .MAC_out_3(MAC_out_21), 
+                      .MAC_out_4(MAC_out_22), .MAC_out_5(MAC_out_23), .bias_0(), .bias_1(), .bias_2(), 
+                      .bias_3(), .bias_4(), .bias_5(), .FC_bias(), .out_0(), 
+                      .out_1(), .out_2(), .out_3(), .out_4(), .out_5(), .out_conv2());
 
 //12 pooling modules to be used by pooling layers
 pooling pooling_0(.a_0(), .a_1(), .b_0(), .b_1(), .out());
