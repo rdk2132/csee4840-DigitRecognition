@@ -13,21 +13,23 @@ module conv2_mem_write (input logic clk, reset, enable,
             count <= 2'b00;
             clk_counter <= 5'b00000;
         end
-        else if (enable == 1'b1 && done == 1'b0 && clk_counter == 5'b11000) begin
-            clk_counter <= 5'b00000;
-            if(addr0 == 6'b111111) begin
-                count <= count + 2'b01;
-                addr0 <= 6'b000000;
+        else if (enable == 1'b1 && done == 1'b0) begin
+            if (clk_counter == 5'b11000) begin
+                clk_counter <= 5'b00000;
+                if(addr0 == 6'b111111) begin
+                    count <= count + 2'b01;
+                    addr0 <= 6'b000000;
+                end
+                else begin
+                    addr0 <= addr0 + 6'b000001;
+                end
             end
             else begin
-                addr0 <= addr0 + 6'b000001;
+                clk_counter <= clk_counter + 5'b00001;
             end
         end
-        else begin
-            clk_counter <= clk_counter + 5'b00001;
-        end
     end
-    
+
     always_comb begin
         if(count == 2'b10 && addr0 == 6'b111111) begin
             done = 1'b1;
