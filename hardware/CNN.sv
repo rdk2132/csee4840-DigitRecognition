@@ -29,7 +29,7 @@ CNN_ctrl CNN_ctrl();
 logic signed [15:0] img_mem_0_q_a, img_mem_0_q_b, img_mem_1_q_a, img_mem_1_q_b;
 logic [9:0] img_mem_addr0_read, img_mem_addr0, img_mem_addr1, img_mem_addr2_read, img_mem_addr2, img_mem_addr3;
 
-img_mem_read img_mem_read_0(.clk(clk), .reset(), .enable(), .addr0(img_mem_addr0_read), .addr1(img_mem_addr1), .addr2(img_mem_addr2_read), .addr3(img_mem_addr3), .done());
+img_mem_read img_mem_read_0(.clk(clk), .reset(reset), .enable(), .addr0(img_mem_addr0_read), .addr1(img_mem_addr1), .addr2(img_mem_addr2_read), .addr3(img_mem_addr3), .done());
 mux_2to1 (#10) img_mem_addr_mux_0(.data_in_0(img_mem_addr_write), .data_in_1(img_mem_addr0_read), .sel(), .data_out(img_mem_addr0));
 mux_2to1 (#10) img_mem_addr_mux_1(.data_in_0(img_mem_addr_write), .data_in_1(img_mem_addr2_read), .sel(), .data_out(img_mem_addr2));
 
@@ -51,8 +51,8 @@ logic signed [15:0] conv1_mem_0_0_q_a, conv1_mem_0_0_q_b, conv1_mem_0_1_q_a, con
                     conv1_mem_5_0_q_a, conv1_mem_5_0_q_b, conv1_mem_5_1_q_a, conv1_mem_5_1_q_b, conv1_mem_5_2_q_a, conv1_mem_5_2_q_b, conv1_mem_5_3_q_a, conv1_mem_5_3_q_b;
 logic [9:0] conv1_addr0_write, conv1_addr1_write, conv1_addr0_read, conv1_addr1_read, conv1_addr2_read, conv1_addr3_read, conv1_addr0w0r, conv1_addr1w2r;
 
-conv1_mem_write conv1_mem_write(.clk(clk), .reset(), .enable(), .addr0(conv1_addr0_write), .addr1(conv1_addr1_write), .done());
-conv1_mem_read conv1_mem_read(.clk(clk), .reset(), .enable(), .addr0(conv1_addr0_read), .addr1(conv1_addr1_read), .addr2(conv1_addr2_read), .addr3(conv1_addr3_read) .done());
+conv1_mem_write conv1_mem_write(.clk(clk), .reset(reset), .enable(), .addr0(conv1_addr0_write), .addr1(conv1_addr1_write), .done());
+conv1_mem_read conv1_mem_read(.clk(clk), .reset(reset), .enable(), .addr0(conv1_addr0_read), .addr1(conv1_addr1_read), .addr2(conv1_addr2_read), .addr3(conv1_addr3_read) .done());
 mux_2to1 (#10) conv1_mem_addr_mux_0(.data_in_0(conv1_addr0_write), .data_in_1(conv1_addr0_read), .sel(), .data_out(conv1_addr0w0r));
 mux_2to1 (#10) conv1_mem_addr_mux_1(.data_in_0(conv1_addr1_write), .data_in_1(conv1_addr2_read), .sel(), .data_out(conv1_addr1w2r));
 
@@ -96,7 +96,7 @@ conv1_mem conv1_mem_5_3(.address_a(conv1_addr1w2r), .address_b(conv1_addr3_read)
 logic signed [15:0] conv1_k_g0_mem_q_a, conv1_k_g0_mem_q_b, conv1_k_g1_mem_q_a, conv1_k_g1_mem_q_b, conv1_k_g2_mem_q_a, conv1_k_g2_mem_q_b;
 logic[5:0] conv1_k_mem_addr0_read, conv1_k_mem_addr1_read;
 
-conv1_k_mem_read conv1_k_mem_read(.clk(clk), .reset(), .enable(), .addr0(conv1_k_mem_addr0_read), .addr1(conv1_k_mem_addr1_read), .done());
+conv1_k_mem_read conv1_k_mem_read(.clk(clk), .reset(reset), .enable(), .addr0(conv1_k_mem_addr0_read), .addr1(conv1_k_mem_addr1_read), .done());
 
 //Memories for conv1 kernels. Each holds 2 25x25 kernels.
 conv1_k_g0_mem conv1_k_g0_mem(.address_a(conv1_k_mem_addr0_read), .address_b(conv1_k_mem_addr1_read), .clock(clk), .rden_a(), .rden_b(), .q_a(), .q_b());
@@ -193,8 +193,8 @@ logic signed [15:0] P2_mem_0_q, P2_mem_1_q, P2_mem_2_q, P2_mem_3_q, P2_mem_4_q, 
 logic [3:0] P2_addr0_write, P2_addr0_read, P2_addr0w0r; //wires for addressing
 
 //addressers for writing and reading the P2 memories
-P2_mem_write P2_mem_write(.clk(clk), .reset(), .enable(), .addr0(P2_addr0_write), .done());
-P2_mem_read P2_mem_read(.clk(clk), .reset(), .enable(), .addr0(P2_addr0_read), .count(P2_mem_sel), .done());
+P2_mem_write P2_mem_write(.clk(clk), .reset(reset), .enable(), .addr0(P2_addr0_write), .done());
+P2_mem_read P2_mem_read(.clk(clk), .reset(reset), .enable(), .addr0(P2_addr0_read), .count(P2_mem_sel), .done());
 mux_2to1 (#4) P2_addr_mux_0(.data_in_0(P2_addr0_write), .data_in_1(P2_addr0_read), .sel(), .data_out(P2_addr0w0r)); //mux to combine write and read addresses
 
 //Memories for the 12 outputs of p2. Each is unique
@@ -222,7 +222,7 @@ logic signed [15:0] fc_g0_mem_q_a, fc_g0_mem_q_b, fc_g1_mem_q_a, fc_g1_mem_q_b, 
 logic [8:0] fc_mem_addr0_read, fc_mem_addr1_read;
 
 //addressers for writing and reading the FC weight memories
-fc_mem_read fc_mem_read(.clk(clk), .reset(), .enable(), .addr0(fc_mem_addr0_read), .addr1(fc_mem_addr1_read), .done());
+fc_mem_read fc_mem_read(.clk(clk), .reset(reset), .enable(), .addr0(fc_mem_addr0_read), .addr1(fc_mem_addr1_read), .done());
 
 //Memories for FC weights. Each holds 2 neurons's 192 weights(384 in total)
 fc_g0_mem fc_g0_mem(.address_a(fc_mem_addr0_read), .address_b(fc_mem_addr1_read), .clock(clk), .rden_a(), .rden_b(), .q_a(fc_g0_mem_q_a), .q_b(fc_g0_mem_q_b));
