@@ -35,7 +35,7 @@ module pool (input logic clk, enable, read_write, cv1m_cv2m,
   conv1_mem_read c1mr(.clk, );
   conv2_mem_read c2mr(.clk, );
 
-  //memcounter work at half clock speed to acount for loading values
+  //memcounter work at half clock speed to account for loading values
   P1_mem_write p1mw(.clk(count), );
   P2_mem_write p2mw(.clk(count), );
 

@@ -88,7 +88,7 @@ module after_MAC (input logic [2:0] layer,
 
 	always_comb begin
 
-		if(layer = 3'b000) begin //if conv1 preforms ReLU and shifts intermediate
+		if(layer = 3'b000) begin //if conv1 performs ReLU and shifts intermediate
 			if(conv1_interm_0[31] == 1'b1) begin
 				out_0[15:0] = 16'b0000000000000000;
 			end
@@ -127,7 +127,7 @@ module after_MAC (input logic [2:0] layer,
 			end
 		end
 
-		if(layer = 3'b010) begin //if conv2 preforms ReLU and shifts intermediate
+		if(layer = 3'b010) begin //if conv2 performs ReLU and shifts intermediate
 			if(conv2_interm[31] == 1'b1) begin
 				out_conv2[15:0] = 16'b0000000000000000;
 			end
