@@ -12,7 +12,6 @@ module mux4to1 (parameter WORD_SIZE = 16)
             2'd1: data_out = data_in_1;
             2'd2: data_out = data_in_2;
             2'd3: data_out = data_in_3;
-            default: data_out = 0;
         endcase
     end
 endmodule
@@ -26,7 +25,6 @@ module mux_3to1 (input logic [15:0] data_in_0, data_in_1, data_in_2,
             2'b00: data_out = data_in_0;
             2'b01: data_out = data_in_1;
             2'b10: data_out = data_in_2;
-            default: data_out = 16'b0000000000000000;
         endcase
     end
 endmodule
@@ -50,12 +48,11 @@ module mux_12to1 (input logic [15:0] data_in_0, data_in_1, data_in_2, data_in_3,
             4'b1001: data_out = data_in_9;
             4'b1010: data_out = data_in_10;
             4'b1011: data_out = data_in_11;
-            default: data_out = 16'b0000000000000000;
         endcase
     end
 endmodule
 
-module mux2to1 (parameter WORD_SIZE = 16)
+module mux_2to1 (parameter WORD_SIZE = 16)
                (input logic [WORD_SIZE - 1:0] data_in_0, data_in_1,
                 input logic sel,
                 output logic [WORD_SIZE - 1:0] data_out);
@@ -63,7 +60,6 @@ module mux2to1 (parameter WORD_SIZE = 16)
         case (sel)
             1'd0: data_out = data_in_0;
             1'd1: data_out = data_in_1;
-            default: data_out = 0;
         endcase
     end
 endmodule

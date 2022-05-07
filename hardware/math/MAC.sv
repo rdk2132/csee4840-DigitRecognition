@@ -43,8 +43,8 @@ endmodule
 
 module MAC (input logic clk, enable, reset, 
 			input logic [2:0] layer, 
-			input signed [15:0] A, B,  
-			output signed logic [31:0] out);
+			input logic signed [15:0] A, B,  
+			output logic signed [31:0] out);
 	
 	reg signed [31:0] MAC_out;
 	reg [7:0] count;
@@ -67,8 +67,8 @@ module MAC (input logic clk, enable, reset,
 endmodule
 
 module after_MAC (input logic [2:0] layer,
-				  input logic [31:0] MAC_out_0, MAC_out_1, MAC_out_2, MAC_out_3, MAC_out_4, MAC_out_5, bias_0, bias_1, bias_2, bias_3, bias_4, bias_5, FC_bias, 
-				  output logic [15:0] out_0, out_1, out_2, out_3, out_4, out_5, out_conv2);
+				  input logic signed [31:0] MAC_out_0, MAC_out_1, MAC_out_2, MAC_out_3, MAC_out_4, MAC_out_5, bias_0, bias_1, bias_2, bias_3, bias_4, bias_5, conv2_bias, 
+				  output logic signed [15:0] out_0, out_1, out_2, out_3, out_4, out_5, out_conv2);
 
 	//bias adding and adding of itermediates for conv1 and conv2
 	wire signed [31:0] conv1_interm_0;
@@ -78,7 +78,7 @@ module after_MAC (input logic [2:0] layer,
 	wire signed [31:0] conv1_interm_4;
 	wire signed [31:0] conv1_interm_5;
 	wire signed [31:0] conv2_interm;
-	assign conv2_interm = MAC_out_0 + MAC_out_1 + MAC_out_2 + MAC_out_3 + MAC_out_4 + MAC_out_5 + FC_bias;
+	assign conv2_interm = MAC_out_0 + MAC_out_1 + MAC_out_2 + MAC_out_3 + MAC_out_4 + MAC_out_5 + conv2_bias;
 	assign conv1_interm_0 = MAC_out_0 + bias_0;
 	assign conv1_interm_1 = MAC_out_1 + bias_1;
 	assign conv1_interm_2 = MAC_out_2 + bias_2;
