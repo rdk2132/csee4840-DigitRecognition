@@ -1,1 +1,5 @@
 software-testbench/FacialRecognition.exe
+software-testbench/FacialRecognition
+*.o
+hardware/mem_counter_test/obj_dir
+hardware/mem_counter_test/*.vcd

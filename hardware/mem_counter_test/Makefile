@@ -96,5 +96,5 @@ lab1.tar.gz : $(TARFILES)
 
 
 clean :
-	rm -rf obj_dir db incremental_db output_files \
+	rm -rf obj_dir db incremental_db output_files *.vcd\
 	lab1.qpf lab1.qsf lab1.sdc lab1.qws c5_pin_model_dump.txt
