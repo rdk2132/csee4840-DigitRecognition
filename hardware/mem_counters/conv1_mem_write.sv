@@ -2,15 +2,22 @@
 module conv1_mem_write (input logic clk, reset, enable,
                         output logic [9:0] addr0, addr1, 
                         output logic done);
+    //Increment addresses every 25 cycles
+    logic [4:0] clk_counter;
 
     always_ff @(posedge clk or posedge reset) begin
         if (reset == 1'b1) begin
             addr0 <= 10'b0000000000;
             addr1 <= 10'b0010010000;
+            clk_counter <= 5'b00000;
         end
-        else if (enable == 1'b1 && done == 1'b0) begin
+        else if (enable == 1'b1 && done == 1'b0 && clk_counter == 5'b11000) begin
             addr0 <= addr0 + 10'b0000000001;
             addr1 <= addr1 + 10'b0000000001;
+            clk_counter <= 5'b00000;
+        end
+        else begin
+            clk_counter <= clk_counter + 5'b00001;
         end
     end
 
