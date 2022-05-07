@@ -99,9 +99,9 @@ logic[5:0] conv1_k_mem_addr0_read, conv1_k_mem_addr1_read;
 conv1_k_mem_read conv1_k_mem_read(.clk(clk), .reset(reset), .enable(), .addr0(conv1_k_mem_addr0_read), .addr1(conv1_k_mem_addr1_read), .done());
 
 //Memories for conv1 kernels. Each holds 2 25x25 kernels.
-conv1_k_g0_mem conv1_k_g0_mem(.address_a(conv1_k_mem_addr0_read), .address_b(conv1_k_mem_addr1_read), .clock(clk), .rden_a(), .rden_b(), .q_a(), .q_b());
-conv1_k_g1_mem conv1_k_g1_mem(.address_a(conv1_k_mem_addr0_read), .address_b(conv1_k_mem_addr1_read), .clock(clk), .rden_a(), .rden_b(), .q_a(), .q_b());
-conv1_k_g2_mem conv1_k_g2_mem(.address_a(conv1_k_mem_addr0_read), .address_b(conv1_k_mem_addr1_read), .clock(clk), .rden_a(), .rden_b(), .q_a(), .q_b());
+conv1_k_g0_mem conv1_k_g0_mem(.address_a(conv1_k_mem_addr0_read), .address_b(conv1_k_mem_addr1_read), .clock(clk), .rden_a(), .rden_b(), .q_a(conv1_k_g0_mem_q_a), .q_b(conv1_k_g0_mem_q_b));
+conv1_k_g1_mem conv1_k_g1_mem(.address_a(conv1_k_mem_addr0_read), .address_b(conv1_k_mem_addr1_read), .clock(clk), .rden_a(), .rden_b(), .q_a(conv1_k_g1_mem_q_a), .q_b(conv1_k_g1_mem_q_b));
+conv1_k_g2_mem conv1_k_g2_mem(.address_a(conv1_k_mem_addr0_read), .address_b(conv1_k_mem_addr1_read), .clock(clk), .rden_a(), .rden_b(), .q_a(conv1_k_g2_mem_q_a), .q_b(conv1_k_g2_mem_q_b));
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -447,20 +447,99 @@ after_MAC after_MAC_3(.layer(), .MAC_out_0(MAC_out_18), .MAC_out_1(MAC_out_19), 
                       .bias_3(16'b1111111111111100), .bias_4(16'b1111111111111100), .bias_5(16'b0000000000000100), .conv2_bias(), .out_0(), 
                       .out_1(), .out_2(), .out_3(), .out_4(), .out_5(), .out_conv2());
 
-//12 pooling modules to be used by pooling layers
-pooling pooling_0(.a_0(), .a_1(), .b_0(), .b_1(), .out());
-pooling pooling_1(.a_0(), .a_1(), .b_0(), .b_1(), .out());
-pooling pooling_2(.a_0(), .a_1(), .b_0(), .b_1(), .out());
-pooling pooling_3(.a_0(), .a_1(), .b_0(), .b_1(), .out());
-pooling pooling_4(.a_0(), .a_1(), .b_0(), .b_1(), .out());
-pooling pooling_5(.a_0(), .a_1(), .b_0(), .b_1(), .out());
-pooling pooling_6(.a_0(), .a_1(), .b_0(), .b_1(), .out());
-pooling pooling_7(.a_0(), .a_1(), .b_0(), .b_1(), .out());
-pooling pooling_8(.a_0(), .a_1(), .b_0(), .b_1(), .out());
-pooling pooling_9(.a_0(), .a_1(), .b_0(), .b_1(), .out());
-pooling pooling_10(.a_0(), .a_1(), .b_0(), .b_1(), .out());
-pooling pooling_11(.a_0(), .a_1(), .b_0(), .b_1(), .out());
+//------------------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------
 
-//still need to add muxes and demuxes
+logic signed [15:0] pooling_0_a0, pooling_0_a1, pooling_0_b0, pooling_0_b1, 
+                    pooling_1_a0, pooling_1_a1, pooling_1_b0, pooling_1_b1, 
+                    pooling_2_a0, pooling_2_a1, pooling_2_b0, pooling_2_b1, 
+                    pooling_3_a0, pooling_3_a1, pooling_3_b0, pooling_3_b1, 
+                    pooling_4_a0, pooling_4_a1, pooling_4_b0, pooling_4_b1, 
+                    pooling_5_a0, pooling_5_a1, pooling_5_b0, pooling_5_b1, 
+                    pooling_6_a0, pooling_6_a1, pooling_6_b0, pooling_6_b1, 
+                    pooling_7_a0, pooling_7_a1, pooling_7_b0, pooling_7_b1, 
+                    pooling_8_a0, pooling_8_a1, pooling_8_b0, pooling_8_b1, 
+                    pooling_9_a0, pooling_9_a1, pooling_9_b0, pooling_9_b1, 
+                    pooling_10_a0, pooling_10_a1, pooling_10_b0, pooling_10_b1, 
+                    pooling_11_a0, pooling_11_a1, pooling_11_b0, pooling_11_b1,
+                    pooling_0_out, pooling_1_out, pooling_2_out, pooling_3_out,
+                    pooling_4_out, pooling_5_out, pooling_6_out, pooling_7_out,
+                    pooling_8_out, pooling_9_out, pooling_10_out, pooling_11_out; 
+mux_2to1 pooling_mux_0_a0(.data_in_0(conv1_mem_0_0_q_a), .data_in_1(), .sel(), .data_out(pooling_0_a0));
+mux_2to1 pooling_mux_0_a1(.data_in_0(conv1_mem_0_0_q_b), .data_in_1(), .sel(), .data_out(pooling_0_a1));
+mux_2to1 pooling_mux_0_b0(.data_in_0(conv1_mem_0_1_q_a), .data_in_1(), .sel(), .data_out(pooling_0_b0));
+mux_2to1 pooling_mux_0_b1(.data_in_0(conv1_mem_0_1_q_b), .data_in_1(), .sel(), .data_out(pooling_0_b1));
+mux_2to1 pooling_mux_1_a0(.data_in_0(conv1_mem_0_2_q_a), .data_in_1(), .sel(), .data_out(pooling_1_a0));
+mux_2to1 pooling_mux_1_a1(.data_in_0(conv1_mem_0_2_q_b), .data_in_1(), .sel(), .data_out(pooling_1_a1));
+mux_2to1 pooling_mux_1_b0(.data_in_0(conv1_mem_0_3_q_a), .data_in_1(), .sel(), .data_out(pooling_1_b0));
+mux_2to1 pooling_mux_1_b1(.data_in_0(conv1_mem_0_3_q_b), .data_in_1(), .sel(), .data_out(pooling_1_b1));
+mux_2to1 pooling_mux_2_a0(.data_in_0(conv1_mem_1_0_q_a), .data_in_1(), .sel(), .data_out(pooling_2_a0));
+mux_2to1 pooling_mux_2_a1(.data_in_0(conv1_mem_1_0_q_b), .data_in_1(), .sel(), .data_out(pooling_2_a1));
+mux_2to1 pooling_mux_2_b0(.data_in_0(conv1_mem_1_1_q_a), .data_in_1(), .sel(), .data_out(pooling_2_b0));
+mux_2to1 pooling_mux_2_b1(.data_in_0(conv1_mem_1_1_q_b), .data_in_1(), .sel(), .data_out(pooling_2_b1));
+mux_2to1 pooling_mux_3_a0(.data_in_0(conv1_mem_1_2_q_a), .data_in_1(), .sel(), .data_out(pooling_3_a0));
+mux_2to1 pooling_mux_3_a1(.data_in_0(conv1_mem_1_2_q_b), .data_in_1(), .sel(), .data_out(pooling_3_a1));
+mux_2to1 pooling_mux_3_b0(.data_in_0(conv1_mem_1_3_q_a), .data_in_1(), .sel(), .data_out(pooling_3_b0));
+mux_2to1 pooling_mux_3_b1(.data_in_0(conv1_mem_1_3_q_b), .data_in_1(), .sel(), .data_out(pooling_3_b1));
+mux_2to1 pooling_mux_4_a0(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_4_a0));
+mux_2to1 pooling_mux_4_a1(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_4_a1));
+mux_2to1 pooling_mux_4_b0(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_4_b0));
+mux_2to1 pooling_mux_4_b1(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_4_b1));
+mux_2to1 pooling_mux_5_a0(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_5_a0));
+mux_2to1 pooling_mux_5_a1(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_5_a1));
+mux_2to1 pooling_mux_5_b0(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_5_b0));
+mux_2to1 pooling_mux_5_b1(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_5_b1));
+mux_2to1 pooling_mux_6_a0(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_6_a0));
+mux_2to1 pooling_mux_6_a1(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_6_a1));
+mux_2to1 pooling_mux_6_b0(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_6_b0));
+mux_2to1 pooling_mux_6_b1(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_6_b1));
+mux_2to1 pooling_mux_7_a0(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_7_a0));
+mux_2to1 pooling_mux_7_a1(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_7_a1));
+mux_2to1 pooling_mux_7_b0(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_7_b0));
+mux_2to1 pooling_mux_7_b1(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_7_b1));
+mux_2to1 pooling_mux_8_a0(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_8_a0));
+mux_2to1 pooling_mux_8_a1(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_8_a1));
+mux_2to1 pooling_mux_8_b0(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_8_b0));
+mux_2to1 pooling_mux_8_b1(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_8_b1));
+mux_2to1 pooling_mux_9_a0(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_9_a0));
+mux_2to1 pooling_mux_9_a1(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_9_a1));
+mux_2to1 pooling_mux_9_b0(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_9_b0));
+mux_2to1 pooling_mux_9_b1(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_9_b1));
+mux_2to1 pooling_mux_10_a0(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_10_a0));
+mux_2to1 pooling_mux_10_a1(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_10_a1));
+mux_2to1 pooling_mux_10_b0(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_10_b0));
+mux_2to1 pooling_mux_10_b1(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_10_b1));
+mux_2to1 pooling_mux_11_a0(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_11_a0));
+mux_2to1 pooling_mux_11_a1(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_11_a1));
+mux_2to1 pooling_mux_11_b0(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_11_b0));
+mux_2to1 pooling_mux_11_b1(.data_in_0(), .data_in_1(), .sel(), .data_out(pooling_11_b1));
+
+//12 pooling modules to be used by pooling layers
+pooling pooling_0(.a_0(pooling_0_a0), .a_1(pooling_0_a1), .b_0(pooling_0_b0), .b_1(pooling_0_b1), .out(pooling_0_out));
+pooling pooling_1(.a_0(pooling_1_a0), .a_1(pooling_1_a1), .b_0(pooling_1_b0), .b_1(pooling_1_b1), .out(pooling_1_out));
+pooling pooling_2(.a_0(pooling_2_a0), .a_1(pooling_2_a1), .b_0(pooling_2_b0), .b_1(pooling_2_b1), .out(pooling_2_out));
+pooling pooling_3(.a_0(pooling_3_a0), .a_1(pooling_3_a1), .b_0(pooling_3_b0), .b_1(pooling_3_b1), .out(pooling_3_out));
+pooling pooling_4(.a_0(pooling_4_a0), .a_1(pooling_4_a1), .b_0(pooling_4_b0), .b_1(pooling_4_b1), .out(pooling_4_out));
+pooling pooling_5(.a_0(pooling_5_a0), .a_1(pooling_5_a1), .b_0(pooling_5_b0), .b_1(pooling_5_b1), .out(pooling_5_out));
+pooling pooling_6(.a_0(pooling_6_a0), .a_1(pooling_6_a1), .b_0(pooling_6_b0), .b_1(pooling_6_b1), .out(pooling_6_out));
+pooling pooling_7(.a_0(pooling_7_a0), .a_1(pooling_7_a1), .b_0(pooling_7_b0), .b_1(pooling_7_b1), .out(pooling_7_out));
+pooling pooling_8(.a_0(pooling_8_a0), .a_1(pooling_8_a1), .b_0(pooling_8_b0), .b_1(pooling_8_b1), .out(pooling_8_out));
+pooling pooling_9(.a_0(pooling_9_a0), .a_1(pooling_9_a1), .b_0(pooling_9_b0), .b_1(pooling_9_b1), .out(pooling_9_out));
+pooling pooling_10(.a_0(pooling_10_a0), .a_1(pooling_10_a1), .b_0(pooling_10_b0), .b_1(pooling_10_b1), .out(pooling_10_out));
+pooling pooling_11(.a_0(pooling_11_a0), .a_1(pooling_11_a1), .b_0(pooling_11_b0), .b_1(pooling_11_b1), .out(pooling_11_out));
+
+demux_1to2 pooling_demux_out_0(.data_in(pooling_0_out), .sel(), .data_out_0(), .data_out_1());
+demux_1to2 pooling_demux_out_1(.data_in(pooling_1_out), .sel(), .data_out_0(), .data_out_1());
+demux_1to2 pooling_demux_out_2(.data_in(pooling_2_out), .sel(), .data_out_0(), .data_out_1());
+demux_1to2 pooling_demux_out_3(.data_in(pooling_3_out), .sel(), .data_out_0(), .data_out_1());
+demux_1to2 pooling_demux_out_4(.data_in(pooling_4_out), .sel(), .data_out_0(), .data_out_1());
+demux_1to2 pooling_demux_out_5(.data_in(pooling_5_out), .sel(), .data_out_0(), .data_out_1());
+demux_1to2 pooling_demux_out_6(.data_in(pooling_6_out), .sel(), .data_out_0(), .data_out_1());
+demux_1to2 pooling_demux_out_7(.data_in(pooling_7_out), .sel(), .data_out_0(), .data_out_1());
+demux_1to2 pooling_demux_out_8(.data_in(pooling_8_out), .sel(), .data_out_0(), .data_out_1());
+demux_1to2 pooling_demux_out_9(.data_in(pooling_9_out), .sel(), .data_out_0(), .data_out_1());
+demux_1to2 pooling_demux_out_10(.data_in(pooling_10_out), .sel(), .data_out_0(), .data_out_1());
+demux_1to2 pooling_demux_out_11(.data_in(pooling_11_out), .sel(), .data_out_0(), .data_out_1());
 
 endmodule

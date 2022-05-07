@@ -1,0 +1,1 @@
+obj_dir/Vfc_mem_read.cpp obj_dir/Vfc_mem_read.h obj_dir/Vfc_mem_read.mk obj_dir/Vfc_mem_read__Syms.cpp obj_dir/Vfc_mem_read__Syms.h obj_dir/Vfc_mem_read__Trace.cpp obj_dir/Vfc_mem_read__Trace__Slow.cpp obj_dir/Vfc_mem_read__ver.d obj_dir/Vfc_mem_read_classes.mk  : /usr/bin/verilator_bin   /usr/bin/verilator_bin fc_mem_read.sv 
