@@ -6,6 +6,10 @@
 
 module CNN_ctrl(//The one and only cock
                 input logic clk,
+
+                //input from software
+                inout logic state, reset,
+
                 //ROM counter done
                 input logic img_d, conv1_kern_d, conv2__kern_d, FC_d,
 
@@ -15,9 +19,6 @@ module CNN_ctrl(//The one and only cock
                 input logic pool1_r_e, pool1_w_e,
                 input logic pool2_r_e, pool2_w_e,
                 input logic fc_r_e, fc_w_e,
-
-                //input from software
-                inout logic state, reset,
 
                 //ROM counter enables
                 output logic img_e, conv1_kern_e, conv2__kern_e, FC_e,
