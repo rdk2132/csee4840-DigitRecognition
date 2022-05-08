@@ -2,8 +2,8 @@
 // counter/addresser for Convolution 2 layer output memory write
 module conv2_mem_write (input logic clk, reset, enable,
                         output logic [5:0] addr0,
+                        output logic [1:0] count, 
                         output logic done);
-    logic [1:0] count;
     //Increment addresses every 25 cycles
     logic [4:0] clk_counter;
 
