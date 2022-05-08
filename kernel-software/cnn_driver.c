@@ -16,15 +16,15 @@
 #include <linux/of_address.h>
 #include <linux/fs.h>
 #include <linux/uaccess.h>
+#include <linux/delay.h>
 
 #include "../software-testbench/Parameters.h"
 
-#define DRIVER_NAME "cnn_fpga"
+#define DRIVER_NAME "cnn"
 #define CONTROL_OUT_REG(x) (x)
 #define CONTROL_IN_REG(x) ((x) + 2)
 #define INPUT_REG(x) ((x) + 4)
 #define OUTPUT_REG(x) ((x) + 6)
-#define WRITE_READY(x) (x & 0x1000)
 
 struct cnn_dev {
     struct resource res; // Registers
@@ -32,21 +32,22 @@ struct cnn_dev {
     cnn_arg_t data;
 } dev;
 
-static void read_output(fixed_t *vector)
-{
-    int i;
-
-    for (i = 0; i < NUM_CLASSES; i++)
-        vector[i] = ioread16(OUTPUT_REG(dev.virtbase));
-}
-
 static void send_image(fixed_t *image)
 {
     int i;
 
-    for (i = 0; i < 25/*TEST PLACEHOLDER*/; i++)
+    for (i = 0; i < 25/*TEST PLACEHOLDER*/; i++){
         iowrite16(image[i], INPUT_REG(dev.virtbase));
-    
+    }
+}
+
+static void read_output(fixed_t *vector)
+{
+    int i;
+
+    for (i = 0; i < NUM_CLASSES; i++){
+        vector[i] = ioread16(OUTPUT_REG(dev.virtbase));
+    }
 }
 
 static long cnn_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
@@ -59,8 +60,6 @@ static long cnn_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
         if (copy_from_user(&in_data, (cnn_arg_t *)arg, sizeof(cnn_arg_t)))
             return -EACCES;
         send_image(in_data.in_image);
-
-        // control stuff
 
         read_output(in_data.classification_vector);
         if (copy_to_user((cnn_arg_t *)arg, &in_data, sizeof(cnn_arg_t)))
@@ -89,8 +88,10 @@ static int __init cnn_probe(struct platform_device *pdev)
 {
     int ret;
 
+    pr_info("Before Misc register");
     /* Register as misc device, also creates /dev/cnn/ */
     ret = misc_register(&cnn_misc_device);
+    pr_info("Misc register");
 
     // Obtain address of the registers from device tree
     ret = of_address_to_resource(pdev->dev.of_node, 0, &dev.res);
@@ -99,12 +100,14 @@ static int __init cnn_probe(struct platform_device *pdev)
         ret = -ENOENT;
         goto out_deregister;
     }
+    pr_info("of address");
 
     if (request_mem_region(dev.res.start, resource_size(&dev.res), 
                         	DRIVER_NAME) == NULL) {
       ret = -EBUSY;
       goto out_deregister;
     }
+    pr_info("request mem region");
 
 
     // Arrange access to registers
@@ -113,6 +116,7 @@ static int __init cnn_probe(struct platform_device *pdev)
         ret = -ENOMEM;
         goto out_release_mem_region;
     }
+    pr_info("of iomap");
     
     return 0;
 
@@ -133,7 +137,7 @@ static int cnn_remove(struct platform_device *pdev)
 
 #ifdef CONFIG_OF
 static const struct of_device_id cnn_of_match[] = {
-    {.compatible = "csee4840,cnn-1.0"},
+    {.compatible = "csee4840,cnn_driver-1.0"},
     {},
 };
 MODULE_DEVICE_TABLE(of, cnn_of_match);

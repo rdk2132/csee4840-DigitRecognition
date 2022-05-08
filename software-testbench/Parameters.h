@@ -35,7 +35,7 @@ typedef struct {
   fixed_t classification_vector[NUM_CLASSES];
 } cnn_arg_t;
 
-#define CNN_IO_FILE "/dev/fpga_cnn"
+#define CNN_IO_FILE "/dev/cnn_driver"
 #define CNN_DRIVER_MAGIC 'q'
 #define CNN_CLASSIFY _IOWR(CNN_DRIVER_MAGIC, 1, cnn_arg_t*)
 #endif
