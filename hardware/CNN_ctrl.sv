@@ -16,14 +16,14 @@ module CNN_ctrl(//The one and only cock
                 input logic img_d, conv1_kern_d, conv2__kern_d, FC_d,
 
                 // RAM counter done
-                input logic conv1_out_r_e, conv1_out_w_e,
-                input logic conv2_out_r_e, conv2_out_w_e, 
-                input logic pool1_r_e, pool1_w_e,
-                input logic pool2_r_e, pool2_w_e,
-                input logic fc_r_e, fc_w_e,
+                input logic conv1_out_c_r_e, conv1_out_c_w_e,
+                input logic conv2_out_c_r_e, conv2_out_c_w_e, 
+                input logic pool1_c_r_e, pool1_c_w_e,
+                input logic pool2_c_r_e, pool2_c_w_e,
+                input logic fc_c_r_e, fc_c_w_e,
 
                 //ROM counter enables
-                output logic img_e, conv1_kern_e, conv2__kern_e, FC_e,
+                output logic img_c_e, conv1_kern_c_e, conv2__kern_c_e, FC_c_e,
 
                 //RAM counter enables
                 output logic conv1_out_c_r_e, conv1_out_c_w_e,
@@ -46,12 +46,12 @@ module CNN_ctrl(//The one and only cock
                 output logic fc_r_r, fc_w_r, 
 
                 //read/write enables
-                output logic img_r, img_w, conv1k_r, conv2k_r, FC_r,
+                output logic img_m_r, img_m_w, conv1_kern_m_r, conv2_kern_m_r, FC_m_r,
                 output logic conv1_out_m_r, conv1_out_m_w, 
                 output logic conv2_out_m_r, conv2_out_m_w, 
-                output logic P1_r, P1_w, 
-                output logic P2_r, P2_w,
-                output logic FC_r, FC_w,
+                output logic P1_m_r, P1_m_w, 
+                output logic P2_m_r, P2_m_w,
+                output logic FC_m_r, FC_m_w,
 
                 //MUX/DEMUX selector bits
                 output logic [1:0] MAC_layer,
@@ -65,11 +65,6 @@ module CNN_ctrl(//The one and only cock
     //used to pulse reset for MAC
     reg pulse;
     logic reset;
-    //sets the mux/demux
-    always_comb begin
-        MAC_layer = state[2:1];
-        pooling_layer = state[2];
-    end
 
     always_ff @(posedge clk) begin
         //pulse these outputs
@@ -91,10 +86,9 @@ module CNN_ctrl(//The one and only cock
             //stop image write
             if( img_d == 1'b1) begin
                 done <= 8'b0000 0001;
-                img_w <= 1'b0;
             end
             else begin
-                img_w <= 1'b1;
+
             end
         end
         //State 2: Convolution 1
