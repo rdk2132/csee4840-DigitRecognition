@@ -18,7 +18,7 @@ module CNN(input logic clk, reset, write, chipselect,
     end
 
 logic [1:0] MAC_layer;
-logic pooling_layer, rMAC, MAC_enable, FC;
+logic pooling_layer, rMAC, MAC_enable;
 //Control circuitry that runs the whole show
 CNN_ctrl CNN_ctrl(.MAC_layer(MAC_layer), .pooling_layer(pooling_layer), .rMAC(rMAC));
 
@@ -501,16 +501,16 @@ after_MAC after_MAC_3(.layer(MAC_layer), .MAC_out_0(MAC_out_18), .MAC_out_1(MAC_
                       .bias_3(16'b1111111111111100), .bias_4(16'b1111111111111100), .bias_5(16'b0000000000000100), .conv2_bias(conv2_bias_3), .out_0(), 
                       .out_1(), .out_2(), .out_3(), .out_4(), .out_5(), .out_conv2(out_conv2_3));
 
-demux_1to2 out_conv1_fc_demux_0(.data_in(after_MAC_0_out_0), .sel(FC), .data_out_0(), .data_out_1(result_0));
-demux_1to2 out_conv1_fc_demux_1(.data_in(after_MAC_0_out_1), .sel(FC), .data_out_0(), .data_out_1(result_1));
-demux_1to2 out_conv1_fc_demux_2(.data_in(after_MAC_0_out_2), .sel(FC), .data_out_0(), .data_out_1(result_2));
-demux_1to2 out_conv1_fc_demux_3(.data_in(after_MAC_0_out_3), .sel(FC), .data_out_0(), .data_out_1(result_3));
-demux_1to2 out_conv1_fc_demux_4(.data_in(after_MAC_0_out_4), .sel(FC), .data_out_0(), .data_out_1(result_4));
-demux_1to2 out_conv1_fc_demux_5(.data_in(after_MAC_0_out_5), .sel(FC), .data_out_0(), .data_out_1(result_5));
-demux_1to2 out_conv1_fc_demux_6(.data_in(after_MAC_1_out_0), .sel(FC), .data_out_0(), .data_out_1(result_6));
-demux_1to2 out_conv1_fc_demux_7(.data_in(after_MAC_1_out_1), .sel(FC), .data_out_0(), .data_out_1(result_7));
-demux_1to2 out_conv1_fc_demux_8(.data_in(after_MAC_1_out_2), .sel(FC), .data_out_0(), .data_out_1(result_8));
-demux_1to2 out_conv1_fc_demux_9(.data_in(after_MAC_1_out_3), .sel(FC), .data_out_0(), .data_out_1(result_9));
+demux_1to2 out_conv1_fc_demux_0(.data_in(after_MAC_0_out_0), .sel(MAC_layer[1]), .data_out_0(), .data_out_1(result_0));
+demux_1to2 out_conv1_fc_demux_1(.data_in(after_MAC_0_out_1), .sel(MAC_layer[1]), .data_out_0(), .data_out_1(result_1));
+demux_1to2 out_conv1_fc_demux_2(.data_in(after_MAC_0_out_2), .sel(MAC_layer[1]), .data_out_0(), .data_out_1(result_2));
+demux_1to2 out_conv1_fc_demux_3(.data_in(after_MAC_0_out_3), .sel(MAC_layer[1]), .data_out_0(), .data_out_1(result_3));
+demux_1to2 out_conv1_fc_demux_4(.data_in(after_MAC_0_out_4), .sel(MAC_layer[1]), .data_out_0(), .data_out_1(result_4));
+demux_1to2 out_conv1_fc_demux_5(.data_in(after_MAC_0_out_5), .sel(MAC_layer[1]), .data_out_0(), .data_out_1(result_5));
+demux_1to2 out_conv1_fc_demux_6(.data_in(after_MAC_1_out_0), .sel(MAC_layer[1]), .data_out_0(), .data_out_1(result_6));
+demux_1to2 out_conv1_fc_demux_7(.data_in(after_MAC_1_out_1), .sel(MAC_layer[1]), .data_out_0(), .data_out_1(result_7));
+demux_1to2 out_conv1_fc_demux_8(.data_in(after_MAC_1_out_2), .sel(MAC_layer[1]), .data_out_0(), .data_out_1(result_8));
+demux_1to2 out_conv1_fc_demux_9(.data_in(after_MAC_1_out_3), .sel(MAC_layer[1]), .data_out_0(), .data_out_1(result_9));
 
 demux_1to3 out_conv2_demux_0(.data_in(out_conv2_0), .sel(conv2_count), .data_out_0(conv2_mem_0_data), .data_out_1(conv2_mem_4_data), .data_out_2(conv2_mem_8_data)); //out img 0, 4, 8
 demux_1to3 out_conv2_demux_1(.data_in(out_conv2_1), .sel(conv2_count), .data_out_0(conv2_mem_1_data), .data_out_1(conv2_mem_5_data), .data_out_2(conv2_mem_9_data)); //out img 1, 5, 9
