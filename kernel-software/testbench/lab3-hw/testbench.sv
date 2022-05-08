@@ -8,48 +8,32 @@ module testbench (
     input logic [15:0] writedata,
     output logic [15:0] readdata
 );
-    logic [15:0] waddr, raddr;
-    logic wren, done;
+    logic [4:0] waddr, raddr;
 
-    testMem memory(
-            .clock(clk),
-            .data(writedata),
-            .rdaddress(raddr),
-            .wraddress(waddr),
-            .wren(wren),
+    twoport4 memory(
+            .clk(clk),
+            .ra(raddr),
+            .wa(waddr),
+            .write(write),
+            .d(writedata),
             .q(readdata)
             );
     
     always_ff @(posedge clk) begin
         if (reset) begin
-            done <= 0;
-            wren <= 0;
-            raddr <= 16'd0;
-            waddr <= 16'd0;
+            raddr <= 5'd0;
+            waddr <= 5'd0;
         end
         else if (chipselect && (write | read)) begin
             case (address)
-                5'h3: begin
-                    if (write && (done == 0)) begin
-                        wren <= 1;
-                        waddr <= waddr + 16'd1;
-                    end
-                    else wren <= 0;
-                    if (waddr == 16'd25) begin
-                        done <= 1;
-                        waddr <= 16'd0;
-                    end
-                end
-                5'h4: begin
-                    if (read && done) begin
-                        raddr <= raddr + 16'd1;
-                    end
-                    if (raddr == 16'd10) begin
-                        done <= 0;
-                        raddr <= 16'd0;
-                    end
-                end
+                3'h2: waddr <= waddr + 5'd1;
+                3'h3: raddr <= raddr + 5'd1;
             endcase
         end
+        if (raddr == 5'd11)
+            raddr <= 5'd0;
+
+        if (waddr == 5'd26)
+            waddr <= 5'd0;
     end
 endmodule
