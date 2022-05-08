@@ -13,45 +13,47 @@ module CNN_ctrl(//The one and only cock
                 inout logic [8:0] state,
 
                 //ROM counter done
-                input logic img_d, conv1_kern_d, conv2__kern_d, FC_d,
+                input logic conv1_kern_c_d, conv2__kern_c_d, FC_c_d,
 
                 // RAM counter done
-                input logic conv1_out_c_r_e, conv1_out_c_w_e,
-                input logic conv2_out_c_r_e, conv2_out_c_w_e, 
-                input logic pool1_c_r_e, pool1_c_w_e,
-                input logic pool2_c_r_e, pool2_c_w_e,
-                input logic fc_c_r_e, fc_c_w_e,
+                input logic img_c_r_d, img_c_w_d,
+                input logic conv1_out_c_r_d, conv1_out_c_w_d,
+                input logic conv2_out_c_r_d, conv2_out_c_w_d, 
+                input logic P1_c_r_d, pool1_c_w_d,
+                input logic P2_c_r_d, pool2_c_w_d,
 
                 //ROM counter enables
-                output logic img_c_e, conv1_kern_c_e, conv2__kern_c_e, FC_c_e,
+                output logic conv1_kern_c_e, conv2__kern_c_e, FC_c_e,
 
                 //RAM counter enables
+                output logic img_c_r_e, img_c_w_e,
                 output logic conv1_out_c_r_e, conv1_out_c_w_e,
                 output logic conv2_out_c_r_e, conv2_out_c_w_e, 
                 output logic P1_c_r_e, P1_c_w_e,
                 output logic P2_c_r_e, P2_c_w_e,
-                output logic fc_c_r_e, fc_c_w_e,
 
                 //MAC reset
                 output logic rMAC,
 
                 //ROM counter resets
-                output logic img_r, conv1_kern_r, conv2__kern_r, FC_r,
+                output logic conv1_kern_c_r, conv2__kern_c_r, FC_c_r,
 
                 //RAM counter resets
-                output logic conv1_out_r_r, conv1_out_w_r,
-                output logic conv2_out_r_r, conv2_out_w_r, 
-                output logic pool1_r_r, pool1_w_r,
-                output logic pool2_r_r, pool2_w_r,
-                output logic fc_r_r, fc_w_r, 
+                output logic img_c_r_r, img_c_w_r,
+                output logic conv1_out_c_r_r, conv1_out_c_w_r,
+                output logic conv2_out_c_r_r, conv2_out_c_w_r, 
+                output logic pool1_c_r_r, pool1_c_w_r,
+                output logic pool2_c_r_r, pool2_c_w_r,
 
-                //read/write enables
-                output logic img_m_r, img_m_w, conv1_kern_m_r, conv2_kern_m_r, FC_m_r,
+                //ROM read enables
+                output logic conv1_kern_m_r, conv2_kern_m_r, FC_m_r,
+
+                //RAM read/write enables
+                output logic img_m_r, img_m_w,
                 output logic conv1_out_m_r, conv1_out_m_w, 
                 output logic conv2_out_m_r, conv2_out_m_w, 
                 output logic P1_m_r, P1_m_w, 
                 output logic P2_m_r, P2_m_w,
-                output logic FC_m_r, FC_m_w,
 
                 //MUX/DEMUX selector bits
                 output logic [1:0] MAC_layer,
