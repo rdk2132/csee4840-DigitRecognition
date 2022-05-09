@@ -1,7 +1,7 @@
 module CNN(input logic clk, reset, write, chipselect, 
            input logic [15:0] writedata, 
            input logic [1:0] address
-           output logic [15:0] return_ctrl, 
+           output logic [7:0] return_ctrl, 
            output logic signed [15:0] result_0, result_1, result_2, result_3, result_4, result_5, result_6, result_7, result_8, result_9);
 
     logic signed [15:0] img_data;
@@ -12,19 +12,28 @@ module CNN(input logic clk, reset, write, chipselect,
             case (address)
                 2'b00 : img_data <= writedata;
                 2'b01 : img_mem_addr_write <= writedata[9:0];
-                2'b10 : ctrl <= writedata;
+                2'b10 : ctrl <= writedata[7:0];
             endcase
         end
     end
 
 logic [1:0] MAC_layer;
-logic pooling_layer, rMAC, MAC_enable, 
+logic pooling_layer, rMAC, MAC_enable, Conv1_layer, P1_layer, Conv2_layer, P2_layer, FC_layer, 
       img_mem_read_reset, conv1_mem_write_reset, conv1_mem_read_reset, conv1_k_mem_read_reset, P1_mem_read_reset, P1_mem_write_reset, 
       conv2_mem_write_reset, conv2_mem_read_reset, conv2_k_mem_read_reset, P2_mem_write_reset, P2_mem_read_reset, fc_mem_read_reset, 
       img_mem_read_done, conv1_mem_write_done, conv1_mem_read_done, conv1_k_mem_read_done, P1_mem_read_done, P1_mem_write_done, 
       conv2_mem_write_done, conv2_mem_read_done, conv2_k_mem_read_done, P2_mem_write_done, P2_mem_read_done, fc_mem_read_done;
-//Control circuitry that runs the whole show
-CNN_ctrl CNN_ctrl(.MAC_layer(MAC_layer), .pooling_layer(pooling_layer), .rMAC(rMAC));
+
+CNN_ctrl CNN_ctrl(.clk(clk), .state(ctrl), .conv1_kern_c_d(), .conv2__kern_c_d(), .FC_c_d(), .img_c_r_d(), 
+                  .img_c_w_d(), .conv1_out_c_r_d(), .conv1_out_c_w_d(), .conv2_out_c_r_d(), .conv2_out_c_w_dconv2_mem_write_done(), .P1_c_r_d(), 
+                  .pool1_c_w_d(), .P2_c_r_d(), .pool2_c_w_d(), .conv1_kern_c_e(), .conv2__kern_c_e(), .FC_c_e(), 
+                  .img_c_r_e(), .img_c_w_e(), .conv1_out_c_r_e(), .conv1_out_c_w_e(), .conv2_out_c_r_e(), .conv2_out_c_w_e(), 
+                  .P1_c_r_e(), .P1_c_w_e(), .P2_c_r_e(), .P2_c_w_e(), .rMAC(rMAC), .conv1_kern_c_r(), 
+                  .conv2__kern_c_r(), .FC_c_r(), .img_c_r_r(), .img_c_w_r(), .conv1_out_c_r_r(), .conv1_out_c_w_r(), 
+                  .conv2_out_c_r_r(), .conv2_out_c_w_r(), .pool1_c_r_r(), .pool1_c_w_r(), .pool2_c_r_r(), .pool2_c_w_r(), 
+                  .conv1_kern_m_r(), .conv2_kern_m_r(), .FC_m_r(), .img_m_r(), .img_m_w(), .conv1_out_m_r(), 
+                  .conv1_out_m_w(), .conv2_out_m_r(), .conv2_out_m_w(), .P1_m_r(), .P1_m_w(), .P2_m_r(), 
+                  .P2_m_w(), .MAC_layer(MAC_layer), .pooling_layer(pooling_layer), .done(return_ctrl));
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -125,10 +134,9 @@ conv1_k_g2_mem conv1_k_g2_mem(.address_a(conv1_k_mem_addr0_read), .address_b(con
 //
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 
-logic [7:0] p1_addr_0_read, p1_addr_0_write, p1_addr_1_read, p1_addr_1_write, p1_addr0w0r, p1_addr0w0r, p1_addr1w2r;
+logic [7:0] p1_addr_0_read, p1_addr_0_write, p1_addr_1_write, p1_addr0w0r;
 mux_2to1 (#8) p1_addr_mux_0(.data_in_0(p1_addr_0_write), .data_in_1(p1_addr_0_read), .sel(Conv2_layer), .data_out(p1_addr0w0r)); //mux to combine write and read addresses
-mux_2to1 (#8) p1_addr_mux_1(.data_in_0(p1_addr_1_write), .data_in_1(p1_addr_1_read), .sel(Conv2_layer), .data_out(p1_addr1w2r)); //mux to combine write and read addresses
-P1_mem_read P1_mem_read(.clk(clk), .reset(P1_mem_read_reset), .enable(Conv2_layer), .addr0(p1_addr_0_read), .addr1(p1_addr_1_read), .done(P1_mem_read_done));
+P1_mem_read P1_mem_read(.clk(clk), .reset(P1_mem_read_reset), .enable(Conv2_layer), .addr0(p1_addr_0_read), .done(P1_mem_read_done));
 P1_mem_write P1_mem_write(.clk(clk), .reset(P1_mem_write_reset), .enable(P1_layer), .addr0(p1_addr_0_write), .addr1(p1_addr_1_write), .done(P1_mem_write_done));
 
 logic signed [15:0] p1_mem_0_data_a, p1_mem_0_data_b, p1_mem_1_data_a, p1_mem_1_data_b,
@@ -136,12 +144,12 @@ logic signed [15:0] p1_mem_0_data_a, p1_mem_0_data_b, p1_mem_1_data_a, p1_mem_1_
                     p1_mem_4_data_a, p1_mem_4_data_b, p1_mem_5_data_a, p1_mem_6_data_b,
                     p1_mem_0_q_a, p1_mem_1_q_a, p1_mem_2_q_a, p1_mem_3_q_a, p1_mem_4_q_a, p1_mem_5_q_a;
 //Memories for the 6 outputs of p1. Each is unique
-p1_mem p1_mem_0(.address_a(p1_addr0w0r), .address_b(p1_addr1w2r), .clock(clk), .data_a(p1_mem_0_data_a), .data_b(p1_mem_0_data_b), .rden_a(Conv2_layer), .rden_b(Conv2_layer), .wren_a(P1_layer), .wren_b(P1_layer), .q_a(p1_mem_0_q_a), .q_b()); //q_b can be left open
-p1_mem p1_mem_1(.address_a(p1_addr0w0r), .address_b(p1_addr1w2r), .clock(clk), .data_a(p1_mem_1_data_a), .data_b(p1_mem_1_data_b), .rden_a(Conv2_layer), .rden_b(Conv2_layer), .wren_a(P1_layer), .wren_b(P1_layer), .q_a(p1_mem_1_q_a), .q_b()); //q_b can be left open
-p1_mem p1_mem_2(.address_a(p1_addr0w0r), .address_b(p1_addr1w2r), .clock(clk), .data_a(p1_mem_2_data_a), .data_b(p1_mem_2_data_b), .rden_a(Conv2_layer), .rden_b(Conv2_layer), .wren_a(P1_layer), .wren_b(P1_layer), .q_a(p1_mem_2_q_a), .q_b()); //q_b can be left open
-p1_mem p1_mem_3(.address_a(p1_addr0w0r), .address_b(p1_addr1w2r), .clock(clk), .data_a(p1_mem_3_data_a), .data_b(p1_mem_3_data_b), .rden_a(Conv2_layer), .rden_b(Conv2_layer), .wren_a(P1_layer), .wren_b(P1_layer), .q_a(p1_mem_3_q_a), .q_b()); //q_b can be left open
-p1_mem p1_mem_4(.address_a(p1_addr0w0r), .address_b(p1_addr1w2r), .clock(clk), .data_a(p1_mem_4_data_a), .data_b(p1_mem_4_data_b), .rden_a(Conv2_layer), .rden_b(Conv2_layer), .wren_a(P1_layer), .wren_b(P1_layer), .q_a(p1_mem_4_q_a), .q_b()); //q_b can be left open
-p1_mem p1_mem_5(.address_a(p1_addr0w0r), .address_b(p1_addr1w2r), .clock(clk), .data_a(p1_mem_5_data_a), .data_b(p1_mem_5_data_b), .rden_a(Conv2_layer), .rden_b(Conv2_layer), .wren_a(P1_layer), .wren_b(P1_layer), .q_a(p1_mem_5_q_a), .q_b()); //q_b can be left open
+p1_mem p1_mem_0(.address_a(p1_addr0w0r), .address_b(p1_addr_1_write), .clock(clk), .data_a(p1_mem_0_data_a), .data_b(p1_mem_0_data_b), .rden_a(Conv2_layer), .rden_b(1'b0), .wren_a(P1_layer), .wren_b(P1_layer), .q_a(p1_mem_0_q_a), .q_b()); //q_b can be left open
+p1_mem p1_mem_1(.address_a(p1_addr0w0r), .address_b(p1_addr_1_write), .clock(clk), .data_a(p1_mem_1_data_a), .data_b(p1_mem_1_data_b), .rden_a(Conv2_layer), .rden_b(1'b0), .wren_a(P1_layer), .wren_b(P1_layer), .q_a(p1_mem_1_q_a), .q_b()); //q_b can be left open
+p1_mem p1_mem_2(.address_a(p1_addr0w0r), .address_b(p1_addr_1_write), .clock(clk), .data_a(p1_mem_2_data_a), .data_b(p1_mem_2_data_b), .rden_a(Conv2_layer), .rden_b(1'b0), .wren_a(P1_layer), .wren_b(P1_layer), .q_a(p1_mem_2_q_a), .q_b()); //q_b can be left open
+p1_mem p1_mem_3(.address_a(p1_addr0w0r), .address_b(p1_addr_1_write), .clock(clk), .data_a(p1_mem_3_data_a), .data_b(p1_mem_3_data_b), .rden_a(Conv2_layer), .rden_b(1'b0), .wren_a(P1_layer), .wren_b(P1_layer), .q_a(p1_mem_3_q_a), .q_b()); //q_b can be left open
+p1_mem p1_mem_4(.address_a(p1_addr0w0r), .address_b(p1_addr_1_write), .clock(clk), .data_a(p1_mem_4_data_a), .data_b(p1_mem_4_data_b), .rden_a(Conv2_layer), .rden_b(1'b0), .wren_a(P1_layer), .wren_b(P1_layer), .q_a(p1_mem_4_q_a), .q_b()); //q_b can be left open
+p1_mem p1_mem_5(.address_a(p1_addr0w0r), .address_b(p1_addr_1_write), .clock(clk), .data_a(p1_mem_5_data_a), .data_b(p1_mem_5_data_b), .rden_a(Conv2_layer), .rden_b(1'b0), .wren_a(P1_layer), .wren_b(P1_layer), .q_a(p1_mem_5_q_a), .q_b()); //q_b can be left open
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -153,7 +161,8 @@ logic [5:0] conv2_addr0_write, conv2_addr0_read, conv2_addr1_read, conv2_addr2_r
 logic [1:0] conv2_count;
 conv2_mem_write conv2_mem_write(.clk(clk), .reset(conv2_mem_write_reset), .enable(Conv2_layer), .addr0(conv2_addr0_write), .count(conv2_count) .done(conv2_mem_write_done));
 conv2_mem_read conv2_mem_read(.clk(clk), .reset(conv2_mem_read_reset), .enable(P2_layer), .addr0(conv2_addr0_read), .addr1(conv2_addr1_read), .addr2(conv2_addr2_read), .addr3(conv2_addr3_read) .done(conv2_mem_read_done));
-mux_2to1 (#10) conv2_mem_addr_mux_0(.data_in_0(conv2_addr0_write), .data_in_1(conv2_addr0_read), .sel(P2_layer), .data_out(conv2_addr0w0r));
+mux_2to1 (#5) conv2_mem_addr_mux_0(.data_in_0(conv2_addr0_write), .data_in_1(conv2_addr0_read), .sel(P2_layer), .data_out(conv2_addr0w0r));
+mux_2to1 (#5) conv2_mem_addr_mux_0(.data_in_0(conv2_addr0_write), .data_in_1(conv2_addr2_read), .sel(P2_layer), .data_out(conv2_addr0w2r));
 
 logic signed [15:0] conv2_mem_0_data, conv2_mem_1_data, conv2_mem_2_data, conv2_mem_3_data, 
                     conv2_mem_4_data, conv2_mem_5_data, conv2_mem_6_data, conv2_mem_7_data, 
@@ -167,40 +176,40 @@ logic signed [15:0] conv2_mem_0_data, conv2_mem_1_data, conv2_mem_2_data, conv2_
 
 //Conv2 output 0. They are redundant to allow for 4 accesses
 conv2_mem conv2_mem_0_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_0_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_0_0_q_a), .q_b(conv2_mem_0_0_q_b));
-conv2_mem conv2_mem_0_1(.address_a(conv2_addr2_read), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_0_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_0_1_q_a), .q_b(conv2_mem_0_1_q_b));
+conv2_mem conv2_mem_0_1(.address_a(conv2_addr0w2r), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_0_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_0_1_q_a), .q_b(conv2_mem_0_1_q_b));
 //Conv2 output 1. They are redundant to allow for 4 accesses
 conv2_mem conv2_mem_1_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_1_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_1_0_q_a), .q_b(conv2_mem_1_0_q_b));
-conv2_mem conv2_mem_1_1(.address_a(conv2_addr2_read), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_1_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_1_1_q_a), .q_b(conv2_mem_1_1_q_b));
+conv2_mem conv2_mem_1_1(.address_a(conv2_addr0w2r), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_1_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_1_1_q_a), .q_b(conv2_mem_1_1_q_b));
 //Conv2 output 2. They are redundant to allow for 4 accesses
 conv2_mem conv2_mem_2_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_2_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_2_0_q_a), .q_b(conv2_mem_2_0_q_b));
-conv2_mem conv2_mem_2_1(.address_a(conv2_addr2_read), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_2_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_2_1_q_a), .q_b(conv2_mem_2_1_q_b));
+conv2_mem conv2_mem_2_1(.address_a(conv2_addr0w2r), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_2_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_2_1_q_a), .q_b(conv2_mem_2_1_q_b));
 //Conv2 output 3. They are redundant to allow for 4 accesses
 conv2_mem conv2_mem_3_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_3_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_3_0_q_a), .q_b(conv2_mem_3_0_q_b));
-conv2_mem conv2_mem_3_1(.address_a(conv2_addr2_read), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_3_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_3_1_q_a), .q_b(conv2_mem_3_1_q_b));
+conv2_mem conv2_mem_3_1(.address_a(conv2_addr0w2r), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_3_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_3_1_q_a), .q_b(conv2_mem_3_1_q_b));
 //Conv2 output 4. They are redundant to allow for 4 accesses
 conv2_mem conv2_mem_4_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_4_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_4_0_q_a), .q_b(conv2_mem_4_0_q_b));
-conv2_mem conv2_mem_4_1(.address_a(conv2_addr2_read), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_4_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_4_1_q_a), .q_b(conv2_mem_4_1_q_b));
+conv2_mem conv2_mem_4_1(.address_a(conv2_addr0w2r), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_4_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_4_1_q_a), .q_b(conv2_mem_4_1_q_b));
 //Conv2 output 5. They are redundant to allow for 4 accesses
 conv2_mem conv2_mem_5_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_5_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_5_0_q_a), .q_b(conv2_mem_5_0_q_b));
-conv2_mem conv2_mem_5_1(.address_a(conv2_addr2_read), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_5_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_5_1_q_a), .q_b(conv2_mem_5_1_q_b));
+conv2_mem conv2_mem_5_1(.address_a(conv2_addr0w2r), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_5_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_5_1_q_a), .q_b(conv2_mem_5_1_q_b));
 //Conv2 output 6. They are redundant to allow for 4 accesses
 conv2_mem conv2_mem_6_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_6_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_6_0_q_a), .q_b(conv2_mem_6_0_q_b));
-conv2_mem conv2_mem_6_1(.address_a(conv2_addr2_read), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_6_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_6_1_q_a), .q_b(conv2_mem_6_1_q_b));
+conv2_mem conv2_mem_6_1(.address_a(conv2_addr0w2r), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_6_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_6_1_q_a), .q_b(conv2_mem_6_1_q_b));
 //Conv2 output 7. They are redundant to allow for 4 accesses
 conv2_mem conv2_mem_7_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_7_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_7_0_q_a), .q_b(conv2_mem_7_0_q_b));
-conv2_mem conv2_mem_7_1(.address_a(conv2_addr2_read), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_7_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_7_1_q_a), .q_b(conv2_mem_7_1_q_b));
+conv2_mem conv2_mem_7_1(.address_a(conv2_addr0w2r), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_7_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_7_1_q_a), .q_b(conv2_mem_7_1_q_b));
 //Conv2 output 8. They are redundant to allow for 4 accesses
 conv2_mem conv2_mem_8_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_8_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_8_0_q_a), .q_b(conv2_mem_8_0_q_b));
-conv2_mem conv2_mem_8_1(.address_a(conv2_addr2_read), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_8_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_8_1_q_a), .q_b(conv2_mem_8_1_q_b));
+conv2_mem conv2_mem_8_1(.address_a(conv2_addr0w2r), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_8_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_8_1_q_a), .q_b(conv2_mem_8_1_q_b));
 //Conv2 output 9. They are redundant to allow for 4 accesses
 conv2_mem conv2_mem_9_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_9_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_9_0_q_a), .q_b(conv2_mem_9_0_q_b));
-conv2_mem conv2_mem_9_1(.address_a(conv2_addr2_read), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_9_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_9_1_q_a), .q_b(conv2_mem_9_1_q_b));
+conv2_mem conv2_mem_9_1(.address_a(conv2_addr0w2r), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_9_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_9_1_q_a), .q_b(conv2_mem_9_1_q_b));
 //Conv2 output 10. They are redundant to allow for 4 accesses
 conv2_mem conv2_mem_10_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_10_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_10_0_q_a), .q_b(conv2_mem_10_0_q_b));
-conv2_mem conv2_mem_10_1(.address_a(conv2_addr2_read), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_10_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_10_1_q_a), .q_b(conv2_mem_10_1_q_b));
+conv2_mem conv2_mem_10_1(.address_a(conv2_addr0w2r), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_10_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_10_1_q_a), .q_b(conv2_mem_10_1_q_b));
 //Conv2 output 11. They are redundant to allow for 4 accesses
 conv2_mem conv2_mem_11_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_11_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_11_0_q_a), .q_b(conv2_mem_11_0_q_b));
-conv2_mem conv2_mem_11_1(.address_a(conv2_addr2_read), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_11_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_11_1_q_a), .q_b(conv2_mem_11_1_q_b));
+conv2_mem conv2_mem_11_1(.address_a(conv2_addr0w2r), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_11_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_11_1_q_a), .q_b(conv2_mem_11_1_q_b));
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 //
