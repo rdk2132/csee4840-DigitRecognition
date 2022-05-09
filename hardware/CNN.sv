@@ -144,7 +144,7 @@ P1_mem_write P1_mem_write(.clk(clk), .reset(P1_mem_write_reset), .enable(P1_laye
 
 logic signed [15:0] p1_mem_0_data_a, p1_mem_0_data_b, p1_mem_1_data_a, p1_mem_1_data_b,
                     p1_mem_2_data_a, p1_mem_2_data_b, p1_mem_3_data_a, p1_mem_3_data_b,
-                    p1_mem_4_data_a, p1_mem_4_data_b, p1_mem_5_data_a, p1_mem_6_data_b,
+                    p1_mem_4_data_a, p1_mem_4_data_b, p1_mem_5_data_a, p1_mem_5_data_b,
                     p1_mem_0_q_a, p1_mem_1_q_a, p1_mem_2_q_a, p1_mem_3_q_a, p1_mem_4_q_a, p1_mem_5_q_a;
 //Memories for the 6 outputs of p1. Each is unique
 p1_mem p1_mem_0(.address_a(p1_addr0w0r), .address_b(p1_addr_1_write), .clock(clk), .data_a(p1_mem_0_data_a), .data_b(p1_mem_0_data_b), .rden_a(Conv2_layer), .rden_b(1'b0), .wren_a(P1_layer), .wren_b(P1_layer), .q_a(p1_mem_0_q_a), .q_b()); //q_b can be left open
@@ -160,7 +160,7 @@ p1_mem p1_mem_5(.address_a(p1_addr0w0r), .address_b(p1_addr_1_write), .clock(clk
 //
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 
-logic [5:0] conv2_addr0_write, conv2_addr0_read, conv2_addr1_read, conv2_addr2_read, conv2_addr3_read, conv2_addr0w0r;
+logic [5:0] conv2_addr0_write, conv2_addr0_read, conv2_addr1_read, conv2_addr2_read, conv2_addr3_read, conv2_addr0w0r, conv2_addr0w2r;
 logic [1:0] conv2_count;
 conv2_mem_write conv2_mem_write(.clk(clk), .reset(conv2_mem_write_reset), .enable(Conv2_layer), .addr0(conv2_addr0_write), .count(conv2_count), .done(conv2_mem_write_done));
 conv2_mem_read conv2_mem_read(.clk(clk), .reset(conv2_mem_read_reset), .enable(P2_layer), .addr0(conv2_addr0_read), .addr1(conv2_addr1_read), .addr2(conv2_addr2_read), .addr3(conv2_addr3_read), .done(conv2_mem_read_done));
@@ -175,7 +175,13 @@ logic signed [15:0] conv2_mem_0_data, conv2_mem_1_data, conv2_mem_2_data, conv2_
                     conv2_mem_2_0_q_a, conv2_mem_2_0_q_b, conv2_mem_2_1_q_a, conv2_mem_2_1_q_b, 
                     conv2_mem_3_0_q_a, conv2_mem_3_0_q_b, conv2_mem_3_1_q_a, conv2_mem_3_1_q_b, 
                     conv2_mem_4_0_q_a, conv2_mem_4_0_q_b, conv2_mem_4_1_q_a, conv2_mem_4_1_q_b, 
-                    conv2_mem_5_0_q_a, conv2_mem_5_0_q_b, conv2_mem_5_1_q_a, conv2_mem_5_1_q_b; 
+                    conv2_mem_5_0_q_a, conv2_mem_5_0_q_b, conv2_mem_5_1_q_a, conv2_mem_5_1_q_b,
+                    conv2_mem_6_0_q_a, conv2_mem_6_0_q_b, conv2_mem_6_1_q_a, conv2_mem_6_1_q_b, 
+                    conv2_mem_7_0_q_a, conv2_mem_7_0_q_b, conv2_mem_7_1_q_a, conv2_mem_7_1_q_b, 
+                    conv2_mem_8_0_q_a, conv2_mem_8_0_q_b, conv2_mem_8_1_q_a, conv2_mem_8_1_q_b, 
+                    conv2_mem_9_0_q_a, conv2_mem_9_0_q_b, conv2_mem_9_1_q_a, conv2_mem_9_1_q_b, 
+                    conv2_mem_10_0_q_a, conv2_mem_10_0_q_b, conv2_mem_10_1_q_a, conv2_mem_10_1_q_b, 
+                    conv2_mem_11_0_q_a, conv2_mem_11_0_q_b, conv2_mem_11_1_q_a, conv2_mem_11_1_q_b;
 
 //Conv2 output 0. They are redundant to allow for 4 accesses
 conv2_mem conv2_mem_0_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_0_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_0_0_q_a), .q_b(conv2_mem_0_0_q_b));
@@ -251,8 +257,8 @@ conv2_k_g11_mem conv2_k_g11_mem(.address_a(conv2_k_mem_addr0_read), .address_b(c
 
 //wires that go from P2 memories/addressers
 logic [3:0] P2_mem_sel; //wire that will control the muxes that make sure the P2 memory is read squentially block by block
-logic signed [15:0] P2_mem_0_data, P2_mem_1_data, P2_mem_2_data, P2_mem_3_data, P2_mem_4_data, P2_mem_5_data_q, 
-                    P2_mem_6_data, P2_mem_7_data, P2_mem_8_data, P2_mem_9_data, P2_mem_10_data, P2_mem_11_data_q, 
+logic signed [15:0] P2_mem_0_data, P2_mem_1_data, P2_mem_2_data, P2_mem_3_data, P2_mem_4_data, P2_mem_5_data, 
+                    P2_mem_6_data, P2_mem_7_data, P2_mem_8_data, P2_mem_9_data, P2_mem_10_data, P2_mem_11_data, 
                     P2_mem_0_q, P2_mem_1_q, P2_mem_2_q, P2_mem_3_q, P2_mem_4_q, P2_mem_5_q, 
                     P2_mem_6_q, P2_mem_7_q, P2_mem_8_q, P2_mem_9_q, P2_mem_10_q, P2_mem_11_q; //q lines for p2 memory block
 logic [3:0] P2_addr0_write, P2_addr0_read, P2_addr0w0r; //wires for addressing
@@ -462,7 +468,7 @@ mux3to1 para_mux_3to1_5(.data_in_0(conv1_k_g2_mem_q_b), .data_in_1(conv2_k_g2_me
 mux3to1 para_mux_3to1_6(.data_in_0(conv1_k_g0_mem_q_a), .data_in_1(conv2_k_g3_mem_q_a), .data_in_2(fc_g3_mem_q_a), .sel(MAC_layer), .data_out(MAC_in_para_6));
 mux3to1 para_mux_3to1_7(.data_in_0(conv1_k_g0_mem_q_b), .data_in_1(conv2_k_g3_mem_q_b), .data_in_2(fc_g3_mem_q_b), .sel(MAC_layer), .data_out(MAC_in_para_7));
 mux3to1 para_mux_3to1_8(.data_in_0(conv1_k_g1_mem_q_a), .data_in_1(conv2_k_g4_mem_q_a), .data_in_2(fc_g4_mem_q_a), .sel(MAC_layer), .data_out(MAC_in_para_8));
-mux3to1 para_mux_3to1_9(.data_in_0(conv1_k_g1_mem_q_b), .data_in_1(conv2_k_g4_mem_q_b), .data_in_2(fc_g5_mem_q_b), .sel(MAC_layer), .data_out(MAC_in_para_9));
+mux3to1 para_mux_3to1_9(.data_in_0(conv1_k_g1_mem_q_b), .data_in_1(conv2_k_g4_mem_q_b), .data_in_2(fc_g4_mem_q_b), .sel(MAC_layer), .data_out(MAC_in_para_9));
 mux3to1 para_mux_3to1_10(.data_in_0(conv1_k_g2_mem_q_a), .data_in_1(conv2_k_g5_mem_q_a), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_10));
 mux3to1 para_mux_3to1_11(.data_in_0(conv1_k_g2_mem_q_b), .data_in_1(conv2_k_g5_mem_q_b), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_11));
 mux3to1 para_mux_3to1_12(.data_in_0(conv1_k_g0_mem_q_a), .data_in_1(conv2_k_g6_mem_q_a), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_12));
