@@ -15,7 +15,7 @@ module conv2_mem_write (input logic clk, reset, enable,
             clk_counter <= 5'b00000;
             delay <= 4'b0000;
         end
-        else if (enable == 1'b1 && done == 1'b0 && delay == 4'b0000) begin
+        else if (enable == 1'b1 && done == 1'b0 && delay == 4'b0010) begin
             if (clk_counter == 5'b11000) begin
                 clk_counter <= 5'b00000;
                 if(addr0 == 6'b111111) begin

@@ -10,7 +10,7 @@ module img_mem_write (input logic clk, reset, enable, next,
             addr0 <= 10'b0000000000;
             delay <= 4'b0000;
         end
-        else if (enable == 1'b1 && done == 1'b0 && delay == 4'b0000) begin
+        else if (enable == 1'b1 && done == 1'b0 && delay == 4'b0001) begin
             addr0 <= addr0 + 1;
             ack <= 1'b1;
         end
