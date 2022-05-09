@@ -18,9 +18,11 @@ module CNN(input logic clk, reset, write, chipselect,
     end
 
 logic [1:0] MAC_layer;
-logic pooling_layer, rMAC, MAC_enable, img_mem_read_done, conv1_mem_write_done, 
-      conv1_mem_read_done, conv1_k_mem_read_done, P1_mem_read_done, P1_mem_write_done, conv2_mem_write_done, 
-      conv2_mem_read_done, conv2_k_mem_read_done, P2_mem_write_done, P2_mem_read_done, fc_mem_read_done;
+logic pooling_layer, rMAC, MAC_enable, 
+      img_mem_read_reset, conv1_mem_write_reset, conv1_mem_read_reset, conv1_k_mem_read_reset, P1_mem_read_reset, P1_mem_write_reset, 
+      conv2_mem_write_reset, conv2_mem_read_reset, conv2_k_mem_read_reset, P2_mem_write_reset, P2_mem_read_reset, fc_mem_read_reset, 
+      img_mem_read_done, conv1_mem_write_done, conv1_mem_read_done, conv1_k_mem_read_done, P1_mem_read_done, P1_mem_write_done, 
+      conv2_mem_write_done, conv2_mem_read_done, conv2_k_mem_read_done, P2_mem_write_done, P2_mem_read_done, fc_mem_read_done;
 //Control circuitry that runs the whole show
 CNN_ctrl CNN_ctrl(.MAC_layer(MAC_layer), .pooling_layer(pooling_layer), .rMAC(rMAC));
 
@@ -37,7 +39,7 @@ CNN_ctrl CNN_ctrl(.MAC_layer(MAC_layer), .pooling_layer(pooling_layer), .rMAC(rM
 logic signed [15:0] img_mem_0_q_a, img_mem_0_q_b, img_mem_1_q_a, img_mem_1_q_b;
 logic [9:0] img_mem_addr0_read, img_mem_addr0, img_mem_addr1, img_mem_addr2_read, img_mem_addr2, img_mem_addr3;
 
-img_mem_read img_mem_read(.clk(clk), .reset(reset), .enable(Conv1_layer), .addr0(img_mem_addr0_read), .addr1(img_mem_addr1), .addr2(img_mem_addr2_read), .addr3(img_mem_addr3), .done(img_mem_read_done));
+img_mem_read img_mem_read(.clk(clk), .reset(img_mem_read_reset), .enable(Conv1_layer), .addr0(img_mem_addr0_read), .addr1(img_mem_addr1), .addr2(img_mem_addr2_read), .addr3(img_mem_addr3), .done(img_mem_read_done));
 mux_2to1 (#10) img_mem_addr_mux_0(.data_in_0(img_mem_addr_write), .data_in_1(img_mem_addr0_read), .sel(Conv1_layer), .data_out(img_mem_addr0));
 mux_2to1 (#10) img_mem_addr_mux_1(.data_in_0(img_mem_addr_write), .data_in_1(img_mem_addr2_read), .sel(Conv1_layer), .data_out(img_mem_addr2));
 
@@ -65,8 +67,8 @@ logic signed [15:0] conv1_mem_0_0_data_a, conv1_mem_0_0_data_b, conv1_mem_0_1_da
                     conv1_mem_5_0_q_a, conv1_mem_5_0_q_b, conv1_mem_5_1_q_a, conv1_mem_5_1_q_b, conv1_mem_5_2_q_a, conv1_mem_5_2_q_b, conv1_mem_5_3_q_a, conv1_mem_5_3_q_b;
 logic [9:0] conv1_addr0_write, conv1_addr1_write, conv1_addr0_read, conv1_addr1_read, conv1_addr2_read, conv1_addr3_read, conv1_addr0w0r, conv1_addr1w2r;
 
-conv1_mem_write conv1_mem_write(.clk(clk), .reset(reset), .enable(Conv1_layer), .addr0(conv1_addr0_write), .addr1(conv1_addr1_write), .done(conv1_mem_write_done));
-conv1_mem_read conv1_mem_read(.clk(clk), .reset(reset), .enable(P1_layer), .addr0(conv1_addr0_read), .addr1(conv1_addr1_read), .addr2(conv1_addr2_read), .addr3(conv1_addr3_read) .done(conv1_mem_read_done));
+conv1_mem_write conv1_mem_write(.clk(clk), .reset(conv1_mem_write_reset), .enable(Conv1_layer), .addr0(conv1_addr0_write), .addr1(conv1_addr1_write), .done(conv1_mem_write_done));
+conv1_mem_read conv1_mem_read(.clk(clk), .reset(conv1_mem_read_reset), .enable(P1_layer), .addr0(conv1_addr0_read), .addr1(conv1_addr1_read), .addr2(conv1_addr2_read), .addr3(conv1_addr3_read) .done(conv1_mem_read_done));
 mux_2to1 (#10) conv1_mem_addr_mux_0(.data_in_0(conv1_addr0_write), .data_in_1(conv1_addr0_read), .sel(P1_layer), .data_out(conv1_addr0w0r));
 mux_2to1 (#10) conv1_mem_addr_mux_1(.data_in_0(conv1_addr1_write), .data_in_1(conv1_addr2_read), .sel(P1_layer), .data_out(conv1_addr1w2r));
 
@@ -110,7 +112,7 @@ conv1_mem conv1_mem_5_3(.address_a(conv1_addr1w2r), .address_b(conv1_addr3_read)
 logic signed [15:0] conv1_k_g0_mem_q_a, conv1_k_g0_mem_q_b, conv1_k_g1_mem_q_a, conv1_k_g1_mem_q_b, conv1_k_g2_mem_q_a, conv1_k_g2_mem_q_b;
 logic[5:0] conv1_k_mem_addr0_read, conv1_k_mem_addr1_read;
 
-conv1_k_mem_read conv1_k_mem_read(.clk(clk), .reset(reset), .enable(Conv1_layer), .addr0(conv1_k_mem_addr0_read), .addr1(conv1_k_mem_addr1_read), .done(conv1_k_mem_read_done));
+conv1_k_mem_read conv1_k_mem_read(.clk(clk), .reset(conv1_k_mem_read_reset), .enable(Conv1_layer), .addr0(conv1_k_mem_addr0_read), .addr1(conv1_k_mem_addr1_read), .done(conv1_k_mem_read_done));
 
 //Memories for conv1 kernels. Each holds 2 25x25 kernels.
 conv1_k_g0_mem conv1_k_g0_mem(.address_a(conv1_k_mem_addr0_read), .address_b(conv1_k_mem_addr1_read), .clock(clk), .rden_a(Conv1_layer), .rden_b(Conv1_layer), .q_a(conv1_k_g0_mem_q_a), .q_b(conv1_k_g0_mem_q_b));
@@ -126,8 +128,8 @@ conv1_k_g2_mem conv1_k_g2_mem(.address_a(conv1_k_mem_addr0_read), .address_b(con
 logic [7:0] p1_addr_0_read, p1_addr_0_write, p1_addr_1_read, p1_addr_1_write, p1_addr0w0r, p1_addr0w0r, p1_addr1w2r;
 mux_2to1 (#8) p1_addr_mux_0(.data_in_0(p1_addr_0_write), .data_in_1(p1_addr_0_read), .sel(Conv2_layer), .data_out(p1_addr0w0r)); //mux to combine write and read addresses
 mux_2to1 (#8) p1_addr_mux_1(.data_in_0(p1_addr_1_write), .data_in_1(p1_addr_1_read), .sel(Conv2_layer), .data_out(p1_addr1w2r)); //mux to combine write and read addresses
-P1_mem_read P1_mem_read(.clk(clk), .reset(reset), .enable(Conv2_layer), .addr0(p1_addr_0_read), .addr1(p1_addr_1_read), .done(P1_mem_read_done));
-P1_mem_write P1_mem_write(.clk(clk), .reset(reset), .enable(P1_layer), .addr0(p1_addr_0_write), .addr1(p1_addr_1_write), .done(P1_mem_write_done));
+P1_mem_read P1_mem_read(.clk(clk), .reset(P1_mem_read_reset), .enable(Conv2_layer), .addr0(p1_addr_0_read), .addr1(p1_addr_1_read), .done(P1_mem_read_done));
+P1_mem_write P1_mem_write(.clk(clk), .reset(P1_mem_write_reset), .enable(P1_layer), .addr0(p1_addr_0_write), .addr1(p1_addr_1_write), .done(P1_mem_write_done));
 
 logic signed [15:0] p1_mem_0_data_a, p1_mem_0_data_b, p1_mem_1_data_a, p1_mem_1_data_b,
                     p1_mem_2_data_a, p1_mem_2_data_b, p1_mem_3_data_a, p1_mem_3_data_b,
@@ -149,8 +151,8 @@ p1_mem p1_mem_5(.address_a(p1_addr0w0r), .address_b(p1_addr1w2r), .clock(clk), .
 
 logic [5:0] conv2_addr0_write, conv2_addr0_read, conv2_addr1_read, conv2_addr2_read, conv2_addr3_read, conv2_addr0w0r;
 logic [1:0] conv2_count;
-conv2_mem_write conv2_mem_write(.clk(clk), .reset(reset), .enable(Conv2_layer), .addr0(conv2_addr0_write), .count(conv2_count) .done(conv2_mem_write_done));
-conv2_mem_read conv2_mem_read(.clk(clk), .reset(reset), .enable(P2_layer), .addr0(conv2_addr0_read), .addr1(conv2_addr1_read), .addr2(conv2_addr2_read), .addr3(conv2_addr3_read) .done(conv2_mem_read_done));
+conv2_mem_write conv2_mem_write(.clk(clk), .reset(conv2_mem_write_reset), .enable(Conv2_layer), .addr0(conv2_addr0_write), .count(conv2_count) .done(conv2_mem_write_done));
+conv2_mem_read conv2_mem_read(.clk(clk), .reset(conv2_mem_read_reset), .enable(P2_layer), .addr0(conv2_addr0_read), .addr1(conv2_addr1_read), .addr2(conv2_addr2_read), .addr3(conv2_addr3_read) .done(conv2_mem_read_done));
 mux_2to1 (#10) conv2_mem_addr_mux_0(.data_in_0(conv2_addr0_write), .data_in_1(conv2_addr0_read), .sel(P2_layer), .data_out(conv2_addr0w0r));
 
 logic signed [15:0] conv2_mem_0_data, conv2_mem_1_data, conv2_mem_2_data, conv2_mem_3_data, 
@@ -207,7 +209,7 @@ conv2_mem conv2_mem_11_1(.address_a(conv2_addr2_read), .address_b(conv2_addr3_re
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 
 logic[7:0] conv2_k_mem_addr0_read, conv2_k_mem_addr1_read;
-conv2_k_mem_read conv2_k_mem_read(.clk(clk), .reset(reset), .enable(Conv2_layer), .addr0(conv2_k_mem_addr0_read), .addr1(conv2_k_mem_addr1_read), .done(conv2_k_mem_read_done));
+conv2_k_mem_read conv2_k_mem_read(.clk(clk), .reset(conv2_k_mem_read_reset), .enable(Conv2_layer), .addr0(conv2_k_mem_addr0_read), .addr1(conv2_k_mem_addr1_read), .done(conv2_k_mem_read_done));
 
 logic signed [15:0] conv2_k_g0_mem_q_a, conv2_k_g0_mem_q_b, conv2_k_g1_mem_q_a, conv2_k_g1_mem_q_b, 
                     conv2_k_g2_mem_q_a, conv2_k_g2_mem_q_b, conv2_k_g3_mem_q_a, conv2_k_g3_mem_q_b, 
@@ -244,8 +246,8 @@ logic signed [15:0] P2_mem_0_data, P2_mem_1_data, P2_mem_2_data, P2_mem_3_data, 
 logic [3:0] P2_addr0_write, P2_addr0_read, P2_addr0w0r; //wires for addressing
 
 //addressers for writing and reading the P2 memories
-P2_mem_write P2_mem_write(.clk(clk), .reset(reset), .enable(P2_layer), .addr0(P2_addr0_write), .done(P2_mem_write_done));
-P2_mem_read P2_mem_read(.clk(clk), .reset(reset), .enable(FC_layer), .addr0(P2_addr0_read), .count(P2_mem_sel), .done(P2_mem_read_done));
+P2_mem_write P2_mem_write(.clk(clk), .reset(P2_mem_write_reset), .enable(P2_layer), .addr0(P2_addr0_write), .done(P2_mem_write_done));
+P2_mem_read P2_mem_read(.clk(clk), .reset(P2_mem_read_reset), .enable(FC_layer), .addr0(P2_addr0_read), .count(P2_mem_sel), .done(P2_mem_read_done));
 mux_2to1 (#4) P2_addr_mux_0(.data_in_0(P2_addr0_write), .data_in_1(P2_addr0_read), .sel(FC_layer), .data_out(P2_addr0w0r)); //mux to combine write and read addresses
 
 //Memories for the 12 outputs of p2. Each is unique
@@ -273,7 +275,7 @@ logic signed [15:0] fc_g0_mem_q_a, fc_g0_mem_q_b, fc_g1_mem_q_a, fc_g1_mem_q_b, 
 logic [8:0] fc_mem_addr0_read, fc_mem_addr1_read;
 
 //addressers for writing and reading the FC weight memories
-fc_mem_read fc_mem_read(.clk(clk), .reset(reset), .enable(FC_layer), .addr0(fc_mem_addr0_read), .addr1(fc_mem_addr1_read), .done(fc_mem_read_done));
+fc_mem_read fc_mem_read(.clk(clk), .reset(fc_mem_read_reset), .enable(FC_layer), .addr0(fc_mem_addr0_read), .addr1(fc_mem_addr1_read), .done(fc_mem_read_done));
 
 //Memories for FC weights. Each holds 2 neurons's 192 weights(384 in total)
 fc_g0_mem fc_g0_mem(.address_a(fc_mem_addr0_read), .address_b(fc_mem_addr1_read), .clock(clk), .rden_a(FC_layer), .rden_b(FC_layer), .q_a(fc_g0_mem_q_a), .q_b(fc_g0_mem_q_b));
@@ -536,7 +538,7 @@ demux_1to3 out_conv2_demux_3(.data_in(out_conv2_3), .sel(conv2_count), .data_out
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 //
-//  POOLING
+//  POOLING (DONE)
 //
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 
