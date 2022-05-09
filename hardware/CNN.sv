@@ -534,7 +534,7 @@ after_MAC after_MAC_3(.MAC_layer(MAC_layer), .MAC_out_0(MAC_out_18), .MAC_out_1(
                       .bias_3(16'b1111111111111100), .bias_4(16'b1111111111111100), .bias_5(16'b0000000000000100), .conv2_bias(conv2_bias_3), .out_0(conv1_mem_0_1_data_b), 
                       .out_1(conv1_mem_1_1_data_b), .out_2(conv1_mem_2_1_data_b), .out_3(conv1_mem_3_1_data_b), .out_4(conv1_mem_4_1_data_b), .out_5(conv1_mem_5_1_data_b), .out_conv2(out_conv2_3));
 
-logic signed result_0, result_1, result_2, result_3, result_4, result_5, result_6, result_7, result_8, result_9;
+logic signed [15:0] result_0, result_1, result_2, result_3, result_4, result_5, result_6, result_7, result_8, result_9;
 
 demux_1to2 out_conv1_fc_demux_0(.data_in(after_MAC_0_out_0), .sel(FC_layer), .data_out_0(conv1_mem_0_0_data_a), .data_out_1(result_0));
 demux_1to2 out_conv1_fc_demux_1(.data_in(after_MAC_0_out_1), .sel(FC_layer), .data_out_0(conv1_mem_1_0_data_a), .data_out_1(result_1));
