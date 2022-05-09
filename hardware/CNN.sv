@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 module CNN(input logic clk, reset, write, read, chipselect, 
+=======
+module CNN(input logic clk, reset, write, chipselect, read, 
+>>>>>>> a0d880b8bf60a1ac8e0158d52e267b8d93d46ecb
            input logic [15:0] writedata, 
            input logic [3:0] address,
            output logic [15:0] readdata);
@@ -10,7 +14,7 @@ module CNN(input logic clk, reset, write, read, chipselect,
         if(chipselect == 1'b1 && (write == 1'b1 || read == 1'b1)) begin
             case (address)
                 4'h0 : ctrl <= writedata[7:0];
-                4'h1 : readdata <= return_ctrl + 16'h0;
+                4'h1 : readdata <= {8'b00000000, return_ctrl};
                 4'h2 : img_mem_addr_write <= writedata[9:0];
                 4'h3 : img_data <= writedata;
                 4'h4 : readdata <= result_0;
@@ -164,8 +168,8 @@ logic [5:0] conv2_addr0_write, conv2_addr0_read, conv2_addr1_read, conv2_addr2_r
 logic [1:0] conv2_count;
 conv2_mem_write conv2_mem_write(.clk(clk), .reset(conv2_mem_write_reset), .enable(Conv2_layer), .addr0(conv2_addr0_write), .count(conv2_count), .done(conv2_mem_write_done));
 conv2_mem_read conv2_mem_read(.clk(clk), .reset(conv2_mem_read_reset), .enable(P2_layer), .addr0(conv2_addr0_read), .addr1(conv2_addr1_read), .addr2(conv2_addr2_read), .addr3(conv2_addr3_read), .done(conv2_mem_read_done));
-mux_2to1 #(5) conv2_mem_addr_mux_0(.data_in_0(conv2_addr0_write), .data_in_1(conv2_addr0_read), .sel(P2_layer), .data_out(conv2_addr0w0r));
-mux_2to1 #(5) conv2_mem_addr_mux_1(.data_in_0(conv2_addr0_write), .data_in_1(conv2_addr2_read), .sel(P2_layer), .data_out(conv2_addr0w2r));
+mux_2to1 #(6) conv2_mem_addr_mux_0(.data_in_0(conv2_addr0_write), .data_in_1(conv2_addr0_read), .sel(P2_layer), .data_out(conv2_addr0w0r));
+mux_2to1 #(6) conv2_mem_addr_mux_1(.data_in_0(conv2_addr0_write), .data_in_1(conv2_addr2_read), .sel(P2_layer), .data_out(conv2_addr0w2r));
 
 logic signed [15:0] conv2_mem_0_data, conv2_mem_1_data, conv2_mem_2_data, conv2_mem_3_data, 
                     conv2_mem_4_data, conv2_mem_5_data, conv2_mem_6_data, conv2_mem_7_data, 
@@ -517,24 +521,24 @@ MAC MAC_22(.clk(clk), .enable(MAC_enable), .reset(rMAC), .MAC_layer(MAC_layer), 
 MAC MAC_23(.clk(clk), .enable(MAC_enable), .reset(rMAC), .MAC_layer(MAC_layer), .A(MAC_in_data_23), .B(MAC_in_para_23), .out(MAC_out_23));
 
 //The after MAC does all subsequent operations needed after the MAC depending on the layer. ReLU, combination, biases, shifting, etc.
-after_MAC after_MAC_0(.layer(MAC_layer), .MAC_out_0(MAC_out_0), .MAC_out_1(MAC_out_1), .MAC_out_2(MAC_out_2), .MAC_out_3(MAC_out_3), 
+after_MAC after_MAC_0(.MAC_layer(MAC_layer), .MAC_out_0(MAC_out_0), .MAC_out_1(MAC_out_1), .MAC_out_2(MAC_out_2), .MAC_out_3(MAC_out_3), 
                       .MAC_out_4(MAC_out_4), .MAC_out_5(MAC_out_5), .bias_0(16'b1111111111110100), .bias_1(16'b1111111111110010), .bias_2(16'b1111111111110111), 
                       .bias_3(16'b1111111111111100), .bias_4(16'b1111111111111100), .bias_5(16'b0000000000000100), .conv2_bias(conv2_bias_0), .out_0(after_MAC_0_out_0), 
                       .out_1(after_MAC_0_out_1), .out_2(after_MAC_0_out_2), .out_3(after_MAC_0_out_3), .out_4(after_MAC_0_out_4), .out_5(after_MAC_0_out_5), .out_conv2(out_conv2_0));
-after_MAC after_MAC_1(.layer(MAC_layer), .MAC_out_0(MAC_out_6), .MAC_out_1(MAC_out_7), .MAC_out_2(MAC_out_8), .MAC_out_3(MAC_out_9), 
+after_MAC after_MAC_1(.MAC_layer(MAC_layer), .MAC_out_0(MAC_out_6), .MAC_out_1(MAC_out_7), .MAC_out_2(MAC_out_8), .MAC_out_3(MAC_out_9), 
                       .MAC_out_4(MAC_out_10), .MAC_out_5(MAC_out_11), .bias_0(16'b1111111111110100), .bias_1(16'b1111111111110010), .bias_2(16'b1111111111110111), 
                       .bias_3(16'b1111111111111100), .bias_4(16'b1111111111111100), .bias_5(16'b0000000000000100), .conv2_bias(conv2_bias_1), .out_0(after_MAC_1_out_0), 
                       .out_1(after_MAC_1_out_1), .out_2(after_MAC_1_out_2), .out_3(after_MAC_1_out_3), .out_4(conv1_mem_4_0_data_b), .out_5(conv1_mem_5_0_data_b), .out_conv2(out_conv2_1));
-after_MAC after_MAC_2(.layer(MAC_layer), .MAC_out_0(MAC_out_12), .MAC_out_1(MAC_out_13), .MAC_out_2(MAC_out_14), .MAC_out_3(MAC_out_15), 
+after_MAC after_MAC_2(.MAC_layer(MAC_layer), .MAC_out_0(MAC_out_12), .MAC_out_1(MAC_out_13), .MAC_out_2(MAC_out_14), .MAC_out_3(MAC_out_15), 
                       .MAC_out_4(MAC_out_16), .MAC_out_5(MAC_out_17), .bias_0(16'b1111111111110100), .bias_1(16'b1111111111110010), .bias_2(16'b1111111111110111), 
                       .bias_3(16'b1111111111111100), .bias_4(16'b1111111111111100), .bias_5(16'b0000000000000100), .conv2_bias(conv2_bias_2), .out_0(conv1_mem_0_1_data_a), 
                       .out_1(conv1_mem_1_1_data_a), .out_2(conv1_mem_2_1_data_a), .out_3(conv1_mem_3_1_data_a), .out_4(conv1_mem_4_1_data_a), .out_5(conv1_mem_5_1_data_a), .out_conv2(out_conv2_2));
-after_MAC after_MAC_3(.layer(MAC_layer), .MAC_out_0(MAC_out_18), .MAC_out_1(MAC_out_19), .MAC_out_2(MAC_out_20), .MAC_out_3(MAC_out_21), 
+after_MAC after_MAC_3(.MAC_layer(MAC_layer), .MAC_out_0(MAC_out_18), .MAC_out_1(MAC_out_19), .MAC_out_2(MAC_out_20), .MAC_out_3(MAC_out_21), 
                       .MAC_out_4(MAC_out_22), .MAC_out_5(MAC_out_23), .bias_0(16'b1111111111110100), .bias_1(16'b1111111111110010), .bias_2(16'b1111111111110111), 
                       .bias_3(16'b1111111111111100), .bias_4(16'b1111111111111100), .bias_5(16'b0000000000000100), .conv2_bias(conv2_bias_3), .out_0(conv1_mem_0_1_data_b), 
                       .out_1(conv1_mem_1_1_data_b), .out_2(conv1_mem_2_1_data_b), .out_3(conv1_mem_3_1_data_b), .out_4(conv1_mem_4_1_data_b), .out_5(conv1_mem_5_1_data_b), .out_conv2(out_conv2_3));
 
-logic signed result_0, result_1, result_2, result_3, result_4, result_5, result_6, result_7, result_8, result_9;
+logic signed [15:0] result_0, result_1, result_2, result_3, result_4, result_5, result_6, result_7, result_8, result_9;
 
 demux_1to2 out_conv1_fc_demux_0(.data_in(after_MAC_0_out_0), .sel(FC_layer), .data_out_0(conv1_mem_0_0_data_a), .data_out_1(result_0));
 demux_1to2 out_conv1_fc_demux_1(.data_in(after_MAC_0_out_1), .sel(FC_layer), .data_out_0(conv1_mem_1_0_data_a), .data_out_1(result_1));
