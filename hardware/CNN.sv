@@ -517,19 +517,19 @@ MAC MAC_22(.clk(clk), .enable(MAC_enable), .reset(rMAC), .MAC_layer(MAC_layer), 
 MAC MAC_23(.clk(clk), .enable(MAC_enable), .reset(rMAC), .MAC_layer(MAC_layer), .A(MAC_in_data_23), .B(MAC_in_para_23), .out(MAC_out_23));
 
 //The after MAC does all subsequent operations needed after the MAC depending on the layer. ReLU, combination, biases, shifting, etc.
-after_MAC after_MAC_0(.layer(MAC_layer), .MAC_out_0(MAC_out_0), .MAC_out_1(MAC_out_1), .MAC_out_2(MAC_out_2), .MAC_out_3(MAC_out_3), 
+after_MAC after_MAC_0(.MAC_layer(MAC_layer), .MAC_out_0(MAC_out_0), .MAC_out_1(MAC_out_1), .MAC_out_2(MAC_out_2), .MAC_out_3(MAC_out_3), 
                       .MAC_out_4(MAC_out_4), .MAC_out_5(MAC_out_5), .bias_0(16'b1111111111110100), .bias_1(16'b1111111111110010), .bias_2(16'b1111111111110111), 
                       .bias_3(16'b1111111111111100), .bias_4(16'b1111111111111100), .bias_5(16'b0000000000000100), .conv2_bias(conv2_bias_0), .out_0(after_MAC_0_out_0), 
                       .out_1(after_MAC_0_out_1), .out_2(after_MAC_0_out_2), .out_3(after_MAC_0_out_3), .out_4(after_MAC_0_out_4), .out_5(after_MAC_0_out_5), .out_conv2(out_conv2_0));
-after_MAC after_MAC_1(.layer(MAC_layer), .MAC_out_0(MAC_out_6), .MAC_out_1(MAC_out_7), .MAC_out_2(MAC_out_8), .MAC_out_3(MAC_out_9), 
+after_MAC after_MAC_1(.MAC_layer(MAC_layer), .MAC_out_0(MAC_out_6), .MAC_out_1(MAC_out_7), .MAC_out_2(MAC_out_8), .MAC_out_3(MAC_out_9), 
                       .MAC_out_4(MAC_out_10), .MAC_out_5(MAC_out_11), .bias_0(16'b1111111111110100), .bias_1(16'b1111111111110010), .bias_2(16'b1111111111110111), 
                       .bias_3(16'b1111111111111100), .bias_4(16'b1111111111111100), .bias_5(16'b0000000000000100), .conv2_bias(conv2_bias_1), .out_0(after_MAC_1_out_0), 
                       .out_1(after_MAC_1_out_1), .out_2(after_MAC_1_out_2), .out_3(after_MAC_1_out_3), .out_4(conv1_mem_4_0_data_b), .out_5(conv1_mem_5_0_data_b), .out_conv2(out_conv2_1));
-after_MAC after_MAC_2(.layer(MAC_layer), .MAC_out_0(MAC_out_12), .MAC_out_1(MAC_out_13), .MAC_out_2(MAC_out_14), .MAC_out_3(MAC_out_15), 
+after_MAC after_MAC_2(.MAC_layer(MAC_layer), .MAC_out_0(MAC_out_12), .MAC_out_1(MAC_out_13), .MAC_out_2(MAC_out_14), .MAC_out_3(MAC_out_15), 
                       .MAC_out_4(MAC_out_16), .MAC_out_5(MAC_out_17), .bias_0(16'b1111111111110100), .bias_1(16'b1111111111110010), .bias_2(16'b1111111111110111), 
                       .bias_3(16'b1111111111111100), .bias_4(16'b1111111111111100), .bias_5(16'b0000000000000100), .conv2_bias(conv2_bias_2), .out_0(conv1_mem_0_1_data_a), 
                       .out_1(conv1_mem_1_1_data_a), .out_2(conv1_mem_2_1_data_a), .out_3(conv1_mem_3_1_data_a), .out_4(conv1_mem_4_1_data_a), .out_5(conv1_mem_5_1_data_a), .out_conv2(out_conv2_2));
-after_MAC after_MAC_3(.layer(MAC_layer), .MAC_out_0(MAC_out_18), .MAC_out_1(MAC_out_19), .MAC_out_2(MAC_out_20), .MAC_out_3(MAC_out_21), 
+after_MAC after_MAC_3(.MAC_layer(MAC_layer), .MAC_out_0(MAC_out_18), .MAC_out_1(MAC_out_19), .MAC_out_2(MAC_out_20), .MAC_out_3(MAC_out_21), 
                       .MAC_out_4(MAC_out_22), .MAC_out_5(MAC_out_23), .bias_0(16'b1111111111110100), .bias_1(16'b1111111111110010), .bias_2(16'b1111111111110111), 
                       .bias_3(16'b1111111111111100), .bias_4(16'b1111111111111100), .bias_5(16'b0000000000000100), .conv2_bias(conv2_bias_3), .out_0(conv1_mem_0_1_data_b), 
                       .out_1(conv1_mem_1_1_data_b), .out_2(conv1_mem_2_1_data_b), .out_3(conv1_mem_3_1_data_b), .out_4(conv1_mem_4_1_data_b), .out_5(conv1_mem_5_1_data_b), .out_conv2(out_conv2_3));
