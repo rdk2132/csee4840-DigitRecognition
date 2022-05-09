@@ -52,8 +52,8 @@ logic signed [15:0] img_mem_0_q_a, img_mem_0_q_b, img_mem_1_q_a, img_mem_1_q_b;
 logic [9:0] img_mem_addr0_read, img_mem_addr0, img_mem_addr1, img_mem_addr2_read, img_mem_addr2, img_mem_addr3;
 
 img_mem_read img_mem_read(.clk(clk), .reset(img_mem_read_reset), .enable(Conv1_layer), .addr0(img_mem_addr0_read), .addr1(img_mem_addr1), .addr2(img_mem_addr2_read), .addr3(img_mem_addr3), .done(img_mem_read_done));
-mux_2to1 (#10) img_mem_addr_mux_0(.data_in_0(img_mem_addr_write), .data_in_1(img_mem_addr0_read), .sel(Conv1_layer), .data_out(img_mem_addr0));
-mux_2to1 (#10) img_mem_addr_mux_1(.data_in_0(img_mem_addr_write), .data_in_1(img_mem_addr2_read), .sel(Conv1_layer), .data_out(img_mem_addr2));
+mux_2to1 #(10) img_mem_addr_mux_0(.data_in_0(img_mem_addr_write), .data_in_1(img_mem_addr0_read), .sel(Conv1_layer), .data_out(img_mem_addr0));
+mux_2to1 #(10) img_mem_addr_mux_1(.data_in_0(img_mem_addr_write), .data_in_1(img_mem_addr2_read), .sel(Conv1_layer), .data_out(img_mem_addr2));
 
 //image memory. They are redundant to allow for 4 accesses
 img_mem img_mem_0(.address_a(img_mem_addr0), .address_b(img_mem_addr1), .clock(clk), .data_a(img_data), .data_b(16'b0000000000000000), .rden_a(Conv1_layer), .rden_b(Conv1_layer), .wren_a(img_load), .wren_b(1'b0), .q_a(img_mem_0_q_a), .q_b(img_mem_0_q_b));
@@ -80,9 +80,9 @@ logic signed [15:0] conv1_mem_0_0_data_a, conv1_mem_0_0_data_b, conv1_mem_0_1_da
 logic [9:0] conv1_addr0_write, conv1_addr1_write, conv1_addr0_read, conv1_addr1_read, conv1_addr2_read, conv1_addr3_read, conv1_addr0w0r, conv1_addr1w2r;
 
 conv1_mem_write conv1_mem_write(.clk(clk), .reset(conv1_mem_write_reset), .enable(Conv1_layer), .addr0(conv1_addr0_write), .addr1(conv1_addr1_write), .done(conv1_mem_write_done));
-conv1_mem_read conv1_mem_read(.clk(clk), .reset(conv1_mem_read_reset), .enable(P1_layer), .addr0(conv1_addr0_read), .addr1(conv1_addr1_read), .addr2(conv1_addr2_read), .addr3(conv1_addr3_read) .done(conv1_mem_read_done));
-mux_2to1 (#10) conv1_mem_addr_mux_0(.data_in_0(conv1_addr0_write), .data_in_1(conv1_addr0_read), .sel(P1_layer), .data_out(conv1_addr0w0r));
-mux_2to1 (#10) conv1_mem_addr_mux_1(.data_in_0(conv1_addr1_write), .data_in_1(conv1_addr2_read), .sel(P1_layer), .data_out(conv1_addr1w2r));
+conv1_mem_read conv1_mem_read(.clk(clk), .reset(conv1_mem_read_reset), .enable(P1_layer), .addr0(conv1_addr0_read), .addr1(conv1_addr1_read), .addr2(conv1_addr2_read), .addr3(conv1_addr3_read), .done(conv1_mem_read_done));
+mux_2to1 #(10) conv1_mem_addr_mux_0(.data_in_0(conv1_addr0_write), .data_in_1(conv1_addr0_read), .sel(P1_layer), .data_out(conv1_addr0w0r));
+mux_2to1 #(10) conv1_mem_addr_mux_1(.data_in_0(conv1_addr1_write), .data_in_1(conv1_addr2_read), .sel(P1_layer), .data_out(conv1_addr1w2r));
 
 //Conv1 output image 0. Each stores half of the image to allow for 8 accesses. _0 _2 and _1 _3 are redundant
 conv1_mem conv1_mem_0_0(.address_a(conv1_addr0w0r), .address_b(conv1_addr1_read), .clock(clk), .data_a(conv1_mem_0_0_data_a), .data_b(conv1_mem_0_0_data_b), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_0_0_q_a), .q_b(conv1_mem_0_0_q_b));
@@ -138,7 +138,7 @@ conv1_k_g2_mem conv1_k_g2_mem(.address_a(conv1_k_mem_addr0_read), .address_b(con
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 
 logic [7:0] p1_addr_0_read, p1_addr_0_write, p1_addr_1_write, p1_addr0w0r;
-mux_2to1 (#8) p1_addr_mux_0(.data_in_0(p1_addr_0_write), .data_in_1(p1_addr_0_read), .sel(Conv2_layer), .data_out(p1_addr0w0r)); //mux to combine write and read addresses
+mux_2to1 #(8) p1_addr_mux_0(.data_in_0(p1_addr_0_write), .data_in_1(p1_addr_0_read), .sel(Conv2_layer), .data_out(p1_addr0w0r)); //mux to combine write and read addresses
 P1_mem_read P1_mem_read(.clk(clk), .reset(P1_mem_read_reset), .enable(Conv2_layer), .addr0(p1_addr_0_read), .done(P1_mem_read_done));
 P1_mem_write P1_mem_write(.clk(clk), .reset(P1_mem_write_reset), .enable(P1_layer), .addr0(p1_addr_0_write), .addr1(p1_addr_1_write), .done(P1_mem_write_done));
 
@@ -162,10 +162,10 @@ p1_mem p1_mem_5(.address_a(p1_addr0w0r), .address_b(p1_addr_1_write), .clock(clk
 
 logic [5:0] conv2_addr0_write, conv2_addr0_read, conv2_addr1_read, conv2_addr2_read, conv2_addr3_read, conv2_addr0w0r;
 logic [1:0] conv2_count;
-conv2_mem_write conv2_mem_write(.clk(clk), .reset(conv2_mem_write_reset), .enable(Conv2_layer), .addr0(conv2_addr0_write), .count(conv2_count) .done(conv2_mem_write_done));
-conv2_mem_read conv2_mem_read(.clk(clk), .reset(conv2_mem_read_reset), .enable(P2_layer), .addr0(conv2_addr0_read), .addr1(conv2_addr1_read), .addr2(conv2_addr2_read), .addr3(conv2_addr3_read) .done(conv2_mem_read_done));
-mux_2to1 (#5) conv2_mem_addr_mux_0(.data_in_0(conv2_addr0_write), .data_in_1(conv2_addr0_read), .sel(P2_layer), .data_out(conv2_addr0w0r));
-mux_2to1 (#5) conv2_mem_addr_mux_1(.data_in_0(conv2_addr0_write), .data_in_1(conv2_addr2_read), .sel(P2_layer), .data_out(conv2_addr0w2r));
+conv2_mem_write conv2_mem_write(.clk(clk), .reset(conv2_mem_write_reset), .enable(Conv2_layer), .addr0(conv2_addr0_write), .count(conv2_count), .done(conv2_mem_write_done));
+conv2_mem_read conv2_mem_read(.clk(clk), .reset(conv2_mem_read_reset), .enable(P2_layer), .addr0(conv2_addr0_read), .addr1(conv2_addr1_read), .addr2(conv2_addr2_read), .addr3(conv2_addr3_read), .done(conv2_mem_read_done));
+mux_2to1 #(5) conv2_mem_addr_mux_0(.data_in_0(conv2_addr0_write), .data_in_1(conv2_addr0_read), .sel(P2_layer), .data_out(conv2_addr0w0r));
+mux_2to1 #(5) conv2_mem_addr_mux_1(.data_in_0(conv2_addr0_write), .data_in_1(conv2_addr2_read), .sel(P2_layer), .data_out(conv2_addr0w2r));
 
 logic signed [15:0] conv2_mem_0_data, conv2_mem_1_data, conv2_mem_2_data, conv2_mem_3_data, 
                     conv2_mem_4_data, conv2_mem_5_data, conv2_mem_6_data, conv2_mem_7_data, 
@@ -260,7 +260,7 @@ logic [3:0] P2_addr0_write, P2_addr0_read, P2_addr0w0r; //wires for addressing
 //addressers for writing and reading the P2 memories
 P2_mem_write P2_mem_write(.clk(clk), .reset(P2_mem_write_reset), .enable(P2_layer), .addr0(P2_addr0_write), .done(P2_mem_write_done));
 P2_mem_read P2_mem_read(.clk(clk), .reset(P2_mem_read_reset), .enable(FC_layer), .addr0(P2_addr0_read), .count(P2_mem_sel), .done(P2_mem_read_done));
-mux_2to1 (#4) P2_addr_mux_0(.data_in_0(P2_addr0_write), .data_in_1(P2_addr0_read), .sel(FC_layer), .data_out(P2_addr0w0r)); //mux to combine write and read addresses
+mux_2to1 #(4) P2_addr_mux_0(.data_in_0(P2_addr0_write), .data_in_1(P2_addr0_read), .sel(FC_layer), .data_out(P2_addr0w0r)); //mux to combine write and read addresses
 
 //Memories for the 12 outputs of p2. Each is unique
 p2_mem p2_mem_0(.address(P2_addr0w0r), .clock(clk), .data(P2_mem_0_data), .rden(FC_layer), .wren(P2_layer), .q(P2_mem_0_q));
@@ -318,7 +318,7 @@ logic signed [15:0] MAC_in_data_0, MAC_in_data_1, MAC_in_data_2, MAC_in_data_3, 
                     FC_in_data_0,  FC_in_data_1,  FC_in_data_2,  FC_in_data_3,  FC_in_data_4,  FC_in_data_5, 
                     FC_in_data_6,  FC_in_data_7,  FC_in_data_8,  FC_in_data_9,  FC_in_data_10,  FC_in_data_11, 
                     FC_in_data_12,  FC_in_data_13,  FC_in_data_14,  FC_in_data_15,  FC_in_data_16,  FC_in_data_17, 
-                    FC_in_data_18,  FC_in_data_19,  FC_in_data_20,  FC_in_data_21,  FC_in_data_22,  FC_in_data_23;
+                    FC_in_data_18,  FC_in_data_19,  FC_in_data_20,  FC_in_data_21,  FC_in_data_22,  FC_in_data_23,
                     conv2_bias_0, conv2_bias_1, conv2_bias_2, conv2_bias_3, 
                     out_conv2_0, out_conv2_1, out_conv2_2, out_conv2_3,
                     after_MAC_0_out_0, after_MAC_0_out_1, after_MAC_0_out_2, after_MAC_0_out_3, after_MAC_0_out_4, 
@@ -480,9 +480,9 @@ mux3to1 para_mux_3to1_23(.data_in_0(conv1_k_g2_mem_q_b), .data_in_1(conv2_k_g11_
 
 //bias muxes
 mux3to1 bias_mux_3to1_0(.data_in_0(16'b0000000000000011), .data_in_1(16'b0000000000000011), .data_in_2(16'b0000000000000011), .sel(conv2_count), .data_out(conv2_bias_0));
-mux3to1 bias_mux_3to1_0(.data_in_0(16'b1111111111111110), .data_in_1(16'b0000000000000000), .data_in_2(16'b0000000000000010), .sel(conv2_count), .data_out(conv2_bias_1));
-mux3to1 bias_mux_3to1_0(.data_in_0(16'b0000000000000001), .data_in_1(16'b0000000000000001), .data_in_2(16'b1111111111111111), .sel(conv2_count), .data_out(conv2_bias_2));
-mux3to1 bias_mux_3to1_0(.data_in_0(16'b0000000000000011), .data_in_1(16'b0000000000000010), .data_in_2(16'b1111111111111111), .sel(conv2_count), .data_out(conv2_bias_3));
+mux3to1 bias_mux_3to1_1(.data_in_0(16'b1111111111111110), .data_in_1(16'b0000000000000000), .data_in_2(16'b0000000000000010), .sel(conv2_count), .data_out(conv2_bias_1));
+mux3to1 bias_mux_3to1_2(.data_in_0(16'b0000000000000001), .data_in_1(16'b0000000000000001), .data_in_2(16'b1111111111111111), .sel(conv2_count), .data_out(conv2_bias_2));
+mux3to1 bias_mux_3to1_3(.data_in_0(16'b0000000000000011), .data_in_1(16'b0000000000000010), .data_in_2(16'b1111111111111111), .sel(conv2_count), .data_out(conv2_bias_3));
 
 //24 MAC modules
 MAC MAC_0(.clk(clk), .enable(MAC_enable), .reset(rMAC), .MAC_layer(MAC_layer), .A(MAC_in_data_0), .B(MAC_in_para_0), .out(MAC_out_0));
