@@ -119,7 +119,7 @@ module CNN_ctrl(//The one and only cock
         end
 
         //State 1: Load Image
-        if(state == 8'b0000 0001 && done == 8'b0000 0000) begin 
+        if(state == 8'b00000001 && done == 8'b00000000) begin 
             //image set image mem to write and enable image write counter
             img_m_w <= 1'b1;
             img_c_w_e <= 1'b1;
@@ -133,7 +133,7 @@ module CNN_ctrl(//The one and only cock
         end
 
         //State 2: Convolution 1
-        else if(state == 8'b0000 0010 && done == 8'b0000 0001) begin
+        else if(state == 8'b00000010 && done == 8'b00000001) begin
             
             //enable counters
             img_c_r_e <= 1'b1;
@@ -161,7 +161,7 @@ module CNN_ctrl(//The one and only cock
         end
 
         //State 3: Pool 1
-        else if(state == 8'b0000 0011 && done == 8'b0000 0010) begin
+        else if(state == 8'b00000011 && done == 8'b00000010) begin
             conv1_out_c_r_e <= 1'b1;
             P1_c_w_e <= 1'b1;
             conv1_out_m_r <= 1'b1;
@@ -176,7 +176,7 @@ module CNN_ctrl(//The one and only cock
         end
 
         //State 4: Convolution 2
-        else if(state == 8'b0000 0100 && done == 8'b0000 0011) begin
+        else if(state == 8'b00000100 && done == 8'b00000011) begin
             //enable counters
             P1_c_r_e <= 1'b1;
             conv2_kern_c_e <= 1'b1;
@@ -203,7 +203,7 @@ module CNN_ctrl(//The one and only cock
         end
 
         //State 5: Pool 2
-        else if(state == 8'b0000 0101 && done == 8'b0000 0100) begin
+        else if(state == 8'b00000101 && done == 8'b00000100) begin
             conv2_out_c_r_e <= 1'b1;
             P2_c_w_e <= 1'b1;
             conv2_out_m_r <= 1'b1;
@@ -218,7 +218,7 @@ module CNN_ctrl(//The one and only cock
         end
 
         //State 6: Fully Connected
-        else if(state == 3'b0000 0110 && done == 8'b0000 0101) begin
+        else if(state == 3'b00000110 && done == 8'b00000101) begin
             //enable counters
             P2_c_r_e <= 1'b1;
             FC_c_e <= 1'b1;
