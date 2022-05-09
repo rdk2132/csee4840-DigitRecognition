@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 module CNN(input logic clk, reset, write, read, chipselect, 
-=======
-module CNN(input logic clk, reset, write, chipselect, read, 
->>>>>>> a0d880b8bf60a1ac8e0158d52e267b8d93d46ecb
            input logic [15:0] writedata, 
            input logic [3:0] address,
            output logic [15:0] readdata);
