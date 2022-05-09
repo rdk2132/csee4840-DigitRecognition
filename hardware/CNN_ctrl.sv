@@ -115,6 +115,7 @@ module CNN_ctrl(//The one and only cock
             fc_r_r <= fc_w_r <= 1'b1;
             //set reset back to 0
             reset <= 0;
+            done <= 0;
         end
 
         //State 1: Load Image
