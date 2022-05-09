@@ -24,7 +24,7 @@
 #define CONTROL_OUT_REG(x) (x)
 #define CONTROL_IN_REG(x) ((x) + 2)
 #define INPUT_REG(x) ((x) + 4)
-#define OUTPUT_REG(x) ((x) + 6)
+#define OUTPUT_REG_BASE(x) ((x) + 6)
 
 struct cnn_dev {
     struct resource res; // Registers
@@ -36,9 +36,34 @@ static void send_image(fixed_t *image)
 {
     int i;
 
-    for (i = 0; i < 25/*TEST PLACEHOLDER*/; i++){
+    for (i = 0; i < IMAGE_SIZE; i++){
         iowrite16(image[i], INPUT_REG(dev.virtbase));
     }
+}
+
+static void control(fixed_t *image) {
+  fixed_t control_in;
+  fixed_t control_out;
+
+  // Load Image
+  control_in = 1;
+  iowrite16(control_in, CONTROL_IN_REG(dev.virtbase));
+  do {
+    control_out = ioread16(CONTROL_OUT_REG(dev.virtbase));
+  } while (control_out != control_in)
+
+  send_image(image);
+
+  control_in = 2;
+  for (; control_in < 7; control_in++) {
+    // Send signal to start next layer
+    iowrite16(control_in, CONTROL_IN_REG(dev.virtbase));
+    
+    // Wait for done signal from hardware
+    do {
+      control_out = ioread16(CONTROL_OUT_REG(dev.virtbase));
+    } while (control_out != control_in)
+  }
 }
 
 static void read_output(fixed_t *vector)
@@ -46,7 +71,7 @@ static void read_output(fixed_t *vector)
     int i;
 
     for (i = 0; i < NUM_CLASSES; i++){
-        vector[i] = ioread16(OUTPUT_REG(dev.virtbase));
+        vector[i] = ioread16(OUTPUT_REG_BASE(dev.virtbase) + (2 * i));
     }
 }
 
@@ -57,11 +82,14 @@ static long cnn_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
     switch (cmd)
     {
     case CNN_CLASSIFY:
+	// Copy image from user
         if (copy_from_user(&in_data, (cnn_arg_t *)arg, sizeof(cnn_arg_t)))
             return -EACCES;
-        send_image(in_data.in_image);
 
-        read_output(in_data.classification_vector);
+        control(in_data.in_image);
+        
+	// Read output
+	read_output(in_data.classification_vector);
         if (copy_to_user((cnn_arg_t *)arg, &in_data, sizeof(cnn_arg_t)))
             return -EACCES;
         break;

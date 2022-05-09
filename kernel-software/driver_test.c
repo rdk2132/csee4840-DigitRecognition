@@ -9,19 +9,25 @@
 int cnn_fd;
 
 
-void run_cnn(const fixed_t *image) {
+void start_cnn(const fixed_t *image) {
 
   cnn_arg_t cnn_data;
   memcpy(&cnn_data, image, 50);
 
-  if (ioctl(cnn_fd, CNN_CLASSIFY, &cnn_data)) {
-    perror("ioctl(CNN_CLASSIFY) failed");
+  if (ioctl(cnn_fd, CNN_START, &cnn_data)) {
+    perror("ioctl(CNN_START) failed");
+    return;
+  }
+
+  if (ioctl(cnn_fd, CNN_FINISH, &cnn_data)) {
+    perror("ioctl(CNN_FINISH) failed");
     return;
   }
   
   for(int i = 0; i < NUM_CLASSES; i++)
     printf("output[%d]: %d\n", i, cnn_data.classification_vector[i]);
 }
+
 
 int main()
 {
@@ -37,7 +43,7 @@ int main()
         return -1;
     }
 
-    run_cnn(image);
+    start_cnn(image);
 
     return 0;
 }
