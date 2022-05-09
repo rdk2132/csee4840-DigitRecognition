@@ -85,14 +85,14 @@ static long cnn_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
     switch (cmd)
     {
     case CNN_CLASSIFY:
-	// Copy image from user
+	    // Copy image from user
         if (copy_from_user(&in_data, (cnn_arg_t *)arg, sizeof(cnn_arg_t)))
             return -EACCES;
 
         control(in_data.in_image);
         
-	// Read output
-	read_output(in_data.classification_vector);
+	    // Read output
+	    read_output(in_data.classification_vector);
         if (copy_to_user((cnn_arg_t *)arg, &in_data, sizeof(cnn_arg_t)))
             return -EACCES;
         break;

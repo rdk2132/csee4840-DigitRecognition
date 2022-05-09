@@ -14,12 +14,7 @@ void start_cnn(const fixed_t *image) {
   cnn_arg_t cnn_data;
   memcpy(&cnn_data, image, 50);
 
-  if (ioctl(cnn_fd, CNN_START, &cnn_data)) {
-    perror("ioctl(CNN_START) failed");
-    return;
-  }
-
-  if (ioctl(cnn_fd, CNN_FINISH, &cnn_data)) {
+  if (ioctl(cnn_fd, CNN_CLASSIFY, &cnn_data)) {
     perror("ioctl(CNN_FINISH) failed");
     return;
   }
