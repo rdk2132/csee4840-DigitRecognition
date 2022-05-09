@@ -10,7 +10,7 @@ module CNN(input logic clk, reset, write, chipselect, read,
         if(chipselect == 1'b1 && (write == 1'b1 || read == 1'b1)) begin
             case (address)
                 4'h0 : ctrl <= writedata[7:0];
-                4'h1 : readdata <= return_ctrl + 16'h0;
+                4'h1 : readdata <= {8'b00000000, return_ctrl};
                 4'h2 : img_mem_addr_write <= writedata[9:0];
                 4'h3 : img_data <= writedata;
                 4'h4 : readdata <= result_0;
