@@ -12,16 +12,17 @@ module CNN(input logic clk, reset, write, chipselect,
                 4'h0 : ctrl <= writedata[7:0];
                 4'h1 : readdata <= control_output + 16'h0;
                 4'h2 : img_mem_addr_write <= writedata[9:0];
-                4'h3 : readdata <= result_0;
-                4'h4 : readdata <= result_1;
-                4'h5 : readdata <= result_2;
-                4'h6 : readdata <= result_3;
-                4'h7 : readdata <= result_4;
-                4'h8 : readdata <= result_5;
-                4'h9 : readdata <= result_6;
-                4'ha : readdata <= result_7;
-                4'hb : readdata <= result_8;
-                4'hc : readdata <= result_9;
+                4'h3 : img_data <= writedata;
+                4'h4 : readdata <= result_0;
+                4'h5 : readdata <= result_1;
+                4'h6 : readdata <= result_2;
+                4'h7 : readdata <= result_3;
+                4'h8 : readdata <= result_4;
+                4'h9 : readdata <= result_5;
+                4'ha : readdata <= result_6;
+                4'hb : readdata <= result_7;
+                4'hc : readdata <= result_8;
+                4'hd : readdata <= result_9;
                 default : readdata <= 0;
             endcase
         end
