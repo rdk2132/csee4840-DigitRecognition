@@ -21,10 +21,11 @@
 #include "../software-testbench/Parameters.h"
 
 #define DRIVER_NAME "cnn"
-#define CONTROL_OUT_REG(x) (x)
-#define CONTROL_IN_REG(x) ((x) + 2)
-#define INPUT_REG(x) ((x) + 4)
-#define OUTPUT_REG_BASE(x) ((x) + 6)
+#define CONTROL_IN_REG(x) (x)
+#define CONTROL_OUT_REG(x) ((x) + 2)
+#define INPUT_ADDR_REG(x) ((x) + 4)
+#define INPUT_DATA_REG(x) ((x) + 6)
+#define OUTPUT_REG_BASE(x) ((x) + 8)
 
 struct cnn_dev {
     struct resource res; // Registers
@@ -34,10 +35,11 @@ struct cnn_dev {
 
 static void send_image(fixed_t *image)
 {
-    int i;
+    fixed_t i;
 
     for (i = 0; i < IMAGE_SIZE; i++){
-        iowrite16(image[i], INPUT_REG(dev.virtbase));
+        iowrite16(i, INPUT_ADDR_REG(dev.virtbase));
+        iowrite16(image[i], INPUT_DATA_REG(dev.virtbase));
     }
 }
 
@@ -71,6 +73,7 @@ static void read_output(fixed_t *vector)
     int i;
 
     for (i = 0; i < NUM_CLASSES; i++){
+        vector[i] = ioread16(OUTPUT_REG_BASE(dev.virtbase) + (2 * i));
         vector[i] = ioread16(OUTPUT_REG_BASE(dev.virtbase) + (2 * i));
     }
 }
