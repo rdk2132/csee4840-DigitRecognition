@@ -164,8 +164,8 @@ logic [5:0] conv2_addr0_write, conv2_addr0_read, conv2_addr1_read, conv2_addr2_r
 logic [1:0] conv2_count;
 conv2_mem_write conv2_mem_write(.clk(clk), .reset(conv2_mem_write_reset), .enable(Conv2_layer), .addr0(conv2_addr0_write), .count(conv2_count), .done(conv2_mem_write_done));
 conv2_mem_read conv2_mem_read(.clk(clk), .reset(conv2_mem_read_reset), .enable(P2_layer), .addr0(conv2_addr0_read), .addr1(conv2_addr1_read), .addr2(conv2_addr2_read), .addr3(conv2_addr3_read), .done(conv2_mem_read_done));
-mux_2to1 #(5) conv2_mem_addr_mux_0(.data_in_0(conv2_addr0_write), .data_in_1(conv2_addr0_read), .sel(P2_layer), .data_out(conv2_addr0w0r));
-mux_2to1 #(5) conv2_mem_addr_mux_1(.data_in_0(conv2_addr0_write), .data_in_1(conv2_addr2_read), .sel(P2_layer), .data_out(conv2_addr0w2r));
+mux_2to1 #(6) conv2_mem_addr_mux_0(.data_in_0(conv2_addr0_write), .data_in_1(conv2_addr0_read), .sel(P2_layer), .data_out(conv2_addr0w0r));
+mux_2to1 #(6) conv2_mem_addr_mux_1(.data_in_0(conv2_addr0_write), .data_in_1(conv2_addr2_read), .sel(P2_layer), .data_out(conv2_addr0w2r));
 
 logic signed [15:0] conv2_mem_0_data, conv2_mem_1_data, conv2_mem_2_data, conv2_mem_3_data, 
                     conv2_mem_4_data, conv2_mem_5_data, conv2_mem_6_data, conv2_mem_7_data, 
