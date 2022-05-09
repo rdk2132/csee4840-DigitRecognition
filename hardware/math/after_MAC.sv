@@ -1,4 +1,4 @@
-module after_MAC (input logic [1:0] Mac_layer,
+module after_MAC (input logic [1:0] MAC_layer,
 				  input logic signed [31:0] MAC_out_0, MAC_out_1, MAC_out_2, MAC_out_3, MAC_out_4, MAC_out_5, bias_0, bias_1, bias_2, bias_3, bias_4, bias_5, conv2_bias, 
 				  output logic signed [15:0] out_0, out_1, out_2, out_3, out_4, out_5, out_conv2);
 
