@@ -1,5 +1,5 @@
-module demux_1to3 (input logic [15:0] data_in
-                   input logic [1:0] sel
+module demux_1to3 (input logic [15:0] data_in,
+                   input logic [1:0] sel,
                    output logic [15:0] data_out_0, data_out_1, data_out_2);
 
     always_comb begin

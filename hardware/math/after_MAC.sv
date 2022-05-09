@@ -20,7 +20,7 @@ module after_MAC (input logic [1:0] Mac_layer,
 
 	always_comb begin
 
-		if(MAC_layer = 2'b00) begin //if conv1 performs ReLU and shifts intermediate
+		if(MAC_layer == 2'b00) begin //if conv1 performs ReLU and shifts intermediate
 			if(conv1_interm_0[31] == 1'b1) begin
 				out_0[15:0] = 16'b0000000000000000;
 			end
@@ -59,7 +59,7 @@ module after_MAC (input logic [1:0] Mac_layer,
 			end
 		end
 
-		if(MAC_layer = 2'b01) begin //if conv2 performs ReLU and shifts intermediate
+		if(MAC_layer == 2'b01) begin //if conv2 performs ReLU and shifts intermediate
 			if(conv2_interm[31] == 1'b1) begin
 				out_conv2[15:0] = 16'b0000000000000000;
 			end
@@ -68,7 +68,7 @@ module after_MAC (input logic [1:0] Mac_layer,
 			end
 		end
 
-		if(MAC_layer = 2'b10) begin //if Fully connected layer just shifts
+		if(MAC_layer == 2'b10) begin //if Fully connected layer just shifts
 			out_0[15:0] = MAC_out_0[18:3];
 			out_1[15:0] = MAC_out_1[18:3];
 			out_2[15:0] = MAC_out_2[18:3];

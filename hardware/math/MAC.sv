@@ -16,7 +16,7 @@ module MAC (input logic clk, enable, reset,
 			count <= count + 1'b1;
 		end
 		if((count == 8'b00011001 && (MAC_layer == 2'b00 || MAC_layer == 2'b01)) || (count == 8'b11000000 && MAC_layer == 2'b10)) begin //if finished with a conv(count = 25) or one of the FC(count = 192) outputs the result
-			out = MAC_out;
+			out <= MAC_out;
 			MAC_out <= 32'b00000000000000000000000000000000;
 			count <= 8'b00000000;
 		end
