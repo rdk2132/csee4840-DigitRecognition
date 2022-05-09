@@ -31,7 +31,7 @@ module CNN_ctrl(//The one and only cock
                 input logic clk,
 
                 //input from software
-                inout logic [8:0] state,
+                inout logic [7:0] state,
 
                 //ROM counter done
                 input logic conv1_kern_c_d, conv2__kern_c_d, FC_c_d,

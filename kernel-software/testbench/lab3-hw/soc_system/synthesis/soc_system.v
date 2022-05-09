@@ -111,7 +111,7 @@ module soc_system (
 	wire         hps_0_h2f_lw_axi_master_rvalid;                           // mm_interconnect_0:hps_0_h2f_lw_axi_master_rvalid -> hps_0:h2f_lw_RVALID
 	wire         mm_interconnect_0_cnn_driver_0_avalon_slave_0_chipselect; // mm_interconnect_0:cnn_driver_0_avalon_slave_0_chipselect -> cnn_driver_0:chipselect
 	wire  [15:0] mm_interconnect_0_cnn_driver_0_avalon_slave_0_readdata;   // cnn_driver_0:readdata -> mm_interconnect_0:cnn_driver_0_avalon_slave_0_readdata
-	wire   [2:0] mm_interconnect_0_cnn_driver_0_avalon_slave_0_address;    // mm_interconnect_0:cnn_driver_0_avalon_slave_0_address -> cnn_driver_0:address
+	wire   [3:0] mm_interconnect_0_cnn_driver_0_avalon_slave_0_address;    // mm_interconnect_0:cnn_driver_0_avalon_slave_0_address -> cnn_driver_0:address
 	wire         mm_interconnect_0_cnn_driver_0_avalon_slave_0_read;       // mm_interconnect_0:cnn_driver_0_avalon_slave_0_read -> cnn_driver_0:read
 	wire         mm_interconnect_0_cnn_driver_0_avalon_slave_0_write;      // mm_interconnect_0:cnn_driver_0_avalon_slave_0_write -> cnn_driver_0:write
 	wire  [15:0] mm_interconnect_0_cnn_driver_0_avalon_slave_0_writedata;  // mm_interconnect_0:cnn_driver_0_avalon_slave_0_writedata -> cnn_driver_0:writedata
