@@ -36,16 +36,7 @@ logic pooling_layer, rMAC, MAC_enable, Conv1_layer, P1_layer, Conv2_layer, P2_la
       img_mem_read_done, conv1_mem_write_done, conv1_mem_read_done, conv1_k_mem_read_done, P1_mem_read_done, P1_mem_write_done, 
       conv2_mem_write_done, conv2_mem_read_done, conv2_k_mem_read_done, P2_mem_write_done, P2_mem_read_done, fc_mem_read_done;
 
-CNN_ctrl CNN_ctrl(.clk(clk), .state(ctrl), .conv1_kern_c_d(), .conv2__kern_c_d(), .FC_c_d(), .img_c_r_d(), 
-                  .img_c_w_d(), .conv1_out_c_r_d(), .conv1_out_c_w_d(), .conv2_out_c_r_d(), .conv2_out_c_w_dconv2_mem_write_done(), .P1_c_r_d(), 
-                  .pool1_c_w_d(), .P2_c_r_d(), .pool2_c_w_d(), .conv1_kern_c_e(), .conv2__kern_c_e(), .FC_c_e(), 
-                  .img_c_r_e(), .img_c_w_e(), .conv1_out_c_r_e(), .conv1_out_c_w_e(), .conv2_out_c_r_e(), .conv2_out_c_w_e(), 
-                  .P1_c_r_e(), .P1_c_w_e(), .P2_c_r_e(), .P2_c_w_e(), .rMAC(rMAC), .conv1_kern_c_r(), 
-                  .conv2__kern_c_r(), .FC_c_r(), .img_c_r_r(), .img_c_w_r(), .conv1_out_c_r_r(), .conv1_out_c_w_r(), 
-                  .conv2_out_c_r_r(), .conv2_out_c_w_r(), .pool1_c_r_r(), .pool1_c_w_r(), .pool2_c_r_r(), .pool2_c_w_r(), 
-                  .conv1_kern_m_r(), .conv2_kern_m_r(), .FC_m_r(), .img_m_r(), .img_m_w(), .conv1_out_m_r(), 
-                  .conv1_out_m_w(), .conv2_out_m_r(), .conv2_out_m_w(), .P1_m_r(), .P1_m_w(), .P2_m_r(), 
-                  .P2_m_w(), .MAC_layer(MAC_layer), .pooling_layer(pooling_layer), .done(control_output));
+CNN_ctrl CNN_ctrl(.*);
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------------------
