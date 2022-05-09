@@ -5,8 +5,8 @@ module demux_1to2 #(parameter WORD_SIZE = 16)
 
     always_comb begin
         case (sel)
-            2'd0: data_out_0 = data_in;
-            2'd1: data_out_1 = data_in;
+            1'd0: data_out_0 = data_in;
+            1'd1: data_out_1 = data_in;
         endcase
     end
 endmodule

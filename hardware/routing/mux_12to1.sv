@@ -17,6 +17,7 @@ module mux_12to1 (input logic [15:0] data_in_0, data_in_1, data_in_2, data_in_3,
             4'b1001: data_out = data_in_9;
             4'b1010: data_out = data_in_10;
             4'b1011: data_out = data_in_11;
+            default: data_out = 16'h0000;
         endcase
     end
 endmodule
