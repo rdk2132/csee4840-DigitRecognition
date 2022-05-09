@@ -1,7 +1,7 @@
 module CNN(input logic clk, reset, write, chipselect, 
            input logic [15:0] writedata, 
            input logic [1:0] address
-           output logic [15:0] return_ctrl, 
+           output logic [7:0] return_ctrl, 
            output logic signed [15:0] result_0, result_1, result_2, result_3, result_4, result_5, result_6, result_7, result_8, result_9);
 
     logic signed [15:0] img_data;
@@ -12,15 +12,32 @@ module CNN(input logic clk, reset, write, chipselect,
             case (address)
                 2'b00 : img_data <= writedata;
                 2'b01 : img_mem_addr_write <= writedata[9:0];
-                2'b10 : ctrl <= writedata;
+                2'b10 : ctrl <= writedata[7:0];
             endcase
         end
     end
 
 logic [1:0] MAC_layer;
-logic pooling_layer, rMAC,  MAC_enable;
-//Control circuitry that runs the whole show
-CNN_ctrl CNN_ctrl(.MAC_layer(MAC_layer), .pooling_layer(pooling_layer), .rMAC(rMAC));
+logic pooling_layer, rMAC, MAC_enable, Conv1_layer, P1_layer, Conv2_layer, P2_layer, FC_layer, 
+      img_mem_read_reset, conv1_mem_write_reset, conv1_mem_read_reset, conv1_k_mem_read_reset, P1_mem_read_reset, P1_mem_write_reset, 
+      conv2_mem_write_reset, conv2_mem_read_reset, conv2_k_mem_read_reset, P2_mem_write_reset, P2_mem_read_reset, fc_mem_read_reset, 
+      img_mem_read_done, conv1_mem_write_done, conv1_mem_read_done, conv1_k_mem_read_done, P1_mem_read_done, P1_mem_write_done, 
+      conv2_mem_write_done, conv2_mem_read_done, conv2_k_mem_read_done, P2_mem_write_done, P2_mem_read_done, fc_mem_read_done;
+
+CNN_ctrl CNN_ctrl(.clk(clk), .state(ctrl), .conv1_kern_c_d(), .conv2__kern_c_d(), .FC_c_d(), .img_c_r_d(), 
+                  .img_c_w_d(), .conv1_out_c_r_d(), .conv1_out_c_w_d(), .conv2_out_c_r_d(), .conv2_out_c_w_dconv2_mem_write_done(), .P1_c_r_d(), 
+                  .pool1_c_w_d(), .P2_c_r_d(), .pool2_c_w_d(), .conv1_kern_c_e(), .conv2__kern_c_e(), .FC_c_e(), 
+                  .img_c_r_e(), .img_c_w_e(), .conv1_out_c_r_e(), .conv1_out_c_w_e(), .conv2_out_c_r_e(), .conv2_out_c_w_e(), 
+                  .P1_c_r_e(), .P1_c_w_e(), .P2_c_r_e(), .P2_c_w_e(), .rMAC(rMAC), .conv1_kern_c_r(), 
+                  .conv2__kern_c_r(), .FC_c_r(), .img_c_r_r(), .img_c_w_r(), .conv1_out_c_r_r(), .conv1_out_c_w_r(), 
+                  .conv2_out_c_r_r(), .conv2_out_c_w_r(), .pool1_c_r_r(), .pool1_c_w_r(), .pool2_c_r_r(), .pool2_c_w_r(), 
+                  .conv1_kern_m_r(), .conv2_kern_m_r(), .FC_m_r(), .img_m_r(), .img_m_w(), .conv1_out_m_r(), 
+                  .conv1_out_m_w(), .conv2_out_m_r(), .conv2_out_m_w(), .P1_m_r(), .P1_m_w(), .P2_m_r(), 
+                  .P2_m_w(), .MAC_layer(MAC_layer), .pooling_layer(pooling_layer), .done(return_ctrl));
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -31,13 +48,13 @@ CNN_ctrl CNN_ctrl(.MAC_layer(MAC_layer), .pooling_layer(pooling_layer), .rMAC(rM
 logic signed [15:0] img_mem_0_q_a, img_mem_0_q_b, img_mem_1_q_a, img_mem_1_q_b;
 logic [9:0] img_mem_addr0_read, img_mem_addr0, img_mem_addr1, img_mem_addr2_read, img_mem_addr2, img_mem_addr3;
 
-img_mem_read img_mem_read_0(.clk(clk), .reset(reset), .enable(), .addr0(img_mem_addr0_read), .addr1(img_mem_addr1), .addr2(img_mem_addr2_read), .addr3(img_mem_addr3), .done());
-mux_2to1 (#10) img_mem_addr_mux_0(.data_in_0(img_mem_addr_write), .data_in_1(img_mem_addr0_read), .sel(), .data_out(img_mem_addr0));
-mux_2to1 (#10) img_mem_addr_mux_1(.data_in_0(img_mem_addr_write), .data_in_1(img_mem_addr2_read), .sel(), .data_out(img_mem_addr2));
+img_mem_read img_mem_read(.clk(clk), .reset(img_mem_read_reset), .enable(Conv1_layer), .addr0(img_mem_addr0_read), .addr1(img_mem_addr1), .addr2(img_mem_addr2_read), .addr3(img_mem_addr3), .done(img_mem_read_done));
+mux_2to1 (#10) img_mem_addr_mux_0(.data_in_0(img_mem_addr_write), .data_in_1(img_mem_addr0_read), .sel(Conv1_layer), .data_out(img_mem_addr0));
+mux_2to1 (#10) img_mem_addr_mux_1(.data_in_0(img_mem_addr_write), .data_in_1(img_mem_addr2_read), .sel(Conv1_layer), .data_out(img_mem_addr2));
 
 //image memory. They are redundant to allow for 4 accesses
-img_mem img_mem_0(.address_a(img_mem_addr0), .address_b(img_mem_addr1), .clock(clk), .data_a(img_data), .data_b(16'b0000000000000000), .rden_a(), .rden_b(), .wren_a(), .wren_b(1'b0), .q_a(img_mem_0_q_a), .q_b(img_mem_0_q_b));
-img_mem img_mem_1(.address_a(img_mem_addr2), .address_b(img_mem_addr3), .clock(clk), .data_a(img_data), .data_b(16'b0000000000000000), .rden_a(), .rden_b(), .wren_a(), .wren_b(1'b0), .q_a(img_mem_1_q_a), .q_b(img_mem_1_q_b));
+img_mem img_mem_0(.address_a(img_mem_addr0), .address_b(img_mem_addr1), .clock(clk), .data_a(img_data), .data_b(16'b0000000000000000), .rden_a(Conv1_layer), .rden_b(Conv1_layer), .wren_a(img_load), .wren_b(1'b0), .q_a(img_mem_0_q_a), .q_b(img_mem_0_q_b));
+img_mem img_mem_1(.address_a(img_mem_addr2), .address_b(img_mem_addr3), .clock(clk), .data_a(img_data), .data_b(16'b0000000000000000), .rden_a(Conv1_layer), .rden_b(Conv1_layer), .wren_a(img_load), .wren_b(1'b0), .q_a(img_mem_1_q_a), .q_b(img_mem_1_q_b));
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -45,49 +62,55 @@ img_mem img_mem_1(.address_a(img_mem_addr2), .address_b(img_mem_addr3), .clock(c
 //
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 
-logic signed [15:0] conv1_mem_0_0_q_a, conv1_mem_0_0_q_b, conv1_mem_0_1_q_a, conv1_mem_0_1_q_b, conv1_mem_0_2_q_a, conv1_mem_0_2_q_b, conv1_mem_0_3_q_a, conv1_mem_0_3_q_b,
-                    conv1_mem_1_0_q_a, conv1_mem_1_0_q_b, conv1_mem_1_1_q_a, conv1_mem_1_1_q_b, conv1_mem_1_2_q_a, conv1_mem_1_2_q_b, conv1_mem_1_3_q_a, conv1_mem_1_3_q_b,
-                    conv1_mem_2_0_q_a, conv1_mem_2_0_q_b, conv1_mem_2_1_q_a, conv1_mem_2_1_q_b, conv1_mem_2_2_q_a, conv1_mem_2_2_q_b, conv1_mem_2_3_q_a, conv1_mem_2_3_q_b,
-                    conv1_mem_3_0_q_a, conv1_mem_3_0_q_b, conv1_mem_3_1_q_a, conv1_mem_3_1_q_b, conv1_mem_3_2_q_a, conv1_mem_3_2_q_b, conv1_mem_3_3_q_a, conv1_mem_3_3_q_b,
-                    conv1_mem_4_0_q_a, conv1_mem_4_0_q_b, conv1_mem_4_1_q_a, conv1_mem_4_1_q_b, conv1_mem_4_2_q_a, conv1_mem_4_2_q_b, conv1_mem_4_3_q_a, conv1_mem_4_3_q_b,
+logic signed [15:0] conv1_mem_0_0_data_a, conv1_mem_0_0_data_b, conv1_mem_0_1_data_a, conv1_mem_0_1_data_b, 
+                    conv1_mem_1_0_data_a, conv1_mem_1_0_data_b, conv1_mem_1_1_data_a, conv1_mem_1_1_data_b, 
+                    conv1_mem_2_0_data_a, conv1_mem_2_0_data_b, conv1_mem_2_1_data_a, conv1_mem_2_1_data_b, 
+                    conv1_mem_3_0_data_a, conv1_mem_3_0_data_b, conv1_mem_3_1_data_a, conv1_mem_3_1_data_b, 
+                    conv1_mem_4_0_data_a, conv1_mem_4_0_data_b, conv1_mem_4_1_data_a, conv1_mem_4_1_data_b, 
+                    conv1_mem_5_0_data_a, conv1_mem_5_0_data_b, conv1_mem_5_1_data_a, conv1_mem_5_1_data_b, 
+                    conv1_mem_0_0_q_a, conv1_mem_0_0_q_b, conv1_mem_0_1_q_a, conv1_mem_0_1_q_b, conv1_mem_0_2_q_a, conv1_mem_0_2_q_b, conv1_mem_0_3_q_a, conv1_mem_0_3_q_b, 
+                    conv1_mem_1_0_q_a, conv1_mem_1_0_q_b, conv1_mem_1_1_q_a, conv1_mem_1_1_q_b, conv1_mem_1_2_q_a, conv1_mem_1_2_q_b, conv1_mem_1_3_q_a, conv1_mem_1_3_q_b, 
+                    conv1_mem_2_0_q_a, conv1_mem_2_0_q_b, conv1_mem_2_1_q_a, conv1_mem_2_1_q_b, conv1_mem_2_2_q_a, conv1_mem_2_2_q_b, conv1_mem_2_3_q_a, conv1_mem_2_3_q_b, 
+                    conv1_mem_3_0_q_a, conv1_mem_3_0_q_b, conv1_mem_3_1_q_a, conv1_mem_3_1_q_b, conv1_mem_3_2_q_a, conv1_mem_3_2_q_b, conv1_mem_3_3_q_a, conv1_mem_3_3_q_b, 
+                    conv1_mem_4_0_q_a, conv1_mem_4_0_q_b, conv1_mem_4_1_q_a, conv1_mem_4_1_q_b, conv1_mem_4_2_q_a, conv1_mem_4_2_q_b, conv1_mem_4_3_q_a, conv1_mem_4_3_q_b, 
                     conv1_mem_5_0_q_a, conv1_mem_5_0_q_b, conv1_mem_5_1_q_a, conv1_mem_5_1_q_b, conv1_mem_5_2_q_a, conv1_mem_5_2_q_b, conv1_mem_5_3_q_a, conv1_mem_5_3_q_b;
 logic [9:0] conv1_addr0_write, conv1_addr1_write, conv1_addr0_read, conv1_addr1_read, conv1_addr2_read, conv1_addr3_read, conv1_addr0w0r, conv1_addr1w2r;
 
-conv1_mem_write conv1_mem_write(.clk(clk), .reset(reset), .enable(), .addr0(conv1_addr0_write), .addr1(conv1_addr1_write), .done());
-conv1_mem_read conv1_mem_read(.clk(clk), .reset(reset), .enable(), .addr0(conv1_addr0_read), .addr1(conv1_addr1_read), .addr2(conv1_addr2_read), .addr3(conv1_addr3_read) .done());
-mux_2to1 (#10) conv1_mem_addr_mux_0(.data_in_0(conv1_addr0_write), .data_in_1(conv1_addr0_read), .sel(), .data_out(conv1_addr0w0r));
-mux_2to1 (#10) conv1_mem_addr_mux_1(.data_in_0(conv1_addr1_write), .data_in_1(conv1_addr2_read), .sel(), .data_out(conv1_addr1w2r));
+conv1_mem_write conv1_mem_write(.clk(clk), .reset(conv1_mem_write_reset), .enable(Conv1_layer), .addr0(conv1_addr0_write), .addr1(conv1_addr1_write), .done(conv1_mem_write_done));
+conv1_mem_read conv1_mem_read(.clk(clk), .reset(conv1_mem_read_reset), .enable(P1_layer), .addr0(conv1_addr0_read), .addr1(conv1_addr1_read), .addr2(conv1_addr2_read), .addr3(conv1_addr3_read) .done(conv1_mem_read_done));
+mux_2to1 (#10) conv1_mem_addr_mux_0(.data_in_0(conv1_addr0_write), .data_in_1(conv1_addr0_read), .sel(P1_layer), .data_out(conv1_addr0w0r));
+mux_2to1 (#10) conv1_mem_addr_mux_1(.data_in_0(conv1_addr1_write), .data_in_1(conv1_addr2_read), .sel(P1_layer), .data_out(conv1_addr1w2r));
 
 //Conv1 output image 0. Each stores half of the image to allow for 8 accesses. _0 _2 and _1 _3 are redundant
-conv1_mem conv1_mem_0_0(.address_a(conv1_addr0w0r), .address_b(conv1_addr1_read), .clock(clk), .data_a(), .data_b(), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_0_0_q_a), .q_b(conv1_mem_0_0_q_b));
-conv1_mem conv1_mem_0_1(.address_a(conv1_addr1w2r), .address_b(conv1_addr3_read), .clock(clk), .data_a(), .data_b(), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_0_1_q_a), .q_b(conv1_mem_0_1_q_b));
-conv1_mem conv1_mem_0_2(.address_a(conv1_addr0w0r), .address_b(conv1_addr1_read), .clock(clk), .data_a(), .data_b(), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_0_2_q_a), .q_b(conv1_mem_0_2_q_b));
-conv1_mem conv1_mem_0_3(.address_a(conv1_addr1w2r), .address_b(conv1_addr3_read), .clock(clk), .data_a(), .data_b(), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_0_3_q_a), .q_b(conv1_mem_0_3_q_b));
+conv1_mem conv1_mem_0_0(.address_a(conv1_addr0w0r), .address_b(conv1_addr1_read), .clock(clk), .data_a(conv1_mem_0_0_data_a), .data_b(conv1_mem_0_0_data_b), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_0_0_q_a), .q_b(conv1_mem_0_0_q_b));
+conv1_mem conv1_mem_0_1(.address_a(conv1_addr1w2r), .address_b(conv1_addr3_read), .clock(clk), .data_a(conv1_mem_0_1_data_a), .data_b(conv1_mem_0_1_data_b), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_0_1_q_a), .q_b(conv1_mem_0_1_q_b));
+conv1_mem conv1_mem_0_2(.address_a(conv1_addr0w0r), .address_b(conv1_addr1_read), .clock(clk), .data_a(conv1_mem_0_0_data_a), .data_b(conv1_mem_0_0_data_b), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_0_2_q_a), .q_b(conv1_mem_0_2_q_b));
+conv1_mem conv1_mem_0_3(.address_a(conv1_addr1w2r), .address_b(conv1_addr3_read), .clock(clk), .data_a(conv1_mem_0_1_data_a), .data_b(conv1_mem_0_1_data_b), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_0_3_q_a), .q_b(conv1_mem_0_3_q_b));
 //Conv1 output image 1. Each stores half of the image to allow for 8 accesses. _0 _2 and _1 _3 are redundant
-conv1_mem conv1_mem_1_0(.address_a(conv1_addr0w0r), .address_b(conv1_addr1_read), .clock(clk), .data_a(), .data_b(), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_1_0_q_a), .q_b(conv1_mem_1_0_q_b));
-conv1_mem conv1_mem_1_1(.address_a(conv1_addr1w2r), .address_b(conv1_addr3_read), .clock(clk), .data_a(), .data_b(), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_1_1_q_a), .q_b(conv1_mem_1_1_q_b));
-conv1_mem conv1_mem_1_2(.address_a(conv1_addr0w0r), .address_b(conv1_addr1_read), .clock(clk), .data_a(), .data_b(), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_1_2_q_a), .q_b(conv1_mem_1_2_q_b));
-conv1_mem conv1_mem_1_3(.address_a(conv1_addr1w2r), .address_b(conv1_addr3_read), .clock(clk), .data_a(), .data_b(), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_1_3_q_a), .q_b(conv1_mem_1_3_q_b));
+conv1_mem conv1_mem_1_0(.address_a(conv1_addr0w0r), .address_b(conv1_addr1_read), .clock(clk), .data_a(conv1_mem_1_0_data_a), .data_b(conv1_mem_1_0_data_b), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_1_0_q_a), .q_b(conv1_mem_1_0_q_b));
+conv1_mem conv1_mem_1_1(.address_a(conv1_addr1w2r), .address_b(conv1_addr3_read), .clock(clk), .data_a(conv1_mem_1_1_data_a), .data_b(conv1_mem_1_1_data_b), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_1_1_q_a), .q_b(conv1_mem_1_1_q_b));
+conv1_mem conv1_mem_1_2(.address_a(conv1_addr0w0r), .address_b(conv1_addr1_read), .clock(clk), .data_a(conv1_mem_1_0_data_a), .data_b(conv1_mem_1_0_data_b), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_1_2_q_a), .q_b(conv1_mem_1_2_q_b));
+conv1_mem conv1_mem_1_3(.address_a(conv1_addr1w2r), .address_b(conv1_addr3_read), .clock(clk), .data_a(conv1_mem_1_1_data_a), .data_b(conv1_mem_1_1_data_b), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_1_3_q_a), .q_b(conv1_mem_1_3_q_b));
 //Conv1 output image 2. Each stores half of the image to allow for 8 accesses. _0 _2 and _1 _3 are redundant
-conv1_mem conv1_mem_2_0(.address_a(conv1_addr0w0r), .address_b(conv1_addr1_read), .clock(clk), .data_a(), .data_b(), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_2_0_q_a), .q_b(conv1_mem_2_0_q_b));
-conv1_mem conv1_mem_2_1(.address_a(conv1_addr1w2r), .address_b(conv1_addr3_read), .clock(clk), .data_a(), .data_b(), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_2_1_q_a), .q_b(conv1_mem_2_1_q_b));
-conv1_mem conv1_mem_2_2(.address_a(conv1_addr0w0r), .address_b(conv1_addr1_read), .clock(clk), .data_a(), .data_b(), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_2_2_q_a), .q_b(conv1_mem_2_2_q_b));
-conv1_mem conv1_mem_2_3(.address_a(conv1_addr1w2r), .address_b(conv1_addr3_read), .clock(clk), .data_a(), .data_b(), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_2_3_q_a), .q_b(conv1_mem_2_3_q_b));
+conv1_mem conv1_mem_2_0(.address_a(conv1_addr0w0r), .address_b(conv1_addr1_read), .clock(clk), .data_a(conv1_mem_2_0_data_a), .data_b(conv1_mem_2_0_data_b), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_2_0_q_a), .q_b(conv1_mem_2_0_q_b));
+conv1_mem conv1_mem_2_1(.address_a(conv1_addr1w2r), .address_b(conv1_addr3_read), .clock(clk), .data_a(conv1_mem_2_1_data_a), .data_b(conv1_mem_2_1_data_b), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_2_1_q_a), .q_b(conv1_mem_2_1_q_b));
+conv1_mem conv1_mem_2_2(.address_a(conv1_addr0w0r), .address_b(conv1_addr1_read), .clock(clk), .data_a(conv1_mem_2_0_data_a), .data_b(conv1_mem_2_0_data_b), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_2_2_q_a), .q_b(conv1_mem_2_2_q_b));
+conv1_mem conv1_mem_2_3(.address_a(conv1_addr1w2r), .address_b(conv1_addr3_read), .clock(clk), .data_a(conv1_mem_2_1_data_a), .data_b(conv1_mem_2_1_data_b), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_2_3_q_a), .q_b(conv1_mem_2_3_q_b));
 //Conv1 output image 3. Each stores half of the image to allow for 8 accesses. _0 _2 and _1 _3 are redundant
-conv1_mem conv1_mem_3_0(.address_a(conv1_addr0w0r), .address_b(conv1_addr1_read), .clock(clk), .data_a(), .data_b(), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_3_0_q_a), .q_b(conv1_mem_3_0_q_b));
-conv1_mem conv1_mem_3_1(.address_a(conv1_addr1w2r), .address_b(conv1_addr3_read), .clock(clk), .data_a(), .data_b(), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_3_1_q_a), .q_b(conv1_mem_3_1_q_b));
-conv1_mem conv1_mem_3_2(.address_a(conv1_addr0w0r), .address_b(conv1_addr1_read), .clock(clk), .data_a(), .data_b(), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_3_2_q_a), .q_b(conv1_mem_3_2_q_b));
-conv1_mem conv1_mem_3_3(.address_a(conv1_addr1w2r), .address_b(conv1_addr3_read), .clock(clk), .data_a(), .data_b(), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_3_3_q_a), .q_b(conv1_mem_3_3_q_b));
+conv1_mem conv1_mem_3_0(.address_a(conv1_addr0w0r), .address_b(conv1_addr1_read), .clock(clk), .data_a(conv1_mem_3_0_data_a), .data_b(conv1_mem_3_0_data_b), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_3_0_q_a), .q_b(conv1_mem_3_0_q_b));
+conv1_mem conv1_mem_3_1(.address_a(conv1_addr1w2r), .address_b(conv1_addr3_read), .clock(clk), .data_a(conv1_mem_3_1_data_a), .data_b(conv1_mem_3_1_data_b), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_3_1_q_a), .q_b(conv1_mem_3_1_q_b));
+conv1_mem conv1_mem_3_2(.address_a(conv1_addr0w0r), .address_b(conv1_addr1_read), .clock(clk), .data_a(conv1_mem_3_0_data_a), .data_b(conv1_mem_3_0_data_b), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_3_2_q_a), .q_b(conv1_mem_3_2_q_b));
+conv1_mem conv1_mem_3_3(.address_a(conv1_addr1w2r), .address_b(conv1_addr3_read), .clock(clk), .data_a(conv1_mem_3_1_data_a), .data_b(conv1_mem_3_1_data_b), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_3_3_q_a), .q_b(conv1_mem_3_3_q_b));
 //Conv1 output image 4. Each stores half of the image to allow for 8 accesses. _0 _2 and _1 _3 are redundant
-conv1_mem conv1_mem_4_0(.address_a(conv1_addr0w0r), .address_b(conv1_addr1_read), .clock(clk), .data_a(), .data_b(), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_4_0_q_a), .q_b(conv1_mem_4_0_q_b));
-conv1_mem conv1_mem_4_1(.address_a(conv1_addr1w2r), .address_b(conv1_addr3_read), .clock(clk), .data_a(), .data_b(), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_4_1_q_a), .q_b(conv1_mem_4_1_q_b));
-conv1_mem conv1_mem_4_2(.address_a(conv1_addr0w0r), .address_b(conv1_addr1_read), .clock(clk), .data_a(), .data_b(), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_4_2_q_a), .q_b(conv1_mem_4_2_q_b));
-conv1_mem conv1_mem_4_3(.address_a(conv1_addr1w2r), .address_b(conv1_addr3_read), .clock(clk), .data_a(), .data_b(), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_4_3_q_a), .q_b(conv1_mem_4_3_q_b));
+conv1_mem conv1_mem_4_0(.address_a(conv1_addr0w0r), .address_b(conv1_addr1_read), .clock(clk), .data_a(conv1_mem_4_0_data_a), .data_b(conv1_mem_4_0_data_b), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_4_0_q_a), .q_b(conv1_mem_4_0_q_b));
+conv1_mem conv1_mem_4_1(.address_a(conv1_addr1w2r), .address_b(conv1_addr3_read), .clock(clk), .data_a(conv1_mem_4_1_data_a), .data_b(conv1_mem_4_1_data_b), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_4_1_q_a), .q_b(conv1_mem_4_1_q_b));
+conv1_mem conv1_mem_4_2(.address_a(conv1_addr0w0r), .address_b(conv1_addr1_read), .clock(clk), .data_a(conv1_mem_4_0_data_a), .data_b(conv1_mem_4_0_data_b), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_4_2_q_a), .q_b(conv1_mem_4_2_q_b));
+conv1_mem conv1_mem_4_3(.address_a(conv1_addr1w2r), .address_b(conv1_addr3_read), .clock(clk), .data_a(conv1_mem_4_1_data_a), .data_b(conv1_mem_4_1_data_b), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_4_3_q_a), .q_b(conv1_mem_4_3_q_b));
 //Conv1 output image 5. Each stores half of the image to allow for 8 accesses. _0 _2 and _1 _3 are redundant
-conv1_mem conv1_mem_5_0(.address_a(conv1_addr0w0r), .address_b(conv1_addr1_read), .clock(clk), .data_a(), .data_b(), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_5_0_q_a), .q_b(conv1_mem_5_0_q_a));
-conv1_mem conv1_mem_5_1(.address_a(conv1_addr1w2r), .address_b(conv1_addr3_read), .clock(clk), .data_a(), .data_b(), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_5_1_q_a), .q_b(conv1_mem_5_1_q_a));
-conv1_mem conv1_mem_5_2(.address_a(conv1_addr0w0r), .address_b(conv1_addr1_read), .clock(clk), .data_a(), .data_b(), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_5_2_q_a), .q_b(conv1_mem_5_2_q_a));
-conv1_mem conv1_mem_5_3(.address_a(conv1_addr1w2r), .address_b(conv1_addr3_read), .clock(clk), .data_a(), .data_b(), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_5_3_q_a), .q_b(conv1_mem_5_3_q_a));
+conv1_mem conv1_mem_5_0(.address_a(conv1_addr0w0r), .address_b(conv1_addr1_read), .clock(clk), .data_a(conv1_mem_5_0_data_a), .data_b(conv1_mem_5_0_data_b), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_5_0_q_a), .q_b(conv1_mem_5_0_q_a));
+conv1_mem conv1_mem_5_1(.address_a(conv1_addr1w2r), .address_b(conv1_addr3_read), .clock(clk), .data_a(conv1_mem_5_1_data_a), .data_b(conv1_mem_5_1_data_b), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_5_1_q_a), .q_b(conv1_mem_5_1_q_a));
+conv1_mem conv1_mem_5_2(.address_a(conv1_addr0w0r), .address_b(conv1_addr1_read), .clock(clk), .data_a(conv1_mem_5_0_data_a), .data_b(conv1_mem_5_0_data_b), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_5_2_q_a), .q_b(conv1_mem_5_2_q_a));
+conv1_mem conv1_mem_5_3(.address_a(conv1_addr1w2r), .address_b(conv1_addr3_read), .clock(clk), .data_a(conv1_mem_5_1_data_a), .data_b(conv1_mem_5_1_data_b), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_5_3_q_a), .q_b(conv1_mem_5_3_q_a));
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -98,7 +121,7 @@ conv1_mem conv1_mem_5_3(.address_a(conv1_addr1w2r), .address_b(conv1_addr3_read)
 logic signed [15:0] conv1_k_g0_mem_q_a, conv1_k_g0_mem_q_b, conv1_k_g1_mem_q_a, conv1_k_g1_mem_q_b, conv1_k_g2_mem_q_a, conv1_k_g2_mem_q_b;
 logic[5:0] conv1_k_mem_addr0_read, conv1_k_mem_addr1_read;
 
-conv1_k_mem_read conv1_k_mem_read(.clk(clk), .reset(reset), .enable(), .addr0(conv1_k_mem_addr0_read), .addr1(conv1_k_mem_addr1_read), .done());
+conv1_k_mem_read conv1_k_mem_read(.clk(clk), .reset(conv1_k_mem_read_reset), .enable(Conv1_layer), .addr0(conv1_k_mem_addr0_read), .addr1(conv1_k_mem_addr1_read), .done(conv1_k_mem_read_done));
 
 //Memories for conv1 kernels. Each holds 2 25x25 kernels.
 conv1_k_g0_mem conv1_k_g0_mem(.address_a(conv1_k_mem_addr0_read), .address_b(conv1_k_mem_addr1_read), .clock(clk), .rden_a(Conv1_layer), .rden_b(Conv1_layer), .q_a(conv1_k_g0_mem_q_a), .q_b(conv1_k_g0_mem_q_b));
@@ -110,29 +133,23 @@ conv1_k_g2_mem conv1_k_g2_mem(.address_a(conv1_k_mem_addr0_read), .address_b(con
 //  P1 OUTPUT MEMORY
 //
 //------------------------------------------------------------------------------------------------------------------------------------------------------
-conv2_mem_write conv2_mem_write(.clk(clk), .reset(reset), .enable(), .addr0(conv2_addr0_write), .done());
-conv2_mem_read conv2_mem_read(.clk(clk), .reset(reset), .enable(), .addr0(conv2_addr0_read), .addr1(conv2_addr1_read), .addr2(conv2_addr2_read), .addr3(conv2_addr3_read) .done());
 
-
-logic [7:0] p1_addr_0_read, p1_addr_0_write, p1_addr_1_read, p1_addr_1_write, p1_addr0w0r, p1_addr0w0r, p1_addr1w2r;
-mux_2to1 (#8) p1_addr_mux_0(.data_in_0(p1_addr_0_read), .data_in_1(p1_addr_0_write), .sel(), .data_out(p1_addr0w0r)); //mux to combine write and read addresses
-mux_2to1 (#8) p1_addr_mux_1(.data_in_0(p1_addr_1_read), .data_in_1(p1_addr_1_write), .sel(), .data_out(p1_addr1w2r)); //mux to combine write and read addresses
-P1_mem_read p1_in_ctr(.clk(clk), .reset(reset), .enable(), .addr0(p1_addr_0_read), .addr1(p1_addr_1_read), .done());
-P1_mem_write p1_out_ctr(.clk(clk), .reset(reset), .enable(), .addr0(p1_addr_0_write), .addr1(p1_addr_1_write), .done());
+logic [7:0] p1_addr_0_read, p1_addr_0_write, p1_addr_1_write, p1_addr0w0r;
+mux_2to1 (#8) p1_addr_mux_0(.data_in_0(p1_addr_0_write), .data_in_1(p1_addr_0_read), .sel(Conv2_layer), .data_out(p1_addr0w0r)); //mux to combine write and read addresses
+P1_mem_read P1_mem_read(.clk(clk), .reset(P1_mem_read_reset), .enable(Conv2_layer), .addr0(p1_addr_0_read), .done(P1_mem_read_done));
+P1_mem_write P1_mem_write(.clk(clk), .reset(P1_mem_write_reset), .enable(P1_layer), .addr0(p1_addr_0_write), .addr1(p1_addr_1_write), .done(P1_mem_write_done));
 
 logic signed [15:0] p1_mem_0_data_a, p1_mem_0_data_b, p1_mem_1_data_a, p1_mem_1_data_b,
                     p1_mem_2_data_a, p1_mem_2_data_b, p1_mem_3_data_a, p1_mem_3_data_b,
                     p1_mem_4_data_a, p1_mem_4_data_b, p1_mem_5_data_a, p1_mem_6_data_b,
-                    p1_mem_0_q_a, p1_mem_0_q_b, p1_mem_1_q_a, p1_mem_1_q_b,
-                    p1_mem_2_q_a, p1_mem_2_q_b, p1_mem_3_q_a, p1_mem_3_q_b,
-                    p1_mem_4_q_a, p1_mem_4_q_b, p1_mem_5_q_a, p1_mem_6_q_b,
+                    p1_mem_0_q_a, p1_mem_1_q_a, p1_mem_2_q_a, p1_mem_3_q_a, p1_mem_4_q_a, p1_mem_5_q_a;
 //Memories for the 6 outputs of p1. Each is unique
-p1_mem p1_mem_0(.address_a(p1_addr0w0r), .address_b(p1_addr1w2r), .clock(clk), .data_a(p1_mem_0_data_a), .data_b(p1_mem_0_data_b), .rden_a(Conv2_layer), .rden_b(Conv2_layer), .wren_a(P1_layer), .wren_b(P1_layer), .q_a(p1_mem_0_q_a), .q_b(p1_mem_0_q_b));
-p1_mem p1_mem_1(.address_a(p1_addr0w0r), .address_b(p1_addr1w2r), .clock(clk), .data_a(p1_mem_1_data_a), .data_b(p1_mem_1_data_b), .rden_a(Conv2_layer), .rden_b(Conv2_layer), .wren_a(P1_layer), .wren_b(P1_layer), .q_a(p1_mem_1_q_a), .q_b(p1_mem_1_q_b));
-p1_mem p1_mem_2(.address_a(p1_addr0w0r), .address_b(p1_addr1w2r), .clock(clk), .data_a(p1_mem_2_data_a), .data_b(p1_mem_2_data_b), .rden_a(Conv2_layer), .rden_b(Conv2_layer), .wren_a(P1_layer), .wren_b(P1_layer), .q_a(p1_mem_2_q_a), .q_b(p1_mem_2_q_b));
-p1_mem p1_mem_3(.address_a(p1_addr0w0r), .address_b(p1_addr1w2r), .clock(clk), .data_a(p1_mem_3_data_a), .data_b(p1_mem_3_data_b), .rden_a(Conv2_layer), .rden_b(Conv2_layer), .wren_a(P1_layer), .wren_b(P1_layer), .q_a(p1_mem_3_q_a), .q_b(p1_mem_3_q_b));
-p1_mem p1_mem_4(.address_a(p1_addr0w0r), .address_b(p1_addr1w2r), .clock(clk), .data_a(p1_mem_4_data_a), .data_b(p1_mem_4_data_b), .rden_a(Conv2_layer), .rden_b(Conv2_layer), .wren_a(P1_layer), .wren_b(P1_layer), .q_a(p1_mem_4_q_a), .q_b(p1_mem_4_q_b));
-p1_mem p1_mem_5(.address_a(p1_addr0w0r), .address_b(p1_addr1w2r), .clock(clk), .data_a(p1_mem_5_data_a), .data_b(p1_mem_5_data_b), .rden_a(Conv2_layer), .rden_b(Conv2_layer), .wren_a(P1_layer), .wren_b(P1_layer), .q_a(p1_mem_5_q_a), .q_b(p1_mem_5_q_b));
+p1_mem p1_mem_0(.address_a(p1_addr0w0r), .address_b(p1_addr_1_write), .clock(clk), .data_a(p1_mem_0_data_a), .data_b(p1_mem_0_data_b), .rden_a(Conv2_layer), .rden_b(1'b0), .wren_a(P1_layer), .wren_b(P1_layer), .q_a(p1_mem_0_q_a), .q_b()); //q_b can be left open
+p1_mem p1_mem_1(.address_a(p1_addr0w0r), .address_b(p1_addr_1_write), .clock(clk), .data_a(p1_mem_1_data_a), .data_b(p1_mem_1_data_b), .rden_a(Conv2_layer), .rden_b(1'b0), .wren_a(P1_layer), .wren_b(P1_layer), .q_a(p1_mem_1_q_a), .q_b()); //q_b can be left open
+p1_mem p1_mem_2(.address_a(p1_addr0w0r), .address_b(p1_addr_1_write), .clock(clk), .data_a(p1_mem_2_data_a), .data_b(p1_mem_2_data_b), .rden_a(Conv2_layer), .rden_b(1'b0), .wren_a(P1_layer), .wren_b(P1_layer), .q_a(p1_mem_2_q_a), .q_b()); //q_b can be left open
+p1_mem p1_mem_3(.address_a(p1_addr0w0r), .address_b(p1_addr_1_write), .clock(clk), .data_a(p1_mem_3_data_a), .data_b(p1_mem_3_data_b), .rden_a(Conv2_layer), .rden_b(1'b0), .wren_a(P1_layer), .wren_b(P1_layer), .q_a(p1_mem_3_q_a), .q_b()); //q_b can be left open
+p1_mem p1_mem_4(.address_a(p1_addr0w0r), .address_b(p1_addr_1_write), .clock(clk), .data_a(p1_mem_4_data_a), .data_b(p1_mem_4_data_b), .rden_a(Conv2_layer), .rden_b(1'b0), .wren_a(P1_layer), .wren_b(P1_layer), .q_a(p1_mem_4_q_a), .q_b()); //q_b can be left open
+p1_mem p1_mem_5(.address_a(p1_addr0w0r), .address_b(p1_addr_1_write), .clock(clk), .data_a(p1_mem_5_data_a), .data_b(p1_mem_5_data_b), .rden_a(Conv2_layer), .rden_b(1'b0), .wren_a(P1_layer), .wren_b(P1_layer), .q_a(p1_mem_5_q_a), .q_b()); //q_b can be left open
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -141,16 +158,15 @@ p1_mem p1_mem_5(.address_a(p1_addr0w0r), .address_b(p1_addr1w2r), .clock(clk), .
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 
 logic [5:0] conv2_addr0_write, conv2_addr0_read, conv2_addr1_read, conv2_addr2_read, conv2_addr3_read, conv2_addr0w0r;
-conv2_mem_write conv2_mem_write(.clk(clk), .reset(reset), .enable(), .addr0(conv2_addr0_write), .done());
-conv2_mem_read conv2_mem_read(.clk(clk), .reset(reset), .enable(), .addr0(conv2_addr0_read), .addr1(conv2_addr1_read), .addr2(conv2_addr2_read), .addr3(conv2_addr3_read) .done());
-mux_2to1 (#10) conv2_mem_addr_mux_0(.data_in_0(conv2_addr0_write), .data_in_1(conv2_addr0_read), .sel(), .data_out(conv2_addr0w0r));
+logic [1:0] conv2_count;
+conv2_mem_write conv2_mem_write(.clk(clk), .reset(conv2_mem_write_reset), .enable(Conv2_layer), .addr0(conv2_addr0_write), .count(conv2_count) .done(conv2_mem_write_done));
+conv2_mem_read conv2_mem_read(.clk(clk), .reset(conv2_mem_read_reset), .enable(P2_layer), .addr0(conv2_addr0_read), .addr1(conv2_addr1_read), .addr2(conv2_addr2_read), .addr3(conv2_addr3_read) .done(conv2_mem_read_done));
+mux_2to1 (#5) conv2_mem_addr_mux_0(.data_in_0(conv2_addr0_write), .data_in_1(conv2_addr0_read), .sel(P2_layer), .data_out(conv2_addr0w0r));
+mux_2to1 (#5) conv2_mem_addr_mux_0(.data_in_0(conv2_addr0_write), .data_in_1(conv2_addr2_read), .sel(P2_layer), .data_out(conv2_addr0w2r));
 
-logic signed [15:0] conv2_mem_0_0_data_a, conv2_mem_0_0_data_b, conv2_mem_0_1_data_a, conv2_mem_0_1_data_b, 
-                    conv2_mem_1_0_data_a, conv2_mem_1_0_data_b, conv2_mem_1_1_data_a, conv2_mem_1_1_data_b, 
-                    conv2_mem_2_0_data_a, conv2_mem_2_0_data_b, conv2_mem_2_1_data_a, conv2_mem_2_1_data_b, 
-                    conv2_mem_3_0_data_a, conv2_mem_3_0_data_b, conv2_mem_3_1_data_a, conv2_mem_3_1_data_b, 
-                    conv2_mem_4_0_data_a, conv2_mem_4_0_data_b, conv2_mem_4_1_data_a, conv2_mem_4_1_data_b, 
-                    conv2_mem_5_0_data_a, conv2_mem_5_0_data_b, conv2_mem_5_1_data_a, conv2_mem_5_1_data_b, 
+logic signed [15:0] conv2_mem_0_data, conv2_mem_1_data, conv2_mem_2_data, conv2_mem_3_data, 
+                    conv2_mem_4_data, conv2_mem_5_data, conv2_mem_6_data, conv2_mem_7_data, 
+                    conv2_mem_8_data, conv2_mem_9_data, conv2_mem_10_data, conv2_mem_11_data, 
                     conv2_mem_0_0_q_a, conv2_mem_0_0_q_b, conv2_mem_0_1_q_a, conv2_mem_0_1_q_b, 
                     conv2_mem_1_0_q_a, conv2_mem_1_0_q_b, conv2_mem_1_1_q_a, conv2_mem_1_1_q_b, 
                     conv2_mem_2_0_q_a, conv2_mem_2_0_q_b, conv2_mem_2_1_q_a, conv2_mem_2_1_q_b, 
@@ -159,41 +175,41 @@ logic signed [15:0] conv2_mem_0_0_data_a, conv2_mem_0_0_data_b, conv2_mem_0_1_da
                     conv2_mem_5_0_q_a, conv2_mem_5_0_q_b, conv2_mem_5_1_q_a, conv2_mem_5_1_q_b; 
 
 //Conv2 output 0. They are redundant to allow for 4 accesses
-conv2_mem conv2_mem_0_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_0_0_data_a), .data_b(conv2_mem_0_0_data_b), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(Conv2_layer), .q_a(conv2_mem_0_0_q_a), .q_b(conv2_mem_0_0_q_b));
-conv2_mem conv2_mem_0_1(.address_a(conv2_addr2_read), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_0_1_data_a), .data_b(conv2_mem_0_1_data_b), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(Conv2_layer), .q_a(conv2_mem_0_1_q_a), .q_b(conv2_mem_0_1_q_b));
+conv2_mem conv2_mem_0_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_0_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_0_0_q_a), .q_b(conv2_mem_0_0_q_b));
+conv2_mem conv2_mem_0_1(.address_a(conv2_addr0w2r), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_0_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_0_1_q_a), .q_b(conv2_mem_0_1_q_b));
 //Conv2 output 1. They are redundant to allow for 4 accesses
-conv2_mem conv2_mem_1_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_1_0_data_a), .data_b(conv2_mem_1_0_data_b), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(Conv2_layer), .q_a(conv2_mem_1_0_q_a), .q_b(conv2_mem_1_0_q_b));
-conv2_mem conv2_mem_1_1(.address_a(conv2_addr2_read), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_1_1_data_a), .data_b(conv2_mem_1_1_data_b), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(Conv2_layer), .q_a(conv2_mem_1_1_q_a), .q_b(conv2_mem_1_1_q_b));
+conv2_mem conv2_mem_1_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_1_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_1_0_q_a), .q_b(conv2_mem_1_0_q_b));
+conv2_mem conv2_mem_1_1(.address_a(conv2_addr0w2r), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_1_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_1_1_q_a), .q_b(conv2_mem_1_1_q_b));
 //Conv2 output 2. They are redundant to allow for 4 accesses
-conv2_mem conv2_mem_2_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_2_0_data_a), .data_b(conv2_mem_2_0_data_b), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(Conv2_layer), .q_a(conv2_mem_2_0_q_a), .q_b(conv2_mem_2_0_q_b));
-conv2_mem conv2_mem_2_1(.address_a(conv2_addr2_read), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_2_1_data_a), .data_b(conv2_mem_2_1_data_b), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(Conv2_layer), .q_a(conv2_mem_2_1_q_a), .q_b(conv2_mem_2_1_q_b));
+conv2_mem conv2_mem_2_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_2_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_2_0_q_a), .q_b(conv2_mem_2_0_q_b));
+conv2_mem conv2_mem_2_1(.address_a(conv2_addr0w2r), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_2_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_2_1_q_a), .q_b(conv2_mem_2_1_q_b));
 //Conv2 output 3. They are redundant to allow for 4 accesses
-conv2_mem conv2_mem_3_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_3_0_data_a), .data_b(conv2_mem_3_0_data_b), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(Conv2_layer), .q_a(conv2_mem_3_0_q_a), .q_b(conv2_mem_3_0_q_b));
-conv2_mem conv2_mem_3_1(.address_a(conv2_addr2_read), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_3_1_data_a), .data_b(conv2_mem_3_1_data_b), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(Conv2_layer), .q_a(conv2_mem_3_1_q_a), .q_b(conv2_mem_3_1_q_b));
+conv2_mem conv2_mem_3_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_3_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_3_0_q_a), .q_b(conv2_mem_3_0_q_b));
+conv2_mem conv2_mem_3_1(.address_a(conv2_addr0w2r), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_3_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_3_1_q_a), .q_b(conv2_mem_3_1_q_b));
 //Conv2 output 4. They are redundant to allow for 4 accesses
-conv2_mem conv2_mem_4_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_4_0_data_a), .data_b(conv2_mem_4_0_data_b), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(Conv2_layer), .q_a(conv2_mem_4_0_q_a), .q_b(conv2_mem_4_0_q_b));
-conv2_mem conv2_mem_4_1(.address_a(conv2_addr2_read), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_4_1_data_a), .data_b(conv2_mem_4_1_data_b), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(Conv2_layer), .q_a(conv2_mem_4_1_q_a), .q_b(conv2_mem_4_1_q_b));
+conv2_mem conv2_mem_4_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_4_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_4_0_q_a), .q_b(conv2_mem_4_0_q_b));
+conv2_mem conv2_mem_4_1(.address_a(conv2_addr0w2r), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_4_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_4_1_q_a), .q_b(conv2_mem_4_1_q_b));
 //Conv2 output 5. They are redundant to allow for 4 accesses
-conv2_mem conv2_mem_5_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_5_0_data_a), .data_b(conv2_mem_5_0_data_b), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(Conv2_layer), .q_a(conv2_mem_5_0_q_a), .q_b(conv2_mem_5_0_q_b));
-conv2_mem conv2_mem_5_1(.address_a(conv2_addr2_read), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_5_1_data_a), .data_b(conv2_mem_5_1_data_b), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(Conv2_layer), .q_a(conv2_mem_5_1_q_a), .q_b(conv2_mem_5_1_q_b));
+conv2_mem conv2_mem_5_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_5_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_5_0_q_a), .q_b(conv2_mem_5_0_q_b));
+conv2_mem conv2_mem_5_1(.address_a(conv2_addr0w2r), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_5_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_5_1_q_a), .q_b(conv2_mem_5_1_q_b));
 //Conv2 output 6. They are redundant to allow for 4 accesses
-conv2_mem conv2_mem_6_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_6_0_data_a), .data_b(conv2_mem_6_0_data_b), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(Conv2_layer), .q_a(conv2_mem_6_0_q_a), .q_b(conv2_mem_6_0_q_b));
-conv2_mem conv2_mem_6_1(.address_a(conv2_addr2_read), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_6_1_data_a), .data_b(conv2_mem_6_1_data_b), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(Conv2_layer), .q_a(conv2_mem_6_1_q_a), .q_b(conv2_mem_6_1_q_b));
+conv2_mem conv2_mem_6_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_6_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_6_0_q_a), .q_b(conv2_mem_6_0_q_b));
+conv2_mem conv2_mem_6_1(.address_a(conv2_addr0w2r), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_6_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_6_1_q_a), .q_b(conv2_mem_6_1_q_b));
 //Conv2 output 7. They are redundant to allow for 4 accesses
-conv2_mem conv2_mem_7_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_7_0_data_a), .data_b(conv2_mem_7_0_data_b), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(Conv2_layer), .q_a(conv2_mem_7_0_q_a), .q_b(conv2_mem_7_0_q_b));
-conv2_mem conv2_mem_7_1(.address_a(conv2_addr2_read), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_7_1_data_a), .data_b(conv2_mem_7_1_data_b), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(Conv2_layer), .q_a(conv2_mem_7_1_q_a), .q_b(conv2_mem_7_1_q_b));
+conv2_mem conv2_mem_7_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_7_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_7_0_q_a), .q_b(conv2_mem_7_0_q_b));
+conv2_mem conv2_mem_7_1(.address_a(conv2_addr0w2r), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_7_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_7_1_q_a), .q_b(conv2_mem_7_1_q_b));
 //Conv2 output 8. They are redundant to allow for 4 accesses
-conv2_mem conv2_mem_8_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_8_0_data_a), .data_b(conv2_mem_8_0_data_b), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(Conv2_layer), .q_a(conv2_mem_8_0_q_a), .q_b(conv2_mem_8_0_q_b));
-conv2_mem conv2_mem_8_1(.address_a(conv2_addr2_read), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_8_1_data_a), .data_b(conv2_mem_8_1_data_b), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(Conv2_layer), .q_a(conv2_mem_8_1_q_a), .q_b(conv2_mem_8_1_q_b));
+conv2_mem conv2_mem_8_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_8_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_8_0_q_a), .q_b(conv2_mem_8_0_q_b));
+conv2_mem conv2_mem_8_1(.address_a(conv2_addr0w2r), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_8_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_8_1_q_a), .q_b(conv2_mem_8_1_q_b));
 //Conv2 output 9. They are redundant to allow for 4 accesses
-conv2_mem conv2_mem_9_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_9_0_data_a), .data_b(conv2_mem_9_0_data_b), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(Conv2_layer), .q_a(conv2_mem_9_0_q_a), .q_b(conv2_mem_9_0_q_b));
-conv2_mem conv2_mem_9_1(.address_a(conv2_addr2_read), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_9_0_data_a), .data_b(conv2_mem_9_1_data_b), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(Conv2_layer), .q_a(conv2_mem_9_1_q_a), .q_b(conv2_mem_9_1_q_b));
+conv2_mem conv2_mem_9_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_9_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_9_0_q_a), .q_b(conv2_mem_9_0_q_b));
+conv2_mem conv2_mem_9_1(.address_a(conv2_addr0w2r), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_9_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_9_1_q_a), .q_b(conv2_mem_9_1_q_b));
 //Conv2 output 10. They are redundant to allow for 4 accesses
-conv2_mem conv2_mem_10_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_10_0_data_a), .data_b(conv2_mem_10_0_data_b), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(Conv2_layer), .q_a(conv2_mem_10_0_q_a), .q_b(conv2_mem_10_0_q_b));
-conv2_mem conv2_mem_10_1(.address_a(conv2_addr2_read), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_10_0_data_a), .data_b(conv2_mem_10_1_data_b), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(Conv2_layer), .q_a(conv2_mem_10_1_q_a), .q_b(conv2_mem_10_1_q_b));
+conv2_mem conv2_mem_10_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_10_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_10_0_q_a), .q_b(conv2_mem_10_0_q_b));
+conv2_mem conv2_mem_10_1(.address_a(conv2_addr0w2r), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_10_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_10_1_q_a), .q_b(conv2_mem_10_1_q_b));
 //Conv2 output 11. They are redundant to allow for 4 accesses
-conv2_mem conv2_mem_11_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_11_0_data_a), .data_b(conv2_mem_11_0_data_b), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(Conv2_layer), .q_a(conv2_mem_11_0_q_a), .q_b(conv2_mem_11_0_q_b));
-conv2_mem conv2_mem_11_1(.address_a(conv2_addr2_read), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_11_0_data_a), .data_b(conv2_mem_11_1_data_b), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(Conv2_layer), .q_a(conv2_mem_11_1_q_a), .q_b(conv2_mem_11_1_q_b));
+conv2_mem conv2_mem_11_0(.address_a(conv2_addr0w0r), .address_b(conv2_addr1_read), .clock(clk), .data_a(conv2_mem_11_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_11_0_q_a), .q_b(conv2_mem_11_0_q_b));
+conv2_mem conv2_mem_11_1(.address_a(conv2_addr0w2r), .address_b(conv2_addr3_read), .clock(clk), .data_a(conv2_mem_11_data), .data_b(16'b0000000000000000), .rden_a(P2_layer), .rden_b(P2_layer), .wren_a(Conv2_layer), .wren_b(1'b0), .q_a(conv2_mem_11_1_q_a), .q_b(conv2_mem_11_1_q_b));
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -202,7 +218,7 @@ conv2_mem conv2_mem_11_1(.address_a(conv2_addr2_read), .address_b(conv2_addr3_re
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 
 logic[7:0] conv2_k_mem_addr0_read, conv2_k_mem_addr1_read;
-conv2_k_mem_read conv2_k_mem_read(.clk(clk), .reset(reset), .enable(), .addr0(conv2_k_mem_addr0_read), .addr1(conv2_k_mem_addr1_read), .done());
+conv2_k_mem_read conv2_k_mem_read(.clk(clk), .reset(conv2_k_mem_read_reset), .enable(Conv2_layer), .addr0(conv2_k_mem_addr0_read), .addr1(conv2_k_mem_addr1_read), .done(conv2_k_mem_read_done));
 
 logic signed [15:0] conv2_k_g0_mem_q_a, conv2_k_g0_mem_q_b, conv2_k_g1_mem_q_a, conv2_k_g1_mem_q_b, 
                     conv2_k_g2_mem_q_a, conv2_k_g2_mem_q_b, conv2_k_g3_mem_q_a, conv2_k_g3_mem_q_b, 
@@ -239,9 +255,9 @@ logic signed [15:0] P2_mem_0_data, P2_mem_1_data, P2_mem_2_data, P2_mem_3_data, 
 logic [3:0] P2_addr0_write, P2_addr0_read, P2_addr0w0r; //wires for addressing
 
 //addressers for writing and reading the P2 memories
-P2_mem_write P2_mem_write(.clk(clk), .reset(reset), .enable(), .addr0(P2_addr0_write), .done());
-P2_mem_read P2_mem_read(.clk(clk), .reset(reset), .enable(), .addr0(P2_addr0_read), .count(P2_mem_sel), .done());
-mux_2to1 (#4) P2_addr_mux_0(.data_in_0(P2_addr0_write), .data_in_1(P2_addr0_read), .sel(), .data_out(P2_addr0w0r)); //mux to combine write and read addresses
+P2_mem_write P2_mem_write(.clk(clk), .reset(P2_mem_write_reset), .enable(P2_layer), .addr0(P2_addr0_write), .done(P2_mem_write_done));
+P2_mem_read P2_mem_read(.clk(clk), .reset(P2_mem_read_reset), .enable(FC_layer), .addr0(P2_addr0_read), .count(P2_mem_sel), .done(P2_mem_read_done));
+mux_2to1 (#4) P2_addr_mux_0(.data_in_0(P2_addr0_write), .data_in_1(P2_addr0_read), .sel(FC_layer), .data_out(P2_addr0w0r)); //mux to combine write and read addresses
 
 //Memories for the 12 outputs of p2. Each is unique
 p2_mem p2_mem_0(.address(P2_addr0w0r), .clock(clk), .data(P2_mem_0_data), .rden(FC_layer), .wren(P2_layer), .q(P2_mem_0_q));
@@ -268,7 +284,7 @@ logic signed [15:0] fc_g0_mem_q_a, fc_g0_mem_q_b, fc_g1_mem_q_a, fc_g1_mem_q_b, 
 logic [8:0] fc_mem_addr0_read, fc_mem_addr1_read;
 
 //addressers for writing and reading the FC weight memories
-fc_mem_read fc_mem_read(.clk(clk), .reset(reset), .enable(), .addr0(fc_mem_addr0_read), .addr1(fc_mem_addr1_read), .done());
+fc_mem_read fc_mem_read(.clk(clk), .reset(fc_mem_read_reset), .enable(FC_layer), .addr0(fc_mem_addr0_read), .addr1(fc_mem_addr1_read), .done(fc_mem_read_done));
 
 //Memories for FC weights. Each holds 2 neurons's 192 weights(384 in total)
 fc_g0_mem fc_g0_mem(.address_a(fc_mem_addr0_read), .address_b(fc_mem_addr1_read), .clock(clk), .rden_a(FC_layer), .rden_b(FC_layer), .q_a(fc_g0_mem_q_a), .q_b(fc_g0_mem_q_b));
@@ -279,6 +295,12 @@ fc_g4_mem fc_g4_mem(.address_a(fc_mem_addr0_read), .address_b(fc_mem_addr1_read)
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------
+//
+//  MAC
+//
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 
 //signals for input to MACs and to connect the MACs to the after MACs
@@ -293,7 +315,11 @@ logic signed [15:0] MAC_in_data_0, MAC_in_data_1, MAC_in_data_2, MAC_in_data_3, 
                     FC_in_data_0,  FC_in_data_1,  FC_in_data_2,  FC_in_data_3,  FC_in_data_4,  FC_in_data_5, 
                     FC_in_data_6,  FC_in_data_7,  FC_in_data_8,  FC_in_data_9,  FC_in_data_10,  FC_in_data_11, 
                     FC_in_data_12,  FC_in_data_13,  FC_in_data_14,  FC_in_data_15,  FC_in_data_16,  FC_in_data_17, 
-                    FC_in_data_18,  FC_in_data_19,  FC_in_data_20,  FC_in_data_21,  FC_in_data_22,  FC_in_data_23, 
+                    FC_in_data_18,  FC_in_data_19,  FC_in_data_20,  FC_in_data_21,  FC_in_data_22,  FC_in_data_23;
+                    conv2_bias_0, conv2_bias_1, conv2_bias_2, conv2_bias_3, 
+                    out_conv2_0, out_conv2_1, out_conv2_2, out_conv2_3,
+                    after_MAC_0_out_0, after_MAC_0_out_1, after_MAC_0_out_2, after_MAC_0_out_3, after_MAC_0_out_4, 
+                    after_MAC_0_out_5, after_MAC_1_out_0, after_MAC_1_out_1, after_MAC_1_out_2, after_MAC_1_out_3; 
 logic signed [31:0] MAC_out_0, MAC_out_1, MAC_out_2, MAC_out_3, MAC_out_4, MAC_out_5, 
                     MAC_out_6, MAC_out_7, MAC_out_8, MAC_out_9, MAC_out_10, MAC_out_11, 
                     MAC_out_12, MAC_out_13, MAC_out_14, MAC_out_15, MAC_out_16, MAC_out_17, 
@@ -398,30 +424,30 @@ mux_12to1 data_mux_12to1_23(.data_in_0(P2_mem_0_q), .data_in_1(P2_mem_1_q), .dat
                             .sel(P2_mem_sel), .data_out(FC_in_data_23));
 
 //Muxes to control the inputs to the MACs based on layer
-mux3to1 data_mux_3to1_0(.data_in_0(img_mem_0_q_a), .data_in_1(), .data_in_2(FC_in_data_0), .sel(MAC_layer), .data_out(MAC_in_data_0));
-mux3to1 data_mux_3to1_1(.data_in_0(img_mem_0_q_b), .data_in_1(), .data_in_2(FC_in_data_1), .sel(MAC_layer), .data_out(MAC_in_data_1));
-mux3to1 data_mux_3to1_2(.data_in_0(img_mem_1_q_a), .data_in_1(), .data_in_2(FC_in_data_2), .sel(MAC_layer), .data_out(MAC_in_data_2));
-mux3to1 data_mux_3to1_3(.data_in_0(img_mem_1_q_b), .data_in_1(), .data_in_2(FC_in_data_3), .sel(MAC_layer), .data_out(MAC_in_data_3));
-mux3to1 data_mux_3to1_4(.data_in_0(img_mem_0_q_a), .data_in_1(), .data_in_2(FC_in_data_4), .sel(MAC_layer), .data_out(MAC_in_data_4));
-mux3to1 data_mux_3to1_5(.data_in_0(img_mem_0_q_b), .data_in_1(), .data_in_2(FC_in_data_5), .sel(MAC_layer), .data_out(MAC_in_data_5));
-mux3to1 data_mux_3to1_6(.data_in_0(img_mem_1_q_a), .data_in_1(), .data_in_2(FC_in_data_6), .sel(MAC_layer), .data_out(MAC_in_data_6));
-mux3to1 data_mux_3to1_7(.data_in_0(img_mem_1_q_b), .data_in_1(), .data_in_2(FC_in_data_7), .sel(MAC_layer), .data_out(MAC_in_data_7));
-mux3to1 data_mux_3to1_8(.data_in_0(img_mem_0_q_a), .data_in_1(), .data_in_2(FC_in_data_8), .sel(MAC_layer), .data_out(MAC_in_data_8));
-mux3to1 data_mux_3to1_9(.data_in_0(img_mem_0_q_b), .data_in_1(), .data_in_2(FC_in_data_9), .sel(MAC_layer), .data_out(MAC_in_data_9));
-mux3to1 data_mux_3to1_10(.data_in_0(img_mem_1_q_a), .data_in_1(), .data_in_2(FC_in_data_10), .sel(MAC_layer), .data_out(MAC_in_data_10));
-mux3to1 data_mux_3to1_11(.data_in_0(img_mem_1_q_b), .data_in_1(), .data_in_2(FC_in_data_11), .sel(MAC_layer), .data_out(MAC_in_data_11));
-mux3to1 data_mux_3to1_12(.data_in_0(img_mem_0_q_a), .data_in_1(), .data_in_2(FC_in_data_12), .sel(MAC_layer), .data_out(MAC_in_data_12));
-mux3to1 data_mux_3to1_13(.data_in_0(img_mem_0_q_b), .data_in_1(), .data_in_2(FC_in_data_13), .sel(MAC_layer), .data_out(MAC_in_data_13));
-mux3to1 data_mux_3to1_14(.data_in_0(img_mem_1_q_a), .data_in_1(), .data_in_2(FC_in_data_14), .sel(MAC_layer), .data_out(MAC_in_data_14));
-mux3to1 data_mux_3to1_15(.data_in_0(img_mem_1_q_b), .data_in_1(), .data_in_2(FC_in_data_15), .sel(MAC_layer), .data_out(MAC_in_data_15));
-mux3to1 data_mux_3to1_16(.data_in_0(img_mem_0_q_a), .data_in_1(), .data_in_2(FC_in_data_16), .sel(MAC_layer), .data_out(MAC_in_data_16));
-mux3to1 data_mux_3to1_17(.data_in_0(img_mem_0_q_b), .data_in_1(), .data_in_2(FC_in_data_17), .sel(MAC_layer), .data_out(MAC_in_data_17));
-mux3to1 data_mux_3to1_18(.data_in_0(img_mem_1_q_a), .data_in_1(), .data_in_2(FC_in_data_18), .sel(MAC_layer), .data_out(MAC_in_data_18));
-mux3to1 data_mux_3to1_19(.data_in_0(img_mem_1_q_b), .data_in_1(), .data_in_2(FC_in_data_19), .sel(MAC_layer), .data_out(MAC_in_data_19));
-mux3to1 data_mux_3to1_20(.data_in_0(img_mem_0_q_a), .data_in_1(), .data_in_2(FC_in_data_20), .sel(MAC_layer), .data_out(MAC_in_data_20));
-mux3to1 data_mux_3to1_21(.data_in_0(img_mem_0_q_b), .data_in_1(), .data_in_2(FC_in_data_21), .sel(MAC_layer), .data_out(MAC_in_data_21));
-mux3to1 data_mux_3to1_22(.data_in_0(img_mem_1_q_a), .data_in_1(), .data_in_2(FC_in_data_22), .sel(MAC_layer), .data_out(MAC_in_data_22));
-mux3to1 data_mux_3to1_23(.data_in_0(img_mem_1_q_b), .data_in_1(), .data_in_2(FC_in_data_23), .sel(MAC_layer), .data_out(MAC_in_data_23));
+mux3to1 data_mux_3to1_0(.data_in_0(img_mem_0_q_a), .data_in_1(p1_mem_0_q_a), .data_in_2(FC_in_data_0), .sel(MAC_layer), .data_out(MAC_in_data_0));
+mux3to1 data_mux_3to1_1(.data_in_0(img_mem_0_q_b), .data_in_1(p1_mem_1_q_a), .data_in_2(FC_in_data_1), .sel(MAC_layer), .data_out(MAC_in_data_1));
+mux3to1 data_mux_3to1_2(.data_in_0(img_mem_1_q_a), .data_in_1(p1_mem_2_q_a), .data_in_2(FC_in_data_2), .sel(MAC_layer), .data_out(MAC_in_data_2));
+mux3to1 data_mux_3to1_3(.data_in_0(img_mem_1_q_b), .data_in_1(p1_mem_3_q_a), .data_in_2(FC_in_data_3), .sel(MAC_layer), .data_out(MAC_in_data_3));
+mux3to1 data_mux_3to1_4(.data_in_0(img_mem_0_q_a), .data_in_1(p1_mem_4_q_a), .data_in_2(FC_in_data_4), .sel(MAC_layer), .data_out(MAC_in_data_4));
+mux3to1 data_mux_3to1_5(.data_in_0(img_mem_0_q_b), .data_in_1(p1_mem_5_q_a), .data_in_2(FC_in_data_5), .sel(MAC_layer), .data_out(MAC_in_data_5));
+mux3to1 data_mux_3to1_6(.data_in_0(img_mem_1_q_a), .data_in_1(p1_mem_0_q_a), .data_in_2(FC_in_data_6), .sel(MAC_layer), .data_out(MAC_in_data_6));
+mux3to1 data_mux_3to1_7(.data_in_0(img_mem_1_q_b), .data_in_1(p1_mem_1_q_a), .data_in_2(FC_in_data_7), .sel(MAC_layer), .data_out(MAC_in_data_7));
+mux3to1 data_mux_3to1_8(.data_in_0(img_mem_0_q_a), .data_in_1(p1_mem_2_q_a), .data_in_2(FC_in_data_8), .sel(MAC_layer), .data_out(MAC_in_data_8));
+mux3to1 data_mux_3to1_9(.data_in_0(img_mem_0_q_b), .data_in_1(p1_mem_3_q_a), .data_in_2(FC_in_data_9), .sel(MAC_layer), .data_out(MAC_in_data_9));
+mux3to1 data_mux_3to1_10(.data_in_0(img_mem_1_q_a), .data_in_1(p1_mem_4_q_a), .data_in_2(FC_in_data_10), .sel(MAC_layer), .data_out(MAC_in_data_10));
+mux3to1 data_mux_3to1_11(.data_in_0(img_mem_1_q_b), .data_in_1(p1_mem_5_q_a), .data_in_2(FC_in_data_11), .sel(MAC_layer), .data_out(MAC_in_data_11));
+mux3to1 data_mux_3to1_12(.data_in_0(img_mem_0_q_a), .data_in_1(p1_mem_0_q_a), .data_in_2(FC_in_data_12), .sel(MAC_layer), .data_out(MAC_in_data_12));
+mux3to1 data_mux_3to1_13(.data_in_0(img_mem_0_q_b), .data_in_1(p1_mem_1_q_a), .data_in_2(FC_in_data_13), .sel(MAC_layer), .data_out(MAC_in_data_13));
+mux3to1 data_mux_3to1_14(.data_in_0(img_mem_1_q_a), .data_in_1(p1_mem_2_q_a), .data_in_2(FC_in_data_14), .sel(MAC_layer), .data_out(MAC_in_data_14));
+mux3to1 data_mux_3to1_15(.data_in_0(img_mem_1_q_b), .data_in_1(p1_mem_3_q_a), .data_in_2(FC_in_data_15), .sel(MAC_layer), .data_out(MAC_in_data_15));
+mux3to1 data_mux_3to1_16(.data_in_0(img_mem_0_q_a), .data_in_1(p1_mem_4_q_a), .data_in_2(FC_in_data_16), .sel(MAC_layer), .data_out(MAC_in_data_16));
+mux3to1 data_mux_3to1_17(.data_in_0(img_mem_0_q_b), .data_in_1(p1_mem_5_q_a), .data_in_2(FC_in_data_17), .sel(MAC_layer), .data_out(MAC_in_data_17));
+mux3to1 data_mux_3to1_18(.data_in_0(img_mem_1_q_a), .data_in_1(p1_mem_0_q_a), .data_in_2(FC_in_data_18), .sel(MAC_layer), .data_out(MAC_in_data_18));
+mux3to1 data_mux_3to1_19(.data_in_0(img_mem_1_q_b), .data_in_1(p1_mem_1_q_a), .data_in_2(FC_in_data_19), .sel(MAC_layer), .data_out(MAC_in_data_19));
+mux3to1 data_mux_3to1_20(.data_in_0(img_mem_0_q_a), .data_in_1(p1_mem_2_q_a), .data_in_2(FC_in_data_20), .sel(MAC_layer), .data_out(MAC_in_data_20));
+mux3to1 data_mux_3to1_21(.data_in_0(img_mem_0_q_b), .data_in_1(p1_mem_3_q_a), .data_in_2(FC_in_data_21), .sel(MAC_layer), .data_out(MAC_in_data_21));
+mux3to1 data_mux_3to1_22(.data_in_0(img_mem_1_q_a), .data_in_1(p1_mem_4_q_a), .data_in_2(FC_in_data_22), .sel(MAC_layer), .data_out(MAC_in_data_22));
+mux3to1 data_mux_3to1_23(.data_in_0(img_mem_1_q_b), .data_in_1(p1_mem_5_q_a), .data_in_2(FC_in_data_23), .sel(MAC_layer), .data_out(MAC_in_data_23));
 
 //Muxes to make sure proper input parameter based on the correct ROM. 1 for conv1, 1 for conv2, 1 for fc.
 mux3to1 para_mux_3to1_0(.data_in_0(conv1_k_g0_mem_q_a), .data_in_1(conv2_k_g0_mem_q_a), .data_in_2(fc_g0_mem_q_a), .sel(MAC_layer), .data_out(MAC_in_para_0));
@@ -430,24 +456,30 @@ mux3to1 para_mux_3to1_2(.data_in_0(conv1_k_g1_mem_q_a), .data_in_1(conv2_k_g1_me
 mux3to1 para_mux_3to1_3(.data_in_0(conv1_k_g1_mem_q_b), .data_in_1(conv2_k_g1_mem_q_b), .data_in_2(fc_g1_mem_q_b), .sel(MAC_layer), .data_out(MAC_in_para_3));
 mux3to1 para_mux_3to1_4(.data_in_0(conv1_k_g2_mem_q_a), .data_in_1(conv2_k_g2_mem_q_a), .data_in_2(fc_g2_mem_q_a), .sel(MAC_layer), .data_out(MAC_in_para_4));
 mux3to1 para_mux_3to1_5(.data_in_0(conv1_k_g2_mem_q_b), .data_in_1(conv2_k_g2_mem_q_b), .data_in_2(fc_g2_mem_q_b), .sel(MAC_layer), .data_out(MAC_in_para_5));
-mux3to1 para_mux_3to1_6(.data_in_0(conv1_k_g3_mem_q_a), .data_in_1(conv2_k_g3_mem_q_a), .data_in_2(fc_g3_mem_q_a), .sel(MAC_layer), .data_out(MAC_in_para_6));
-mux3to1 para_mux_3to1_7(.data_in_0(conv1_k_g3_mem_q_b), .data_in_1(conv2_k_g3_mem_q_b), .data_in_2(fc_g3_mem_q_b), .sel(MAC_layer), .data_out(MAC_in_para_7));
-mux3to1 para_mux_3to1_8(.data_in_0(conv1_k_g0_mem_q_a), .data_in_1(conv2_k_g4_mem_q_a), .data_in_2(fc_g4_mem_q_a), .sel(MAC_layer), .data_out(MAC_in_para_8));
-mux3to1 para_mux_3to1_9(.data_in_0(conv1_k_g0_mem_q_b), .data_in_1(conv2_k_g4_mem_q_b), .data_in_2(fc_g5_mem_q_b), .sel(MAC_layer), .data_out(MAC_in_para_9));
-mux3to1 para_mux_3to1_10(.data_in_0(conv1_k_g1_mem_q_a), .data_in_1(conv2_k_g5_mem_q_a), .data_in_2(), .sel(MAC_layer), .data_out(MAC_in_para_10));
-mux3to1 para_mux_3to1_11(.data_in_0(conv1_k_g1_mem_q_b), .data_in_1(conv2_k_g5_mem_q_b), .data_in_2(), .sel(MAC_layer), .data_out(MAC_in_para_11));
-mux3to1 para_mux_3to1_12(.data_in_0(conv1_k_g2_mem_q_a), .data_in_1(conv2_k_g6_mem_q_a), .data_in_2(), .sel(MAC_layer), .data_out(MAC_in_para_12));
-mux3to1 para_mux_3to1_13(.data_in_0(conv1_k_g2_mem_q_b), .data_in_1(conv2_k_g6_mem_q_b), .data_in_2(), .sel(MAC_layer), .data_out(MAC_in_para_13));
-mux3to1 para_mux_3to1_14(.data_in_0(conv1_k_g3_mem_q_a), .data_in_1(conv2_k_g7_mem_q_a), .data_in_2(), .sel(MAC_layer), .data_out(MAC_in_para_14));
-mux3to1 para_mux_3to1_15(.data_in_0(conv1_k_g3_mem_q_b), .data_in_1(conv2_k_g7_mem_q_b), .data_in_2(), .sel(MAC_layer), .data_out(MAC_in_para_15));
-mux3to1 para_mux_3to1_16(.data_in_0(conv1_k_g0_mem_q_a), .data_in_1(conv2_k_g8_mem_q_a), .data_in_2(), .sel(MAC_layer), .data_out(MAC_in_para_16));
-mux3to1 para_mux_3to1_17(.data_in_0(conv1_k_g0_mem_q_b), .data_in_1(conv2_k_g8_mem_q_b), .data_in_2(), .sel(MAC_layer), .data_out(MAC_in_para_17));
-mux3to1 para_mux_3to1_18(.data_in_0(conv1_k_g1_mem_q_a), .data_in_1(conv2_k_g9_mem_q_a), .data_in_2(), .sel(MAC_layer), .data_out(MAC_in_para_18));
-mux3to1 para_mux_3to1_19(.data_in_0(conv1_k_g1_mem_q_b), .data_in_1(conv2_k_g9_mem_q_b), .data_in_2(), .sel(MAC_layer), .data_out(MAC_in_para_19));
-mux3to1 para_mux_3to1_20(.data_in_0(conv1_k_g2_mem_q_a), .data_in_1(conv2_k_g10_mem_q_a), .data_in_2(), .sel(MAC_layer), .data_out(MAC_in_para_20));
-mux3to1 para_mux_3to1_21(.data_in_0(conv1_k_g2_mem_q_b), .data_in_1(conv2_k_g10_mem_q_b), .data_in_2(), .sel(MAC_layer), .data_out(MAC_in_para_21));
-mux3to1 para_mux_3to1_22(.data_in_0(conv1_k_g3_mem_q_a), .data_in_1(conv2_k_g11_mem_q_a), .data_in_2(), .sel(MAC_layer), .data_out(MAC_in_para_22));
-mux3to1 para_mux_3to1_23(.data_in_0(conv1_k_g3_mem_q_b), .data_in_1(conv2_k_g11_mem_q_b), .data_in_2(), .sel(MAC_layer), .data_out(MAC_in_para_23));
+mux3to1 para_mux_3to1_6(.data_in_0(conv1_k_g0_mem_q_a), .data_in_1(conv2_k_g3_mem_q_a), .data_in_2(fc_g3_mem_q_a), .sel(MAC_layer), .data_out(MAC_in_para_6));
+mux3to1 para_mux_3to1_7(.data_in_0(conv1_k_g0_mem_q_b), .data_in_1(conv2_k_g3_mem_q_b), .data_in_2(fc_g3_mem_q_b), .sel(MAC_layer), .data_out(MAC_in_para_7));
+mux3to1 para_mux_3to1_8(.data_in_0(conv1_k_g1_mem_q_a), .data_in_1(conv2_k_g4_mem_q_a), .data_in_2(fc_g4_mem_q_a), .sel(MAC_layer), .data_out(MAC_in_para_8));
+mux3to1 para_mux_3to1_9(.data_in_0(conv1_k_g1_mem_q_b), .data_in_1(conv2_k_g4_mem_q_b), .data_in_2(fc_g5_mem_q_b), .sel(MAC_layer), .data_out(MAC_in_para_9));
+mux3to1 para_mux_3to1_10(.data_in_0(conv1_k_g2_mem_q_a), .data_in_1(conv2_k_g5_mem_q_a), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_10));
+mux3to1 para_mux_3to1_11(.data_in_0(conv1_k_g2_mem_q_b), .data_in_1(conv2_k_g5_mem_q_b), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_11));
+mux3to1 para_mux_3to1_12(.data_in_0(conv1_k_g0_mem_q_a), .data_in_1(conv2_k_g6_mem_q_a), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_12));
+mux3to1 para_mux_3to1_13(.data_in_0(conv1_k_g0_mem_q_b), .data_in_1(conv2_k_g6_mem_q_b), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_13));
+mux3to1 para_mux_3to1_14(.data_in_0(conv1_k_g1_mem_q_a), .data_in_1(conv2_k_g7_mem_q_a), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_14));
+mux3to1 para_mux_3to1_15(.data_in_0(conv1_k_g1_mem_q_b), .data_in_1(conv2_k_g7_mem_q_b), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_15));
+mux3to1 para_mux_3to1_16(.data_in_0(conv1_k_g2_mem_q_a), .data_in_1(conv2_k_g8_mem_q_a), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_16));
+mux3to1 para_mux_3to1_17(.data_in_0(conv1_k_g2_mem_q_b), .data_in_1(conv2_k_g8_mem_q_b), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_17));
+mux3to1 para_mux_3to1_18(.data_in_0(conv1_k_g0_mem_q_a), .data_in_1(conv2_k_g9_mem_q_a), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_18));
+mux3to1 para_mux_3to1_19(.data_in_0(conv1_k_g0_mem_q_b), .data_in_1(conv2_k_g9_mem_q_b), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_19));
+mux3to1 para_mux_3to1_20(.data_in_0(conv1_k_g1_mem_q_a), .data_in_1(conv2_k_g10_mem_q_a), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_20));
+mux3to1 para_mux_3to1_21(.data_in_0(conv1_k_g1_mem_q_b), .data_in_1(conv2_k_g10_mem_q_b), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_21));
+mux3to1 para_mux_3to1_22(.data_in_0(conv1_k_g2_mem_q_a), .data_in_1(conv2_k_g11_mem_q_a), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_22));
+mux3to1 para_mux_3to1_23(.data_in_0(conv1_k_g2_mem_q_b), .data_in_1(conv2_k_g11_mem_q_b), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_23));
+
+//bias muxes
+mux3to1 bias_mux_3to1_0(.data_in_0(16'b0000000000000011), .data_in_1(16'b0000000000000011), .data_in_2(16'b0000000000000011), .sel(conv2_count), .data_out(conv2_bias_0));
+mux3to1 bias_mux_3to1_0(.data_in_0(16'b1111111111111110), .data_in_1(16'b0000000000000000), .data_in_2(16'b0000000000000010), .sel(conv2_count), .data_out(conv2_bias_1));
+mux3to1 bias_mux_3to1_0(.data_in_0(16'b0000000000000001), .data_in_1(16'b0000000000000001), .data_in_2(16'b1111111111111111), .sel(conv2_count), .data_out(conv2_bias_2));
+mux3to1 bias_mux_3to1_0(.data_in_0(16'b0000000000000011), .data_in_1(16'b0000000000000010), .data_in_2(16'b1111111111111111), .sel(conv2_count), .data_out(conv2_bias_3));
 
 //24 MAC modules
 MAC MAC_0(.clk(clk), .enable(MAC_enable), .reset(rMAC), .MAC_layer(MAC_layer), .A(MAC_in_data_0), .B(MAC_in_para_0), .out(MAC_out_0));
@@ -478,23 +510,45 @@ MAC MAC_23(.clk(clk), .enable(MAC_enable), .reset(rMAC), .MAC_layer(MAC_layer), 
 //The after MAC does all subsequent operations needed after the MAC depending on the layer. ReLU, combination, biases, shifting, etc.
 after_MAC after_MAC_0(.layer(MAC_layer), .MAC_out_0(MAC_out_0), .MAC_out_1(MAC_out_1), .MAC_out_2(MAC_out_2), .MAC_out_3(MAC_out_3), 
                       .MAC_out_4(MAC_out_4), .MAC_out_5(MAC_out_5), .bias_0(16'b1111111111110100), .bias_1(16'b1111111111110010), .bias_2(16'b1111111111110111), 
-                      .bias_3(16'b1111111111111100), .bias_4(16'b1111111111111100), .bias_5(16'b0000000000000100), .conv2_bias(), .out_0(), 
-                      .out_1(), .out_2(), .out_3(), .out_4(), .out_5(), .out_conv2());
+                      .bias_3(16'b1111111111111100), .bias_4(16'b1111111111111100), .bias_5(16'b0000000000000100), .conv2_bias(conv2_bias_0), .out_0(after_MAC_0_out_0), 
+                      .out_1(after_MAC_0_out_1), .out_2(after_MAC_0_out_2), .out_3(after_MAC_0_out_3), .out_4(after_MAC_0_out_4), .out_5(after_MAC_0_out_5), .out_conv2(out_conv2_0));
 after_MAC after_MAC_1(.layer(MAC_layer), .MAC_out_0(MAC_out_6), .MAC_out_1(MAC_out_7), .MAC_out_2(MAC_out_8), .MAC_out_3(MAC_out_9), 
                       .MAC_out_4(MAC_out_10), .MAC_out_5(MAC_out_11), .bias_0(16'b1111111111110100), .bias_1(16'b1111111111110010), .bias_2(16'b1111111111110111), 
-                      .bias_3(16'b1111111111111100), .bias_4(16'b1111111111111100), .bias_5(16'b0000000000000100), .conv2_bias(), .out_0(), 
-                      .out_1(), .out_2(), .out_3(), .out_4(), .out_5(), .out_conv2());
+                      .bias_3(16'b1111111111111100), .bias_4(16'b1111111111111100), .bias_5(16'b0000000000000100), .conv2_bias(conv2_bias_1), .out_0(after_MAC_1_out_0), 
+                      .out_1(after_MAC_1_out_1), .out_2(after_MAC_1_out_2), .out_3(after_MAC_1_out_3), .out_4(conv1_mem_4_0_data_b), .out_5(conv1_mem_5_0_data_b), .out_conv2(out_conv2_1));
 after_MAC after_MAC_2(.layer(MAC_layer), .MAC_out_0(MAC_out_12), .MAC_out_1(MAC_out_13), .MAC_out_2(MAC_out_14), .MAC_out_3(MAC_out_15), 
                       .MAC_out_4(MAC_out_16), .MAC_out_5(MAC_out_17), .bias_0(16'b1111111111110100), .bias_1(16'b1111111111110010), .bias_2(16'b1111111111110111), 
-                      .bias_3(16'b1111111111111100), .bias_4(16'b1111111111111100), .bias_5(16'b0000000000000100), .conv2_bias(), .out_0(), 
-                      .out_1(), .out_2(), .out_3(), .out_4(), .out_5(), .out_conv2());
+                      .bias_3(16'b1111111111111100), .bias_4(16'b1111111111111100), .bias_5(16'b0000000000000100), .conv2_bias(conv2_bias_2), .out_0(conv1_mem_0_1_data_a), 
+                      .out_1(conv1_mem_1_1_data_a), .out_2(conv1_mem_2_1_data_a), .out_3(conv1_mem_3_1_data_a), .out_4(conv1_mem_4_1_data_a), .out_5(conv1_mem_5_1_data_a), .out_conv2(out_conv2_2));
 after_MAC after_MAC_3(.layer(MAC_layer), .MAC_out_0(MAC_out_18), .MAC_out_1(MAC_out_19), .MAC_out_2(MAC_out_20), .MAC_out_3(MAC_out_21), 
                       .MAC_out_4(MAC_out_22), .MAC_out_5(MAC_out_23), .bias_0(16'b1111111111110100), .bias_1(16'b1111111111110010), .bias_2(16'b1111111111110111), 
-                      .bias_3(16'b1111111111111100), .bias_4(16'b1111111111111100), .bias_5(16'b0000000000000100), .conv2_bias(), .out_0(), 
-                      .out_1(), .out_2(), .out_3(), .out_4(), .out_5(), .out_conv2());
+                      .bias_3(16'b1111111111111100), .bias_4(16'b1111111111111100), .bias_5(16'b0000000000000100), .conv2_bias(conv2_bias_3), .out_0(conv1_mem_0_1_data_b), 
+                      .out_1(conv1_mem_1_1_data_b), .out_2(conv1_mem_2_1_data_b), .out_3(conv1_mem_3_1_data_b), .out_4(conv1_mem_4_1_data_b), .out_5(conv1_mem_5_1_data_b), .out_conv2(out_conv2_3));
+
+demux_1to2 out_conv1_fc_demux_0(.data_in(after_MAC_0_out_0), .sel(FC_layer), .data_out_0(conv1_mem_0_0_data_a), .data_out_1(result_0));
+demux_1to2 out_conv1_fc_demux_1(.data_in(after_MAC_0_out_1), .sel(FC_layer), .data_out_0(conv1_mem_1_0_data_a), .data_out_1(result_1));
+demux_1to2 out_conv1_fc_demux_2(.data_in(after_MAC_0_out_2), .sel(FC_layer), .data_out_0(conv1_mem_2_0_data_a), .data_out_1(result_2));
+demux_1to2 out_conv1_fc_demux_3(.data_in(after_MAC_0_out_3), .sel(FC_layer), .data_out_0(conv1_mem_3_0_data_a), .data_out_1(result_3));
+demux_1to2 out_conv1_fc_demux_4(.data_in(after_MAC_0_out_4), .sel(FC_layer), .data_out_0(conv1_mem_4_0_data_a), .data_out_1(result_4));
+demux_1to2 out_conv1_fc_demux_5(.data_in(after_MAC_0_out_5), .sel(FC_layer), .data_out_0(conv1_mem_5_0_data_a), .data_out_1(result_5));
+demux_1to2 out_conv1_fc_demux_6(.data_in(after_MAC_1_out_0), .sel(FC_layer), .data_out_0(conv1_mem_0_0_data_b), .data_out_1(result_6));
+demux_1to2 out_conv1_fc_demux_7(.data_in(after_MAC_1_out_1), .sel(FC_layer), .data_out_0(conv1_mem_1_0_data_b), .data_out_1(result_7));
+demux_1to2 out_conv1_fc_demux_8(.data_in(after_MAC_1_out_2), .sel(FC_layer), .data_out_0(conv1_mem_2_0_data_b), .data_out_1(result_8));
+demux_1to2 out_conv1_fc_demux_9(.data_in(after_MAC_1_out_3), .sel(FC_layer), .data_out_0(conv1_mem_3_0_data_b), .data_out_1(result_9));
+
+demux_1to3 out_conv2_demux_0(.data_in(out_conv2_0), .sel(conv2_count), .data_out_0(conv2_mem_0_data), .data_out_1(conv2_mem_4_data), .data_out_2(conv2_mem_8_data)); //out img 0, 4, 8
+demux_1to3 out_conv2_demux_1(.data_in(out_conv2_1), .sel(conv2_count), .data_out_0(conv2_mem_1_data), .data_out_1(conv2_mem_5_data), .data_out_2(conv2_mem_9_data)); //out img 1, 5, 9
+demux_1to3 out_conv2_demux_2(.data_in(out_conv2_2), .sel(conv2_count), .data_out_0(conv2_mem_2_data), .data_out_1(conv2_mem_6_data), .data_out_2(conv2_mem_10_data)); //out img 2, 6, 10
+demux_1to3 out_conv2_demux_3(.data_in(out_conv2_3), .sel(conv2_count), .data_out_0(conv2_mem_3_data), .data_out_1(conv2_mem_7_data), .data_out_2(conv2_mem_11_data)); //out img 3, 7, 11
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------
+//
+//  POOLING (DONE)
+//
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 
 logic signed [15:0] pooling_0_a0, pooling_0_a1, pooling_0_b0, pooling_0_b1, 
@@ -587,5 +641,9 @@ demux_1to2 pooling_demux_out_8(.data_in(pooling_8_out), .sel(pooling_layer), .da
 demux_1to2 pooling_demux_out_9(.data_in(pooling_9_out), .sel(pooling_layer), .data_out_0(p1_mem_4_data_b), .data_out_1(P2_mem_9_data));
 demux_1to2 pooling_demux_out_10(.data_in(pooling_10_out), .sel(pooling_layer), .data_out_0(p1_mem_5_data_a), .data_out_1(P2_mem_10_data));
 demux_1to2 pooling_demux_out_11(.data_in(pooling_11_out), .sel(pooling_layer), .data_out_0(p1_mem_5_data_b), .data_out_1(P2_mem_11_data));
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------
 
 endmodule
