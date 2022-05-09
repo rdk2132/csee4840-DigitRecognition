@@ -1,23 +1,34 @@
 module CNN(input logic clk, reset, write, chipselect, 
            input logic [15:0] writedata, 
-           input logic [1:0] address
-           output logic [7:0] return_ctrl, 
-           output logic signed [15:0] result_0, result_1, result_2, result_3, result_4, result_5, result_6, result_7, result_8, result_9);
+           input logic [3:0] address,
+           output logic [15:0] readdata);
 
     logic signed [15:0] img_data;
     logic [9:0] img_mem_addr_write;
-    logic [15:0] ctrl;
+    logic [7:0] ctrl;
     always_ff @(posedge clk) begin
         if(chipselect == 1'b1 && write == 1'b1) begin
             case (address)
-                2'b00 : img_data <= writedata;
-                2'b01 : img_mem_addr_write <= writedata[9:0];
-                2'b10 : ctrl <= writedata[7:0];
+                4'h0 : ctrl <= writedata[7:0];
+                4'h1 : readdata <= control_output + 16'h0;
+                4'h2 : img_mem_addr_write <= writedata[9:0];
+                4'h3 : readdata <= result_0;
+                4'h4 : readdata <= result_1;
+                4'h5 : readdata <= result_2;
+                4'h6 : readdata <= result_3;
+                4'h7 : readdata <= result_4;
+                4'h8 : readdata <= result_5;
+                4'h9 : readdata <= result_6;
+                4'ha : readdata <= result_7;
+                4'hb : readdata <= result_8;
+                4'hc : readdata <= result_9;
+                default : readdata <= 0;
             endcase
         end
     end
 
 logic [1:0] MAC_layer;
+logic [7:0] control_output;
 logic pooling_layer, rMAC, MAC_enable, Conv1_layer, P1_layer, Conv2_layer, P2_layer, FC_layer, 
       img_mem_read_reset, conv1_mem_write_reset, conv1_mem_read_reset, conv1_k_mem_read_reset, P1_mem_read_reset, P1_mem_write_reset, 
       conv2_mem_write_reset, conv2_mem_read_reset, conv2_k_mem_read_reset, P2_mem_write_reset, P2_mem_read_reset, fc_mem_read_reset, 
@@ -33,7 +44,7 @@ CNN_ctrl CNN_ctrl(.clk(clk), .state(ctrl), .conv1_kern_c_d(), .conv2__kern_c_d()
                   .conv2_out_c_r_r(), .conv2_out_c_w_r(), .pool1_c_r_r(), .pool1_c_w_r(), .pool2_c_r_r(), .pool2_c_w_r(), 
                   .conv1_kern_m_r(), .conv2_kern_m_r(), .FC_m_r(), .img_m_r(), .img_m_w(), .conv1_out_m_r(), 
                   .conv1_out_m_w(), .conv2_out_m_r(), .conv2_out_m_w(), .P1_m_r(), .P1_m_w(), .P2_m_r(), 
-                  .P2_m_w(), .MAC_layer(MAC_layer), .pooling_layer(pooling_layer), .done(return_ctrl));
+                  .P2_m_w(), .MAC_layer(MAC_layer), .pooling_layer(pooling_layer), .done(control_output));
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------------------
