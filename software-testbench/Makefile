@@ -1,7 +1,7 @@
 CC = gcc
 CXX = g++
 INCLUDES =
-CFLAGS = -g -std=c99 -W -Wall $(INCLUDES)
+CFLAGS = -g -std=c99 -W -Wall $(INCLUDES) -DUSE_FPGA
 CXXFLAGS = -g -W -Wall $(INCLUDES)
 LDFLAGS = -lm
 

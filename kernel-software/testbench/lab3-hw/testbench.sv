@@ -25,8 +25,8 @@ module testbench (
         end
         else if (chipselect && (write | read)) begin
             case (address)
-                4'h0: //CONTROL IN
-                4'h1: //CONTROL OUT
+                4'h0: readdata <= done;
+                4'h1: state <= writedata;
                 4'h2: waddr <= waddr + 5'd1;
                 4'h3: raddr <= 5'h1;
                 4'h4: raddr <= 5'h2;
