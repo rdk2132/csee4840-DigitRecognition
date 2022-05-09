@@ -7,14 +7,16 @@ module P1_mem_read (input logic clk, reset, enable,
     logic [2:0] rowcount, columncount;
     //counter for position within image row
     logic [2:0] i_count;
+    logic [3:0] delay;
 
     always_ff @(posedge clk or posedge reset) begin
         if (reset == 1'b1) begin
             addr0 <= 8'b00000000;
             addr1 <= 8'b00110000;
             i_count <= 3'b000;
+            delay <= 4'b0000;
         end
-        else if (enable == 1'b1 && done == 1'b0) begin
+        else if (enable == 1'b1 && done == 1'b0 && delay == 4'b0000) begin
             if (i_count == 3'b111 && rowcount == 3'b100 && columncount == 3'b100) begin
                 //done with applying the kernel over an entire image row, go to the next row
                 //Move addresses 4 rows up, 11 pixels back and 1 row down, i.e. -47
@@ -44,6 +46,9 @@ module P1_mem_read (input logic clk, reset, enable,
                 addr1 <= addr1 + 8'b00000001;
                 columncount <= columncount + 3'b001;
             end
+        end
+        else begin
+            delay <= delay + 4'b0001;
         end
     end
     
