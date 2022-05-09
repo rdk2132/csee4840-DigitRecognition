@@ -228,7 +228,7 @@ logic signed [15:0] conv2_k_g0_mem_q_a, conv2_k_g0_mem_q_b, conv2_k_g1_mem_q_a, 
                     conv2_k_g4_mem_q_a, conv2_k_g4_mem_q_b, conv2_k_g5_mem_q_a, conv2_k_g5_mem_q_b, 
                     conv2_k_g6_mem_q_a, conv2_k_g6_mem_q_b, conv2_k_g7_mem_q_a, conv2_k_g7_mem_q_b, 
                     conv2_k_g8_mem_q_a, conv2_k_g8_mem_q_b, conv2_k_g9_mem_q_a, conv2_k_g9_mem_q_b, 
-                    conv2_k_g10_mem_q_a, conv2_k_g10_mem_q_b, conv2_k_g11_mem_q_a, conv2_k_g11_mem_q_b, 
+                    conv2_k_g10_mem_q_a, conv2_k_g10_mem_q_b, conv2_k_g11_mem_q_a, conv2_k_g11_mem_q_b;
 //Memories for conv2 kernels. Each holds 6 25x25 kernels.
 conv2_k_g0_mem conv2_k_g0_mem(.address_a(conv2_k_mem_addr0_read), .address_b(conv2_k_mem_addr1_read), .clock(clk), .rden_a(Conv2_layer), .rden_b(Conv2_layer), .q_a(conv2_k_g0_mem_q_a), .q_b(conv2_k_g0_mem_q_b));
 conv2_k_g1_mem conv2_k_g1_mem(.address_a(conv2_k_mem_addr0_read), .address_b(conv2_k_mem_addr1_read), .clock(clk), .rden_a(Conv2_layer), .rden_b(Conv2_layer), .q_a(conv2_k_g1_mem_q_a), .q_b(conv2_k_g1_mem_q_b));
