@@ -325,11 +325,11 @@ logic signed [15:0] MAC_in_data_0, MAC_in_data_1, MAC_in_data_2, MAC_in_data_3, 
                     FC_in_data_6,  FC_in_data_7,  FC_in_data_8,  FC_in_data_9,  FC_in_data_10,  FC_in_data_11, 
                     FC_in_data_12,  FC_in_data_13,  FC_in_data_14,  FC_in_data_15,  FC_in_data_16,  FC_in_data_17, 
                     FC_in_data_18,  FC_in_data_19,  FC_in_data_20,  FC_in_data_21,  FC_in_data_22,  FC_in_data_23,
-                    conv2_bias_0, conv2_bias_1, conv2_bias_2, conv2_bias_3, 
                     out_conv2_0, out_conv2_1, out_conv2_2, out_conv2_3,
                     after_MAC_0_out_0, after_MAC_0_out_1, after_MAC_0_out_2, after_MAC_0_out_3, after_MAC_0_out_4, 
                     after_MAC_0_out_5, after_MAC_1_out_0, after_MAC_1_out_1, after_MAC_1_out_2, after_MAC_1_out_3; 
-logic signed [31:0] MAC_out_0, MAC_out_1, MAC_out_2, MAC_out_3, MAC_out_4, MAC_out_5, 
+logic signed [31:0] conv2_bias_0, conv2_bias_1, conv2_bias_2, conv2_bias_3,
+                    MAC_out_0, MAC_out_1, MAC_out_2, MAC_out_3, MAC_out_4, MAC_out_5,
                     MAC_out_6, MAC_out_7, MAC_out_8, MAC_out_9, MAC_out_10, MAC_out_11, 
                     MAC_out_12, MAC_out_13, MAC_out_14, MAC_out_15, MAC_out_16, MAC_out_17, 
                     MAC_out_18, MAC_out_19, MAC_out_20, MAC_out_21, MAC_out_22, MAC_out_23;
@@ -433,62 +433,62 @@ mux_12to1 data_mux_12to1_23(.data_in_0(P2_mem_0_q), .data_in_1(P2_mem_1_q), .dat
                             .sel(P2_mem_sel), .data_out(FC_in_data_23));
 
 //Muxes to control the inputs to the MACs based on layer
-mux3to1 data_mux_3to1_0(.data_in_0(img_mem_0_q_a), .data_in_1(p1_mem_0_q_a), .data_in_2(FC_in_data_0), .sel(MAC_layer), .data_out(MAC_in_data_0));
-mux3to1 data_mux_3to1_1(.data_in_0(img_mem_0_q_b), .data_in_1(p1_mem_1_q_a), .data_in_2(FC_in_data_1), .sel(MAC_layer), .data_out(MAC_in_data_1));
-mux3to1 data_mux_3to1_2(.data_in_0(img_mem_1_q_a), .data_in_1(p1_mem_2_q_a), .data_in_2(FC_in_data_2), .sel(MAC_layer), .data_out(MAC_in_data_2));
-mux3to1 data_mux_3to1_3(.data_in_0(img_mem_1_q_b), .data_in_1(p1_mem_3_q_a), .data_in_2(FC_in_data_3), .sel(MAC_layer), .data_out(MAC_in_data_3));
-mux3to1 data_mux_3to1_4(.data_in_0(img_mem_0_q_a), .data_in_1(p1_mem_4_q_a), .data_in_2(FC_in_data_4), .sel(MAC_layer), .data_out(MAC_in_data_4));
-mux3to1 data_mux_3to1_5(.data_in_0(img_mem_0_q_b), .data_in_1(p1_mem_5_q_a), .data_in_2(FC_in_data_5), .sel(MAC_layer), .data_out(MAC_in_data_5));
-mux3to1 data_mux_3to1_6(.data_in_0(img_mem_1_q_a), .data_in_1(p1_mem_0_q_a), .data_in_2(FC_in_data_6), .sel(MAC_layer), .data_out(MAC_in_data_6));
-mux3to1 data_mux_3to1_7(.data_in_0(img_mem_1_q_b), .data_in_1(p1_mem_1_q_a), .data_in_2(FC_in_data_7), .sel(MAC_layer), .data_out(MAC_in_data_7));
-mux3to1 data_mux_3to1_8(.data_in_0(img_mem_0_q_a), .data_in_1(p1_mem_2_q_a), .data_in_2(FC_in_data_8), .sel(MAC_layer), .data_out(MAC_in_data_8));
-mux3to1 data_mux_3to1_9(.data_in_0(img_mem_0_q_b), .data_in_1(p1_mem_3_q_a), .data_in_2(FC_in_data_9), .sel(MAC_layer), .data_out(MAC_in_data_9));
-mux3to1 data_mux_3to1_10(.data_in_0(img_mem_1_q_a), .data_in_1(p1_mem_4_q_a), .data_in_2(FC_in_data_10), .sel(MAC_layer), .data_out(MAC_in_data_10));
-mux3to1 data_mux_3to1_11(.data_in_0(img_mem_1_q_b), .data_in_1(p1_mem_5_q_a), .data_in_2(FC_in_data_11), .sel(MAC_layer), .data_out(MAC_in_data_11));
-mux3to1 data_mux_3to1_12(.data_in_0(img_mem_0_q_a), .data_in_1(p1_mem_0_q_a), .data_in_2(FC_in_data_12), .sel(MAC_layer), .data_out(MAC_in_data_12));
-mux3to1 data_mux_3to1_13(.data_in_0(img_mem_0_q_b), .data_in_1(p1_mem_1_q_a), .data_in_2(FC_in_data_13), .sel(MAC_layer), .data_out(MAC_in_data_13));
-mux3to1 data_mux_3to1_14(.data_in_0(img_mem_1_q_a), .data_in_1(p1_mem_2_q_a), .data_in_2(FC_in_data_14), .sel(MAC_layer), .data_out(MAC_in_data_14));
-mux3to1 data_mux_3to1_15(.data_in_0(img_mem_1_q_b), .data_in_1(p1_mem_3_q_a), .data_in_2(FC_in_data_15), .sel(MAC_layer), .data_out(MAC_in_data_15));
-mux3to1 data_mux_3to1_16(.data_in_0(img_mem_0_q_a), .data_in_1(p1_mem_4_q_a), .data_in_2(FC_in_data_16), .sel(MAC_layer), .data_out(MAC_in_data_16));
-mux3to1 data_mux_3to1_17(.data_in_0(img_mem_0_q_b), .data_in_1(p1_mem_5_q_a), .data_in_2(FC_in_data_17), .sel(MAC_layer), .data_out(MAC_in_data_17));
-mux3to1 data_mux_3to1_18(.data_in_0(img_mem_1_q_a), .data_in_1(p1_mem_0_q_a), .data_in_2(FC_in_data_18), .sel(MAC_layer), .data_out(MAC_in_data_18));
-mux3to1 data_mux_3to1_19(.data_in_0(img_mem_1_q_b), .data_in_1(p1_mem_1_q_a), .data_in_2(FC_in_data_19), .sel(MAC_layer), .data_out(MAC_in_data_19));
-mux3to1 data_mux_3to1_20(.data_in_0(img_mem_0_q_a), .data_in_1(p1_mem_2_q_a), .data_in_2(FC_in_data_20), .sel(MAC_layer), .data_out(MAC_in_data_20));
-mux3to1 data_mux_3to1_21(.data_in_0(img_mem_0_q_b), .data_in_1(p1_mem_3_q_a), .data_in_2(FC_in_data_21), .sel(MAC_layer), .data_out(MAC_in_data_21));
-mux3to1 data_mux_3to1_22(.data_in_0(img_mem_1_q_a), .data_in_1(p1_mem_4_q_a), .data_in_2(FC_in_data_22), .sel(MAC_layer), .data_out(MAC_in_data_22));
-mux3to1 data_mux_3to1_23(.data_in_0(img_mem_1_q_b), .data_in_1(p1_mem_5_q_a), .data_in_2(FC_in_data_23), .sel(MAC_layer), .data_out(MAC_in_data_23));
+mux_3to1 data_mux_3to1_0(.data_in_0(img_mem_0_q_a), .data_in_1(p1_mem_0_q_a), .data_in_2(FC_in_data_0), .sel(MAC_layer), .data_out(MAC_in_data_0));
+mux_3to1 data_mux_3to1_1(.data_in_0(img_mem_0_q_b), .data_in_1(p1_mem_1_q_a), .data_in_2(FC_in_data_1), .sel(MAC_layer), .data_out(MAC_in_data_1));
+mux_3to1 data_mux_3to1_2(.data_in_0(img_mem_1_q_a), .data_in_1(p1_mem_2_q_a), .data_in_2(FC_in_data_2), .sel(MAC_layer), .data_out(MAC_in_data_2));
+mux_3to1 data_mux_3to1_3(.data_in_0(img_mem_1_q_b), .data_in_1(p1_mem_3_q_a), .data_in_2(FC_in_data_3), .sel(MAC_layer), .data_out(MAC_in_data_3));
+mux_3to1 data_mux_3to1_4(.data_in_0(img_mem_0_q_a), .data_in_1(p1_mem_4_q_a), .data_in_2(FC_in_data_4), .sel(MAC_layer), .data_out(MAC_in_data_4));
+mux_3to1 data_mux_3to1_5(.data_in_0(img_mem_0_q_b), .data_in_1(p1_mem_5_q_a), .data_in_2(FC_in_data_5), .sel(MAC_layer), .data_out(MAC_in_data_5));
+mux_3to1 data_mux_3to1_6(.data_in_0(img_mem_1_q_a), .data_in_1(p1_mem_0_q_a), .data_in_2(FC_in_data_6), .sel(MAC_layer), .data_out(MAC_in_data_6));
+mux_3to1 data_mux_3to1_7(.data_in_0(img_mem_1_q_b), .data_in_1(p1_mem_1_q_a), .data_in_2(FC_in_data_7), .sel(MAC_layer), .data_out(MAC_in_data_7));
+mux_3to1 data_mux_3to1_8(.data_in_0(img_mem_0_q_a), .data_in_1(p1_mem_2_q_a), .data_in_2(FC_in_data_8), .sel(MAC_layer), .data_out(MAC_in_data_8));
+mux_3to1 data_mux_3to1_9(.data_in_0(img_mem_0_q_b), .data_in_1(p1_mem_3_q_a), .data_in_2(FC_in_data_9), .sel(MAC_layer), .data_out(MAC_in_data_9));
+mux_3to1 data_mux_3to1_10(.data_in_0(img_mem_1_q_a), .data_in_1(p1_mem_4_q_a), .data_in_2(FC_in_data_10), .sel(MAC_layer), .data_out(MAC_in_data_10));
+mux_3to1 data_mux_3to1_11(.data_in_0(img_mem_1_q_b), .data_in_1(p1_mem_5_q_a), .data_in_2(FC_in_data_11), .sel(MAC_layer), .data_out(MAC_in_data_11));
+mux_3to1 data_mux_3to1_12(.data_in_0(img_mem_0_q_a), .data_in_1(p1_mem_0_q_a), .data_in_2(FC_in_data_12), .sel(MAC_layer), .data_out(MAC_in_data_12));
+mux_3to1 data_mux_3to1_13(.data_in_0(img_mem_0_q_b), .data_in_1(p1_mem_1_q_a), .data_in_2(FC_in_data_13), .sel(MAC_layer), .data_out(MAC_in_data_13));
+mux_3to1 data_mux_3to1_14(.data_in_0(img_mem_1_q_a), .data_in_1(p1_mem_2_q_a), .data_in_2(FC_in_data_14), .sel(MAC_layer), .data_out(MAC_in_data_14));
+mux_3to1 data_mux_3to1_15(.data_in_0(img_mem_1_q_b), .data_in_1(p1_mem_3_q_a), .data_in_2(FC_in_data_15), .sel(MAC_layer), .data_out(MAC_in_data_15));
+mux_3to1 data_mux_3to1_16(.data_in_0(img_mem_0_q_a), .data_in_1(p1_mem_4_q_a), .data_in_2(FC_in_data_16), .sel(MAC_layer), .data_out(MAC_in_data_16));
+mux_3to1 data_mux_3to1_17(.data_in_0(img_mem_0_q_b), .data_in_1(p1_mem_5_q_a), .data_in_2(FC_in_data_17), .sel(MAC_layer), .data_out(MAC_in_data_17));
+mux_3to1 data_mux_3to1_18(.data_in_0(img_mem_1_q_a), .data_in_1(p1_mem_0_q_a), .data_in_2(FC_in_data_18), .sel(MAC_layer), .data_out(MAC_in_data_18));
+mux_3to1 data_mux_3to1_19(.data_in_0(img_mem_1_q_b), .data_in_1(p1_mem_1_q_a), .data_in_2(FC_in_data_19), .sel(MAC_layer), .data_out(MAC_in_data_19));
+mux_3to1 data_mux_3to1_20(.data_in_0(img_mem_0_q_a), .data_in_1(p1_mem_2_q_a), .data_in_2(FC_in_data_20), .sel(MAC_layer), .data_out(MAC_in_data_20));
+mux_3to1 data_mux_3to1_21(.data_in_0(img_mem_0_q_b), .data_in_1(p1_mem_3_q_a), .data_in_2(FC_in_data_21), .sel(MAC_layer), .data_out(MAC_in_data_21));
+mux_3to1 data_mux_3to1_22(.data_in_0(img_mem_1_q_a), .data_in_1(p1_mem_4_q_a), .data_in_2(FC_in_data_22), .sel(MAC_layer), .data_out(MAC_in_data_22));
+mux_3to1 data_mux_3to1_23(.data_in_0(img_mem_1_q_b), .data_in_1(p1_mem_5_q_a), .data_in_2(FC_in_data_23), .sel(MAC_layer), .data_out(MAC_in_data_23));
 
 //Muxes to make sure proper input parameter based on the correct ROM. 1 for conv1, 1 for conv2, 1 for fc.
-mux3to1 para_mux_3to1_0(.data_in_0(conv1_k_g0_mem_q_a), .data_in_1(conv2_k_g0_mem_q_a), .data_in_2(fc_g0_mem_q_a), .sel(MAC_layer), .data_out(MAC_in_para_0));
-mux3to1 para_mux_3to1_1(.data_in_0(conv1_k_g0_mem_q_b), .data_in_1(conv2_k_g0_mem_q_b), .data_in_2(fc_g0_mem_q_b), .sel(MAC_layer), .data_out(MAC_in_para_1));
-mux3to1 para_mux_3to1_2(.data_in_0(conv1_k_g1_mem_q_a), .data_in_1(conv2_k_g1_mem_q_a), .data_in_2(fc_g1_mem_q_a), .sel(MAC_layer), .data_out(MAC_in_para_2));
-mux3to1 para_mux_3to1_3(.data_in_0(conv1_k_g1_mem_q_b), .data_in_1(conv2_k_g1_mem_q_b), .data_in_2(fc_g1_mem_q_b), .sel(MAC_layer), .data_out(MAC_in_para_3));
-mux3to1 para_mux_3to1_4(.data_in_0(conv1_k_g2_mem_q_a), .data_in_1(conv2_k_g2_mem_q_a), .data_in_2(fc_g2_mem_q_a), .sel(MAC_layer), .data_out(MAC_in_para_4));
-mux3to1 para_mux_3to1_5(.data_in_0(conv1_k_g2_mem_q_b), .data_in_1(conv2_k_g2_mem_q_b), .data_in_2(fc_g2_mem_q_b), .sel(MAC_layer), .data_out(MAC_in_para_5));
-mux3to1 para_mux_3to1_6(.data_in_0(conv1_k_g0_mem_q_a), .data_in_1(conv2_k_g3_mem_q_a), .data_in_2(fc_g3_mem_q_a), .sel(MAC_layer), .data_out(MAC_in_para_6));
-mux3to1 para_mux_3to1_7(.data_in_0(conv1_k_g0_mem_q_b), .data_in_1(conv2_k_g3_mem_q_b), .data_in_2(fc_g3_mem_q_b), .sel(MAC_layer), .data_out(MAC_in_para_7));
-mux3to1 para_mux_3to1_8(.data_in_0(conv1_k_g1_mem_q_a), .data_in_1(conv2_k_g4_mem_q_a), .data_in_2(fc_g4_mem_q_a), .sel(MAC_layer), .data_out(MAC_in_para_8));
-mux3to1 para_mux_3to1_9(.data_in_0(conv1_k_g1_mem_q_b), .data_in_1(conv2_k_g4_mem_q_b), .data_in_2(fc_g4_mem_q_b), .sel(MAC_layer), .data_out(MAC_in_para_9));
-mux3to1 para_mux_3to1_10(.data_in_0(conv1_k_g2_mem_q_a), .data_in_1(conv2_k_g5_mem_q_a), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_10));
-mux3to1 para_mux_3to1_11(.data_in_0(conv1_k_g2_mem_q_b), .data_in_1(conv2_k_g5_mem_q_b), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_11));
-mux3to1 para_mux_3to1_12(.data_in_0(conv1_k_g0_mem_q_a), .data_in_1(conv2_k_g6_mem_q_a), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_12));
-mux3to1 para_mux_3to1_13(.data_in_0(conv1_k_g0_mem_q_b), .data_in_1(conv2_k_g6_mem_q_b), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_13));
-mux3to1 para_mux_3to1_14(.data_in_0(conv1_k_g1_mem_q_a), .data_in_1(conv2_k_g7_mem_q_a), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_14));
-mux3to1 para_mux_3to1_15(.data_in_0(conv1_k_g1_mem_q_b), .data_in_1(conv2_k_g7_mem_q_b), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_15));
-mux3to1 para_mux_3to1_16(.data_in_0(conv1_k_g2_mem_q_a), .data_in_1(conv2_k_g8_mem_q_a), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_16));
-mux3to1 para_mux_3to1_17(.data_in_0(conv1_k_g2_mem_q_b), .data_in_1(conv2_k_g8_mem_q_b), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_17));
-mux3to1 para_mux_3to1_18(.data_in_0(conv1_k_g0_mem_q_a), .data_in_1(conv2_k_g9_mem_q_a), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_18));
-mux3to1 para_mux_3to1_19(.data_in_0(conv1_k_g0_mem_q_b), .data_in_1(conv2_k_g9_mem_q_b), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_19));
-mux3to1 para_mux_3to1_20(.data_in_0(conv1_k_g1_mem_q_a), .data_in_1(conv2_k_g10_mem_q_a), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_20));
-mux3to1 para_mux_3to1_21(.data_in_0(conv1_k_g1_mem_q_b), .data_in_1(conv2_k_g10_mem_q_b), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_21));
-mux3to1 para_mux_3to1_22(.data_in_0(conv1_k_g2_mem_q_a), .data_in_1(conv2_k_g11_mem_q_a), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_22));
-mux3to1 para_mux_3to1_23(.data_in_0(conv1_k_g2_mem_q_b), .data_in_1(conv2_k_g11_mem_q_b), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_23));
+mux_3to1 para_mux_3to1_0(.data_in_0(conv1_k_g0_mem_q_a), .data_in_1(conv2_k_g0_mem_q_a), .data_in_2(fc_g0_mem_q_a), .sel(MAC_layer), .data_out(MAC_in_para_0));
+mux_3to1 para_mux_3to1_1(.data_in_0(conv1_k_g0_mem_q_b), .data_in_1(conv2_k_g0_mem_q_b), .data_in_2(fc_g0_mem_q_b), .sel(MAC_layer), .data_out(MAC_in_para_1));
+mux_3to1 para_mux_3to1_2(.data_in_0(conv1_k_g1_mem_q_a), .data_in_1(conv2_k_g1_mem_q_a), .data_in_2(fc_g1_mem_q_a), .sel(MAC_layer), .data_out(MAC_in_para_2));
+mux_3to1 para_mux_3to1_3(.data_in_0(conv1_k_g1_mem_q_b), .data_in_1(conv2_k_g1_mem_q_b), .data_in_2(fc_g1_mem_q_b), .sel(MAC_layer), .data_out(MAC_in_para_3));
+mux_3to1 para_mux_3to1_4(.data_in_0(conv1_k_g2_mem_q_a), .data_in_1(conv2_k_g2_mem_q_a), .data_in_2(fc_g2_mem_q_a), .sel(MAC_layer), .data_out(MAC_in_para_4));
+mux_3to1 para_mux_3to1_5(.data_in_0(conv1_k_g2_mem_q_b), .data_in_1(conv2_k_g2_mem_q_b), .data_in_2(fc_g2_mem_q_b), .sel(MAC_layer), .data_out(MAC_in_para_5));
+mux_3to1 para_mux_3to1_6(.data_in_0(conv1_k_g0_mem_q_a), .data_in_1(conv2_k_g3_mem_q_a), .data_in_2(fc_g3_mem_q_a), .sel(MAC_layer), .data_out(MAC_in_para_6));
+mux_3to1 para_mux_3to1_7(.data_in_0(conv1_k_g0_mem_q_b), .data_in_1(conv2_k_g3_mem_q_b), .data_in_2(fc_g3_mem_q_b), .sel(MAC_layer), .data_out(MAC_in_para_7));
+mux_3to1 para_mux_3to1_8(.data_in_0(conv1_k_g1_mem_q_a), .data_in_1(conv2_k_g4_mem_q_a), .data_in_2(fc_g4_mem_q_a), .sel(MAC_layer), .data_out(MAC_in_para_8));
+mux_3to1 para_mux_3to1_9(.data_in_0(conv1_k_g1_mem_q_b), .data_in_1(conv2_k_g4_mem_q_b), .data_in_2(fc_g4_mem_q_b), .sel(MAC_layer), .data_out(MAC_in_para_9));
+mux_3to1 para_mux_3to1_10(.data_in_0(conv1_k_g2_mem_q_a), .data_in_1(conv2_k_g5_mem_q_a), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_10));
+mux_3to1 para_mux_3to1_11(.data_in_0(conv1_k_g2_mem_q_b), .data_in_1(conv2_k_g5_mem_q_b), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_11));
+mux_3to1 para_mux_3to1_12(.data_in_0(conv1_k_g0_mem_q_a), .data_in_1(conv2_k_g6_mem_q_a), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_12));
+mux_3to1 para_mux_3to1_13(.data_in_0(conv1_k_g0_mem_q_b), .data_in_1(conv2_k_g6_mem_q_b), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_13));
+mux_3to1 para_mux_3to1_14(.data_in_0(conv1_k_g1_mem_q_a), .data_in_1(conv2_k_g7_mem_q_a), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_14));
+mux_3to1 para_mux_3to1_15(.data_in_0(conv1_k_g1_mem_q_b), .data_in_1(conv2_k_g7_mem_q_b), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_15));
+mux_3to1 para_mux_3to1_16(.data_in_0(conv1_k_g2_mem_q_a), .data_in_1(conv2_k_g8_mem_q_a), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_16));
+mux_3to1 para_mux_3to1_17(.data_in_0(conv1_k_g2_mem_q_b), .data_in_1(conv2_k_g8_mem_q_b), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_17));
+mux_3to1 para_mux_3to1_18(.data_in_0(conv1_k_g0_mem_q_a), .data_in_1(conv2_k_g9_mem_q_a), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_18));
+mux_3to1 para_mux_3to1_19(.data_in_0(conv1_k_g0_mem_q_b), .data_in_1(conv2_k_g9_mem_q_b), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_19));
+mux_3to1 para_mux_3to1_20(.data_in_0(conv1_k_g1_mem_q_a), .data_in_1(conv2_k_g10_mem_q_a), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_20));
+mux_3to1 para_mux_3to1_21(.data_in_0(conv1_k_g1_mem_q_b), .data_in_1(conv2_k_g10_mem_q_b), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_21));
+mux_3to1 para_mux_3to1_22(.data_in_0(conv1_k_g2_mem_q_a), .data_in_1(conv2_k_g11_mem_q_a), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_22));
+mux_3to1 para_mux_3to1_23(.data_in_0(conv1_k_g2_mem_q_b), .data_in_1(conv2_k_g11_mem_q_b), .data_in_2(16'b0000000000000000), .sel(MAC_layer), .data_out(MAC_in_para_23));
 
 //bias muxes
-mux3to1 bias_mux_3to1_0(.data_in_0(16'b0000000000000011), .data_in_1(16'b0000000000000011), .data_in_2(16'b0000000000000011), .sel(conv2_count), .data_out(conv2_bias_0));
-mux3to1 bias_mux_3to1_1(.data_in_0(16'b1111111111111110), .data_in_1(16'b0000000000000000), .data_in_2(16'b0000000000000010), .sel(conv2_count), .data_out(conv2_bias_1));
-mux3to1 bias_mux_3to1_2(.data_in_0(16'b0000000000000001), .data_in_1(16'b0000000000000001), .data_in_2(16'b1111111111111111), .sel(conv2_count), .data_out(conv2_bias_2));
-mux3to1 bias_mux_3to1_3(.data_in_0(16'b0000000000000011), .data_in_1(16'b0000000000000010), .data_in_2(16'b1111111111111111), .sel(conv2_count), .data_out(conv2_bias_3));
+mux_3to1 #(32) bias_mux_3to1_0(.data_in_0(32'b00000000000000000000000000000011), .data_in_1(32'b00000000000000000000000000000011), .data_in_2(32'b00000000000000000000000000000011), .sel(conv2_count), .data_out(conv2_bias_0));
+mux_3to1 #(32) bias_mux_3to1_1(.data_in_0(32'b11111111111111111111111111111110), .data_in_1(32'b00000000000000000000000000000000), .data_in_2(32'b00000000000000000000000000000010), .sel(conv2_count), .data_out(conv2_bias_1));
+mux_3to1 #(32) bias_mux_3to1_2(.data_in_0(32'b00000000000000000000000000000001), .data_in_1(32'b00000000000000000000000000000001), .data_in_2(32'b11111111111111111111111111111111), .sel(conv2_count), .data_out(conv2_bias_2));
+mux_3to1 #(32) bias_mux_3to1_3(.data_in_0(32'b00000000000000000000000000000011), .data_in_1(32'b00000000000000000000000000000010), .data_in_2(32'b11111111111111111111111111111111), .sel(conv2_count), .data_out(conv2_bias_3));
 
 //24 MAC modules
 MAC MAC_0(.clk(clk), .enable(MAC_enable), .reset(rMAC), .MAC_layer(MAC_layer), .A(MAC_in_data_0), .B(MAC_in_para_0), .out(MAC_out_0));
@@ -518,20 +518,20 @@ MAC MAC_23(.clk(clk), .enable(MAC_enable), .reset(rMAC), .MAC_layer(MAC_layer), 
 
 //The after MAC does all subsequent operations needed after the MAC depending on the layer. ReLU, combination, biases, shifting, etc.
 after_MAC after_MAC_0(.MAC_layer(MAC_layer), .MAC_out_0(MAC_out_0), .MAC_out_1(MAC_out_1), .MAC_out_2(MAC_out_2), .MAC_out_3(MAC_out_3), 
-                      .MAC_out_4(MAC_out_4), .MAC_out_5(MAC_out_5), .bias_0(16'b1111111111110100), .bias_1(16'b1111111111110010), .bias_2(16'b1111111111110111), 
-                      .bias_3(16'b1111111111111100), .bias_4(16'b1111111111111100), .bias_5(16'b0000000000000100), .conv2_bias(conv2_bias_0), .out_0(after_MAC_0_out_0), 
+                      .MAC_out_4(MAC_out_4), .MAC_out_5(MAC_out_5), .bias_0(32'b11111111111111111111111111110100), .bias_1(32'b11111111111111111111111111110010), .bias_2(32'b11111111111111111111111111110111),
+                      .bias_3(32'b11111111111111111111111111111100), .bias_4(32'b11111111111111111111111111111100), .bias_5(32'b00000000000000000000000000000100), .conv2_bias(conv2_bias_0), .out_0(after_MAC_0_out_0),
                       .out_1(after_MAC_0_out_1), .out_2(after_MAC_0_out_2), .out_3(after_MAC_0_out_3), .out_4(after_MAC_0_out_4), .out_5(after_MAC_0_out_5), .out_conv2(out_conv2_0));
 after_MAC after_MAC_1(.MAC_layer(MAC_layer), .MAC_out_0(MAC_out_6), .MAC_out_1(MAC_out_7), .MAC_out_2(MAC_out_8), .MAC_out_3(MAC_out_9), 
-                      .MAC_out_4(MAC_out_10), .MAC_out_5(MAC_out_11), .bias_0(16'b1111111111110100), .bias_1(16'b1111111111110010), .bias_2(16'b1111111111110111), 
-                      .bias_3(16'b1111111111111100), .bias_4(16'b1111111111111100), .bias_5(16'b0000000000000100), .conv2_bias(conv2_bias_1), .out_0(after_MAC_1_out_0), 
+                      .MAC_out_4(MAC_out_10), .MAC_out_5(MAC_out_11), .bias_0(32'b11111111111111111111111111110100), .bias_1(32'b11111111111111111111111111110010), .bias_2(32'b11111111111111111111111111110111),
+                      .bias_3(32'b11111111111111111111111111111100), .bias_4(32'b11111111111111111111111111111100), .bias_5(32'b00000000000000000000000000000100), .conv2_bias(conv2_bias_1), .out_0(after_MAC_1_out_0),
                       .out_1(after_MAC_1_out_1), .out_2(after_MAC_1_out_2), .out_3(after_MAC_1_out_3), .out_4(conv1_mem_4_0_data_b), .out_5(conv1_mem_5_0_data_b), .out_conv2(out_conv2_1));
 after_MAC after_MAC_2(.MAC_layer(MAC_layer), .MAC_out_0(MAC_out_12), .MAC_out_1(MAC_out_13), .MAC_out_2(MAC_out_14), .MAC_out_3(MAC_out_15), 
-                      .MAC_out_4(MAC_out_16), .MAC_out_5(MAC_out_17), .bias_0(16'b1111111111110100), .bias_1(16'b1111111111110010), .bias_2(16'b1111111111110111), 
-                      .bias_3(16'b1111111111111100), .bias_4(16'b1111111111111100), .bias_5(16'b0000000000000100), .conv2_bias(conv2_bias_2), .out_0(conv1_mem_0_1_data_a), 
+                      .MAC_out_4(MAC_out_16), .MAC_out_5(MAC_out_17), .bias_0(32'b11111111111111111111111111110100), .bias_1(32'b11111111111111111111111111110010), .bias_2(32'b11111111111111111111111111110111),
+                      .bias_3(32'b11111111111111111111111111111100), .bias_4(32'b11111111111111111111111111111100), .bias_5(32'b00000000000000000000000000000100), .conv2_bias(conv2_bias_2), .out_0(conv1_mem_0_1_data_a),
                       .out_1(conv1_mem_1_1_data_a), .out_2(conv1_mem_2_1_data_a), .out_3(conv1_mem_3_1_data_a), .out_4(conv1_mem_4_1_data_a), .out_5(conv1_mem_5_1_data_a), .out_conv2(out_conv2_2));
 after_MAC after_MAC_3(.MAC_layer(MAC_layer), .MAC_out_0(MAC_out_18), .MAC_out_1(MAC_out_19), .MAC_out_2(MAC_out_20), .MAC_out_3(MAC_out_21), 
-                      .MAC_out_4(MAC_out_22), .MAC_out_5(MAC_out_23), .bias_0(16'b1111111111110100), .bias_1(16'b1111111111110010), .bias_2(16'b1111111111110111), 
-                      .bias_3(16'b1111111111111100), .bias_4(16'b1111111111111100), .bias_5(16'b0000000000000100), .conv2_bias(conv2_bias_3), .out_0(conv1_mem_0_1_data_b), 
+                      .MAC_out_4(MAC_out_22), .MAC_out_5(MAC_out_23), .bias_0(32'b11111111111111111111111111110100), .bias_1(32'b11111111111111111111111111110010), .bias_2(32'b11111111111111111111111111110111),
+                      .bias_3(32'b11111111111111111111111111111100), .bias_4(32'b11111111111111111111111111111100), .bias_5(32'b00000000000000000000000000000100), .conv2_bias(conv2_bias_3), .out_0(conv1_mem_0_1_data_b),
                       .out_1(conv1_mem_1_1_data_b), .out_2(conv1_mem_2_1_data_b), .out_3(conv1_mem_3_1_data_b), .out_4(conv1_mem_4_1_data_b), .out_5(conv1_mem_5_1_data_b), .out_conv2(out_conv2_3));
 
 logic signed [15:0] result_0, result_1, result_2, result_3, result_4, result_5, result_6, result_7, result_8, result_9;
