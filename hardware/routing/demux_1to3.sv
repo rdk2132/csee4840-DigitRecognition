@@ -4,10 +4,26 @@ module demux_1to3 (input logic [15:0] data_in,
 
     always_comb begin
         case (sel)
-            2'd0: data_out_0 = data_in;
-            2'd1: data_out_1 = data_in;
-            2'd2: data_out_2 = data_in;
-            default: data_out_0 = 16'h0000;
+            2'd0: begin
+                data_out_0 = data_in;
+                data_out_1 = 0;
+                data_out_2 = 0;
+            end
+            2'd1: begin
+                data_out_0 = 0;
+                data_out_1 = data_in;
+                data_out_2 = 0;
+            end
+            2'd2: begin 
+                data_out_0 = 0;
+                data_out_1 = 0;
+                data_out_2 = data_in;
+            end
+            default: begin
+                data_out_0 = 16'h0000;
+                data_out_1 = 16'h0000;
+                data_out_2 = 16'h0000;
+            end
         endcase
     end
 endmodule
