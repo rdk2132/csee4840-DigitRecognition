@@ -12,23 +12,30 @@ module conv1_mem_write (input logic clk, reset, enable,
             addr1 <= 10'b0010010000;
             clk_counter <= 5'b00000;
             delay <= 4'b0000;
-            done <= 0;
         end
-        else if (enable == 1'b1 && done == 1'b0 && delay == 4'b0001) begin
-            if (clk_counter == 5'b11000) begin
-                addr0 <= addr0 + 10'b0000000001;
-                addr1 <= addr1 + 10'b0000000001;
-                clk_counter <= 5'b00000;
+        else if (enable == 1'b1 && done == 1'b0) begin
+            if(delay == 4'b0001) begin
+                if (clk_counter == 5'b11000) begin
+                    addr0 <= addr0 + 10'b0000000001;
+                    addr1 <= addr1 + 10'b0000000001;
+                    clk_counter <= 5'b00000;
+                end
+                else begin
+                    clk_counter <= clk_counter + 5'b00001;
+                end
             end
             else begin
-                clk_counter <= clk_counter + 5'b00001;
+                delay <= delay + 4'b0001;
             end
         end
-        else if(addr1 == 10'b1000111111) begin
-            done <= 1'b1;
+    end
+
+        always_comb begin
+        if(addr1 == 10'b1000111111) begin
+            done = 1'b1;
         end
-        else if (enable == 1'b1) begin
-            delay <= delay + 4'b0001;
+        else begin
+            done = 1'b0;
         end
     end
 endmodule

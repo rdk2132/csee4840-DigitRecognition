@@ -11,17 +11,24 @@ module conv2_k_mem_read (input logic clk, reset, enable,
             addr0 <= 8'b00000000;
             addr1 <= 8'b01001011;
             delay <= 4'b0000;
-            done <= 0;
         end
-        else if (enable == 1'b1 && done == 1'b0 && delay == 4'b0000) begin
-            addr0 <= addr0 + 8'b00000001;
-            addr1 <= addr1 + 8'b00000001;
+        else if (enable == 1'b1 && done == 1'b0) begin
+            if(delay == 4'b0000) begin
+                addr0 <= addr0 + 8'b00000001;
+                addr1 <= addr1 + 8'b00000001;
+            end
+            else begin
+                delay <= delay + 4'b0001;
+            end
         end
-        else if(addr1 == 8'b10010101) begin
-            done <= 1'b1;
+    end
+
+    always_comb begin
+        if(addr1 == 8'b100101011) begin
+            done = 1'b1;
         end
-        else if (enable == 1'b1)begin
-            delay <= delay + 4'b0001;
+        else begin
+            done = 1'b0;
         end
     end
 endmodule

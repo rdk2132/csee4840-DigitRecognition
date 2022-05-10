@@ -13,29 +13,36 @@ module conv1_mem_read (input logic clk, reset, enable,
             addr3 <= 10'b0000011001;
             count <= 4'b0000;
             delay <= 4'b0000;
-            done <= 1'b0;
         end
-        else if (enable == 1'b1 && done == 1'b0 && delay == 4'b0000) begin
-            if(count == 4'b1011) begin
-                count <= 4'b0000;
-                addr0 <= addr0 + 10'b0000011010;
-                addr1 <= addr1 + 10'b0000011010;
-                addr2 <= addr2 + 10'b0000011010;
-                addr3 <= addr3 + 10'b0000011010;
+        else if (enable == 1'b1 && done == 1'b0) begin
+            if(delay == 4'b0000) begin
+                if(count == 4'b1011) begin
+                    count <= 4'b0000;
+                    addr0 <= addr0 + 10'b0000011010;
+                    addr1 <= addr1 + 10'b0000011010;
+                    addr2 <= addr2 + 10'b0000011010;
+                    addr3 <= addr3 + 10'b0000011010;
+                end
+                else begin    
+                    addr0 <= addr0 + 10'b0000000010;
+                    addr1 <= addr1 + 10'b0000000010;
+                    addr2 <= addr2 + 10'b0000000010;
+                    addr3 <= addr3 + 10'b0000000010;
+                    count <= count + 4'b0001;
+                end
             end
-            else begin    
-                addr0 <= addr0 + 10'b0000000010;
-                addr1 <= addr1 + 10'b0000000010;
-                addr2 <= addr2 + 10'b0000000010;
-                addr3 <= addr3 + 10'b0000000010;
-                count <= count + 4'b0001;
+            else begin
+                delay <= delay + 4'b0001;
             end
         end
-        else if(addr3 == 10'b1000111111) begin
-            done <= 1'b1;
+    end
+
+    always_comb begin
+        if(addr3 == 10'b1000111111) begin
+            done = 1'b1;
         end
-        else if (enable == 1'b1) begin
-            delay <= delay + 4'b0001;
+        else begin
+            done = 1'b0;
         end
     end
 endmodule
