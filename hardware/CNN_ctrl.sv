@@ -84,7 +84,7 @@ module CNN_ctrl(input logic reset, img_mem_read_done, conv1_mem_write_done, conv
             if(img_mem_read_done == 1'b1 && conv1_mem_write_done == 1'b1 && conv1_k_mem_read_done == 1'b1) begin
                 return_ctrl = 8'b00000010;
             end
-            else return ctrl = 0;
+            else return_ctrl = 0;
         end
         else if(ctrl == 8'b00000011) begin //pool1
             img_load = 1'b0;
