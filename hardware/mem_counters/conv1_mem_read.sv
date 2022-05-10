@@ -13,6 +13,7 @@ module conv1_mem_read (input logic clk, reset, enable,
             addr3 <= 10'b0000011001;
             count <= 4'b0000;
             delay <= 4'b0000;
+            done <= 1'b0;
         end
         else if (enable == 1'b1 && done == 1'b0 && delay == 4'b0000) begin
             if(count == 4'b1011) begin
@@ -30,16 +31,11 @@ module conv1_mem_read (input logic clk, reset, enable,
                 count <= count + 4'b0001;
             end
         end
-        else begin
+        else if (enable == 1'b1) begin
             delay <= delay + 4'b0001;
         end
-    end
-    
-    always_comb begin
-        //stop when addr3 == 24^2 - 1, i.e. we have processed the entire image
         if(addr3 == 10'b1000111111) begin
-            done = 1'b1;
+            done <= 1'b1;
         end
     end
-
 endmodule

@@ -18,6 +18,10 @@ module img_mem_read (input logic clk, reset, enable,
             addr3 <= 10'b0111111000;
             i_count <= 5'b00000;
             delay <= 4'b0000;
+            done <= 0;
+        end
+        else if(addr3 == 10'b1100001111) begin
+            done <= 1'b1;
         end
         else if (enable == 1'b1 && done == 1'b0 && delay == 4'b0000) begin
             if (i_count == 5'b10111 && rowcount == 3'b100 && columncount == 3'b100) begin
@@ -58,15 +62,8 @@ module img_mem_read (input logic clk, reset, enable,
                 columncount <= columncount + 3'b001;
             end
         end
-        else begin
+        else if(enable == 1'b1) begin
             delay <= delay + 4'b0001;
         end
     end
-
-    always_comb begin
-        if(addr3 == 10'b1100001111) begin
-            done = 1'b1;
-        end
-    end
-
 endmodule
