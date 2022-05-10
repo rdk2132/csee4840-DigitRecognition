@@ -1,26 +1,26 @@
 module MAC (input logic clk, enable, reset, 
 			input logic [1:0] MAC_layer, 
 			input logic signed [15:0] A, B,  
-			output logic signed [31:0] out);
+			output reg signed [31:0] out);
 	
-	reg signed [31:0] MAC_out;
 	reg [7:0] count;
 
 	always_ff @(posedge clk or posedge reset) begin
 		if(reset == 1'b1) begin
-			MAC_out <= 32'b00000000000000000000000000000000;
+			out <= 32'b00000000000000000000000000000000;
 			count <= 8'b00000000;
 		end
 		else if (enable == 1'b1) begin
-			MAC_out <= MAC_out + (A * B); //does the MAC thing
+			out <= MAC_out + (A * B); //does the MAC thing
 			count <= count + 1'b1;
 		end
-		if((count == 8'b00011001 && (MAC_layer == 2'b00 || MAC_layer == 2'b01)) || (count == 8'b11000000 && MAC_layer == 2'b10)) begin //if finished with a conv(count = 25) or one of the FC(count = 192) outputs the result
-			out <= MAC_out;
-			MAC_out <= 32'b00000000000000000000000000000000;
+		else if((count == 8'b00011001 && (MAC_layer == 2'b00 || MAC_layer == 2'b01)) || (count == 8'b11000000 && MAC_layer == 2'b10)) begin //if finished with a conv(count = 25) or one of the FC(count = 192) outputs the result
+			out <= 32'b00000000000000000000000000000000;
 			count <= 8'b00000000;
 		end
 	end
+
+
 endmodule
 
 /*
