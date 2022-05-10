@@ -4,7 +4,7 @@ module P1_mem_write (input logic clk, reset, enable,
                         output logic done);
 
     logic [3:0] delay;
-    reg done;
+
     always_ff @(posedge clk or posedge reset) begin
         if (reset == 1'b1) begin
             addr0 <= 8'b00000000;
@@ -23,9 +23,12 @@ module P1_mem_write (input logic clk, reset, enable,
     end
     
     always_comb begin
-        //stop when addr1 == 12^2 - 1, i.e. we have processed the entire image
-        if(addr1 == 8'b10001111) done = 1'b1;
-        else done = 1'b0;
+        if(addr1 == 8'b10001111) begin
+            done = 1'b1;
+        end
+        else begin
+            done = 1'b0;
+        end
     end
 
 endmodule
