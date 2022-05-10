@@ -31,7 +31,7 @@ module conv1_mem_write (input logic clk, reset, enable,
     end
 
         always_comb begin
-        if(addr3 == 9'b100011111) begin
+        if(addr1 == 9'b100011111) begin
             done = 1'b1;
         end
         else begin
