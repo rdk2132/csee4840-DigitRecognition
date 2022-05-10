@@ -18,6 +18,7 @@ module conv1_k_mem_read (input logic clk, reset, enable,
             end
             else begin
                 delay <= delat + 4'b0001;
+            end
         end
     end
 
