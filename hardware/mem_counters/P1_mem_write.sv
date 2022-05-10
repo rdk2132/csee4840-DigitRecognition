@@ -24,8 +24,8 @@ module P1_mem_write (input logic clk, reset, enable,
     
     always_comb begin
         //stop when addr1 == 12^2 - 1, i.e. we have processed the entire image
-        if(addr1 == 8'b10001111) done <= 1'b1;
-        else done <= 1'b0;
+        if(addr1 == 8'b10001111) done = 1'b1;
+        else done = 1'b0;
     end
 
 endmodule
