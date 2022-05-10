@@ -17,7 +17,7 @@ module conv2_k_mem_read (input logic clk, reset, enable,
             addr0 <= addr0 + 8'b00000001;
             addr1 <= addr1 + 8'b00000001;
         end
-        if(addr1 == 8'b10010101) begin
+        else if(addr1 == 8'b10010101) begin
             done <= 1'b1;
         end
         else if (enable == 1'b1)begin
