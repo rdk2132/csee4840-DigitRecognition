@@ -1,0 +1,14 @@
+WIDTH=16;
+DEPTH=6;
+
+ADDRESS_RADIX=HEX;
+DATA_RADIX=HEX;
+
+CONTENT BEGIN
+	0   :   fff4;
+	1   :   fff2;
+	2   :   fff7;
+	3   :   fffc;
+	4   :   fffc;
+	5   :   0004;
+END;
