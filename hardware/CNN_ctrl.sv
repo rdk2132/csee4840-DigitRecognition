@@ -10,6 +10,7 @@ module CNN_ctrl(input logic reset, img_mem_read_done, conv1_mem_write_done, conv
     always_comb begin 
         if (reset == 1'b1 || ctrl == 8'b00000000) begin
             return_ctrl = 8'b00000000;
+            img_load = 1'b0;
             MAC_layer = 2'b00;
             pooling_layer = 1'b0;
             rMAC = 1'b1;
@@ -200,6 +201,7 @@ module CNN_ctrl(input logic reset, img_mem_read_done, conv1_mem_write_done, conv
         end
         else begin
             return_ctrl = 8'b00000000;
+            img_load = 1'b0;
             MAC_layer = 2'b00;
             pooling_layer = 1'b0;
             rMAC = 1'b1;
