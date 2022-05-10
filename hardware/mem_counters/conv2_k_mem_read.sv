@@ -24,7 +24,7 @@ module conv2_k_mem_read (input logic clk, reset, enable,
     end
 
     always_comb begin
-        if(addr1 == 8'b100101011) begin
+        if(addr1 == 8'b10010101) begin
             done = 1'b1;
         end
         else begin

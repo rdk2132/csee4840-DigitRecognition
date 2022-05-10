@@ -8,7 +8,7 @@ module mux_3to1 #(parameter WORD_SIZE = 16)
             2'b00: data_out = data_in_0;
             2'b01: data_out = data_in_1;
             2'b10: data_out = data_in_2;
-            default: data_out = 16'b0000000000000000;
+            default: data_out = 0;
         endcase
     end
 endmodule
