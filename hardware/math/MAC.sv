@@ -13,14 +13,16 @@ module MAC (input logic clk, enable, reset,
 			count <= 8'b00000000;
 		end
 		else if (enable == 1'b1) begin
-			MAC_out <= MAC_out + (A * B); //does the MAC thing
-			out <= 32'b00000000000000000000000000000000;
-			count <= count + 1'b1;
-		end
-		if((count == 8'b00011001 && (MAC_layer == 2'b00 || MAC_layer == 2'b01)) || (count == 8'b11000000 && MAC_layer == 2'b10)) begin //if finished with a conv(count = 25) or one of the FC(count = 192) outputs the result
-			out <= MAC_out;
-			MAC_out <= 32'b00000000000000000000000000000000;
-			count <= 8'b00000000;
+			if((count == 8'b00011001 && (MAC_layer == 2'b00 || MAC_layer == 2'b01)) || (count == 8'b11000000 && MAC_layer == 2'b10)) begin //if finished with a conv(count = 25) or one of the FC(count = 192) outputs the result
+				out <= MAC_out;
+				MAC_out <= 32'b00000000000000000000000000000000;
+				count <= 8'b00000000;
+			end
+			else begin
+				MAC_out <= MAC_out + (A * B); //does the MAC thing
+				out <= 32'b00000000000000000000000000000000;
+				count <= count + 1'b1;
+			end
 		end
 	end
 endmodule
