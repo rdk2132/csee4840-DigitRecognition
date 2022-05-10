@@ -84,7 +84,7 @@ module CNN_ctrl(input logic reset, img_mem_read_done, conv1_mem_write_done, conv
             if(img_mem_read_done == 1'b1 && conv1_mem_write_done == 1'b1 && conv1_k_mem_read_done == 1'b1) begin
                 return_ctrl = 8'b00000010;
             end
-            else return_ctrl = 0;
+            else return_ctrl = 8'b00000001;
         end
         else if(ctrl == 8'b00000011) begin //pool1
             img_load = 1'b0;
@@ -112,7 +112,7 @@ module CNN_ctrl(input logic reset, img_mem_read_done, conv1_mem_write_done, conv
             if(conv1_mem_read_done == 1'b1 && P1_mem_write_done == 1'b1) begin
                 return_ctrl = 8'b00000011;
             end
-            else return_ctrl = 0;
+            else return_ctrl = 8'b00000010;
         end
         else if(ctrl == 8'b00000100) begin //conv2
             img_load = 1'b0;
@@ -140,7 +140,7 @@ module CNN_ctrl(input logic reset, img_mem_read_done, conv1_mem_write_done, conv
             if(P1_mem_read_done  == 1'b1 && conv2_mem_write_done == 1'b1 && conv2_k_mem_read_done == 1'b1) begin
                 return_ctrl = 8'b00000100;
             end
-            else return_ctrl = 0;
+            else return_ctrl = 8'b00000011;
         end
         else if(ctrl == 8'b00000101) begin //pool2
             img_load = 1'b0;
@@ -168,7 +168,7 @@ module CNN_ctrl(input logic reset, img_mem_read_done, conv1_mem_write_done, conv
             if(conv2_mem_read_done == 1'b1 && P2_mem_write_done == 1'b1) begin
                 return_ctrl = 8'b00000101;
             end
-            else return_ctrl = 0;
+            else return_ctrl = 8'b00000100;
         end
         else if(ctrl == 8'b00000110) begin //FC
             img_load = 1'b0;
@@ -196,7 +196,7 @@ module CNN_ctrl(input logic reset, img_mem_read_done, conv1_mem_write_done, conv
             if(P2_mem_read_done == 1'b1 && fc_mem_read_done == 1'b1) begin
                 return_ctrl = 8'b00000110;
             end
-            else return_ctrl = 0;
+            else return_ctrl = 8'b00000101;
         end
 
     end
