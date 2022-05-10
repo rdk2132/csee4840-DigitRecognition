@@ -39,11 +39,11 @@ module conv2_mem_read (input logic clk, reset, enable,
     end
 
     always_comb begin
-        if( addr3 <= 6'b111111) begin 
-            done <= 1'b1;
+        if( addr3 == 6'b111111) begin 
+            done = 1'b1;
         end
         else begin 
-            done <= 1'b0;
+            done = 1'b0;
         end
     end 
 endmodule
