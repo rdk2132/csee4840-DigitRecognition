@@ -81,8 +81,8 @@ logic [8:0] conv1_addr0_write, conv1_addr1_write, conv1_addr0_read, conv1_addr1_
 
 conv1_mem_write conv1_mem_write(.clk(clk), .reset(conv1_mem_write_reset), .enable(Conv1_layer), .addr0(conv1_addr0_write), .addr1(conv1_addr1_write), .done(conv1_mem_write_done));
 conv1_mem_read conv1_mem_read(.clk(clk), .reset(conv1_mem_read_reset), .enable(P1_layer), .addr0(conv1_addr0_read), .addr1(conv1_addr1_read), .addr2(conv1_addr2_read), .addr3(conv1_addr3_read), .done(conv1_mem_read_done));
-mux_2to1 #(10) conv1_mem_addr_mux_0(.data_in_0(conv1_addr0_write), .data_in_1(conv1_addr0_read), .sel(P1_layer), .data_out(conv1_addr0w0r));
-mux_2to1 #(10) conv1_mem_addr_mux_1(.data_in_0(conv1_addr1_write), .data_in_1(conv1_addr2_read), .sel(P1_layer), .data_out(conv1_addr1w2r));
+mux_2to1 #(9) conv1_mem_addr_mux_0(.data_in_0(conv1_addr0_write), .data_in_1(conv1_addr0_read), .sel(P1_layer), .data_out(conv1_addr0w0r));
+mux_2to1 #(9) conv1_mem_addr_mux_1(.data_in_0(conv1_addr1_write), .data_in_1(conv1_addr2_read), .sel(P1_layer), .data_out(conv1_addr1w2r));
 
 //Conv1 output image 0. Each stores half of the image to allow for 8 accesses. _0 _2 and _1 _3 are redundant
 conv1_mem conv1_mem_0_0(.address_a(conv1_addr0w0r), .address_b(conv1_addr1_read), .clock(clk), .data_a(conv1_mem_0_0_data_a), .data_b(conv1_mem_0_0_data_b), .rden_a(P1_layer), .rden_b(P1_layer), .wren_a(Conv1_layer), .wren_b(Conv1_layer), .q_a(conv1_mem_0_0_q_a), .q_b(conv1_mem_0_0_q_b));
@@ -594,13 +594,13 @@ mux_2to1 pooling_mux_3_a1(.data_in_0(conv1_mem_1_2_q_b), .data_in_1(conv2_mem_3_
 mux_2to1 pooling_mux_3_b0(.data_in_0(conv1_mem_1_3_q_a), .data_in_1(conv2_mem_3_1_q_a), .sel(pooling_layer), .data_out(pooling_3_b0));
 mux_2to1 pooling_mux_3_b1(.data_in_0(conv1_mem_1_3_q_b), .data_in_1(conv2_mem_3_1_q_b), .sel(pooling_layer), .data_out(pooling_3_b1));
 mux_2to1 pooling_mux_4_a0(.data_in_0(conv1_mem_2_0_q_a), .data_in_1(conv2_mem_4_0_q_a), .sel(pooling_layer), .data_out(pooling_4_a0));
-mux_2to1 pooling_mux_4_a1(.data_in_0(conv1_mem_2_0_q_a), .data_in_1(conv2_mem_4_0_q_b), .sel(pooling_layer), .data_out(pooling_4_a1));
+mux_2to1 pooling_mux_4_a1(.data_in_0(conv1_mem_2_0_q_b), .data_in_1(conv2_mem_4_0_q_b), .sel(pooling_layer), .data_out(pooling_4_a1));
 mux_2to1 pooling_mux_4_b0(.data_in_0(conv1_mem_2_1_q_a), .data_in_1(conv2_mem_4_1_q_a), .sel(pooling_layer), .data_out(pooling_4_b0));
-mux_2to1 pooling_mux_4_b1(.data_in_0(conv1_mem_2_1_q_a), .data_in_1(conv2_mem_4_1_q_b), .sel(pooling_layer), .data_out(pooling_4_b1));
+mux_2to1 pooling_mux_4_b1(.data_in_0(conv1_mem_2_1_q_b), .data_in_1(conv2_mem_4_1_q_b), .sel(pooling_layer), .data_out(pooling_4_b1));
 mux_2to1 pooling_mux_5_a0(.data_in_0(conv1_mem_2_2_q_a), .data_in_1(conv2_mem_5_0_q_a), .sel(pooling_layer), .data_out(pooling_5_a0));
-mux_2to1 pooling_mux_5_a1(.data_in_0(conv1_mem_2_2_q_a), .data_in_1(conv2_mem_5_0_q_b), .sel(pooling_layer), .data_out(pooling_5_a1));
+mux_2to1 pooling_mux_5_a1(.data_in_0(conv1_mem_2_2_q_b), .data_in_1(conv2_mem_5_0_q_b), .sel(pooling_layer), .data_out(pooling_5_a1));
 mux_2to1 pooling_mux_5_b0(.data_in_0(conv1_mem_2_3_q_a), .data_in_1(conv2_mem_5_1_q_a), .sel(pooling_layer), .data_out(pooling_5_b0));
-mux_2to1 pooling_mux_5_b1(.data_in_0(conv1_mem_2_3_q_a), .data_in_1(conv2_mem_5_1_q_b), .sel(pooling_layer), .data_out(pooling_5_b1));
+mux_2to1 pooling_mux_5_b1(.data_in_0(conv1_mem_2_3_q_b), .data_in_1(conv2_mem_5_1_q_b), .sel(pooling_layer), .data_out(pooling_5_b1));
 mux_2to1 pooling_mux_6_a0(.data_in_0(conv1_mem_3_0_q_a), .data_in_1(conv2_mem_6_0_q_a), .sel(pooling_layer), .data_out(pooling_6_a0));
 mux_2to1 pooling_mux_6_a1(.data_in_0(conv1_mem_3_0_q_b), .data_in_1(conv2_mem_6_0_q_b), .sel(pooling_layer), .data_out(pooling_6_a1));
 mux_2to1 pooling_mux_6_b0(.data_in_0(conv1_mem_3_1_q_a), .data_in_1(conv2_mem_6_1_q_a), .sel(pooling_layer), .data_out(pooling_6_b0));
