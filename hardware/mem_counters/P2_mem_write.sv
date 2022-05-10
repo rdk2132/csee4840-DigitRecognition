@@ -21,7 +21,7 @@ module P2_mem_write (input logic clk, reset, enable,
     end
 
     always_comb begin
-        if(addr0 = 4'b1111) begin 
+        if(addr0 == 4'b1111) begin 
             done = 1'b1;
         end
         else begin 
