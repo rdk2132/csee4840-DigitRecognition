@@ -49,7 +49,7 @@ module P1_mem_read (input logic clk, reset, enable,
         end
     end
     always_comb begin
-        if(addr1 == 8'b10001111) begin
+        if(addr0 == 8'b10001111) begin
             done = 1'b1;
         end
         else begin
