@@ -22,11 +22,11 @@ module P2_mem_read (input logic clk, reset, enable,
                 addr0 <= addr0 + 4'b0001;
             end
         end
+        else if(count == 4'b1011 && addr0 == 4'b1111) begin
+            done = 1'b1;
+        end
         else if (enable == 1'b1) begin
             delay <= delay + 4'b0001;
-        end
-        if(count == 4'b1011 && addr0 == 4'b1111) begin
-            done = 1'b1;
         end
     end
 

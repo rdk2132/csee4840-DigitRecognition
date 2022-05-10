@@ -43,11 +43,11 @@ module P1_mem_read (input logic clk, reset, enable,
                 columncount <= columncount + 3'b001;
             end
         end
+        else if(addr0 == 8'b10001111) begin
+            done <= 1'b1;
+        end
         else if (enable == 1'b1) begin
             delay <= delay + 4'b0001;
-        end
-        if(addr0 == 8'b10001111) begin
-            done <= 1'b1;
         end
     end
 endmodule
