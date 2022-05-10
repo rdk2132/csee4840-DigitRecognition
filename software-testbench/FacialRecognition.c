@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "Parameters.h"
 #include "Pool.h"
 #include "convolution.h"
@@ -50,13 +51,17 @@ unsigned classify(unsigned char* in_image, struct weights* w) {
 #ifdef USE_FPGA
 unsigned classify_fpga(int fpga_fd, unsigned char* in_image) {
   cnn_arg_t cnn_io;
+  clock_t start, end;
   for (int i = 0; i < IMAGE_SIZE; i++) {
     cnn_io.in_image[i] = ((fixed_t)in_image[i]) * FIXED_SCALE;
   }
-  if (ioctl(fpga_fd, CNN_CLASSIFY, cnn_io) == -1) {
+  start = clock();
+  if (ioctl(fpga_fd, CNN_CLASSIFY, &cnn_io)) {
     perror("ioctl(CNN_CLASSIFY) failed");
     return 0;
   }
+  end = clock();	
+  fprintf(stderr, "time: %f\n\n", (double)(end - start)/CLOCKS_PER_SEC);
 
   fixed_t max = FIXED_MIN;
   unsigned max_index = 0;
@@ -101,6 +106,7 @@ void write_fixed(const char* file, fixed_t* ptr, unsigned count) {
 }
 
 int main() {
+ clock_t start, end;
 #ifdef USE_FPGA
   int fpga_io = open(CNN_IO_FILE,  O_RDWR);
   if (fpga_io == -1) {
@@ -153,7 +159,10 @@ int main() {
 #ifdef USE_FPGA
     unsigned prediction = classify_fpga(fpga_io, &(in_image[i * IMAGE_SIZE + IMAGE_METADATA_OFFSET]));
 #else
+    start = clock();
     unsigned prediction = classify(&(in_image[i * IMAGE_SIZE + IMAGE_METADATA_OFFSET]), &wt);
+    end = clock();	
+    fprintf(stderr, "time: %f\n\n", (double)(end - start)/CLOCKS_PER_SEC);
 #endif
     printf("Actual label: %u\n", in_labels[i + LABEL_METADATA_OFFSET]);
     correct_classifications += (in_labels[i + LABEL_METADATA_OFFSET] == prediction);

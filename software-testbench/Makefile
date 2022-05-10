@@ -8,7 +8,8 @@ LDFLAGS = -lm
 .PHONY: default
 default: FacialRecognition
 
-FacialRecognition:
+FacialRecognition: FacialRecognition.o
+	${CC} ${CFLAGS} FacialRecognition.o ${LDFLAGS} -o FacialRecognition
 
 FacialRecognition.o: Parameters.h Pool.h fully_connected.h convolution.h
 

@@ -40,6 +40,7 @@ static void send_image(fixed_t *image)
     for (i = 0; i < IMAGE_SIZE; i++){
         iowrite16(i, INPUT_ADDR_REG(dev.virtbase));
         iowrite16(image[i], INPUT_DATA_REG(dev.virtbase));
+	mdelay(1);
     }
 }
 
@@ -52,11 +53,13 @@ static void control(fixed_t *image) {
   iowrite16(control_in, CONTROL_IN_REG(dev.virtbase));
   do {
     control_out = ioread16(CONTROL_OUT_REG(dev.virtbase));
-  } while (control_out != control_in)
+  } while (control_out != control_in);
+  pr_info("load_image");
 
   send_image(image);
 
   control_in = 2;
+  pr_info("load_image");
   for (; control_in < 7; control_in++) {
     // Send signal to start next layer
     iowrite16(control_in, CONTROL_IN_REG(dev.virtbase));
@@ -64,7 +67,7 @@ static void control(fixed_t *image) {
     // Wait for done signal from hardware
     do {
       control_out = ioread16(CONTROL_OUT_REG(dev.virtbase));
-    } while (control_out != control_in)
+    } while (control_out != control_in);
   }
 }
 
@@ -89,6 +92,7 @@ static long cnn_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
         if (copy_from_user(&in_data, (cnn_arg_t *)arg, sizeof(cnn_arg_t)))
             return -EACCES;
 
+    	pr_info("CNN_CLASSIFY");
         control(in_data.in_image);
         
 	    // Read output
