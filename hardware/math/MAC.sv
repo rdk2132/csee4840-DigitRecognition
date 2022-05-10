@@ -1,5 +1,5 @@
 module MAC (input logic clk, enable, reset, 
-			input logic [2:0] MAC_layer, 
+			input logic [1:0] MAC_layer,
 			input logic signed [15:0] A, B,  
 			output logic signed [31:0] out);
 	
