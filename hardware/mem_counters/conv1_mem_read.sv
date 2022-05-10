@@ -31,11 +31,11 @@ module conv1_mem_read (input logic clk, reset, enable,
                 count <= count + 4'b0001;
             end
         end
+        else if(addr3 == 10'b1000111111) begin
+            done <= 1'b1;
+        end
         else if (enable == 1'b1) begin
             delay <= delay + 4'b0001;
-        end
-        if(addr3 == 10'b1000111111) begin
-            done <= 1'b1;
         end
     end
 endmodule

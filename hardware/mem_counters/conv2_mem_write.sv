@@ -31,11 +31,11 @@ module conv2_mem_write (input logic clk, reset, enable,
                 clk_counter <= clk_counter + 5'b00001;
             end
         end
+        else if(count == 2'b10 && addr0 == 6'b111111) begin
+            done <= 1'b1;
+        end
         else if (enable == 1'b1) begin
             delay <= delay + 4'b0001;
-        end
-        if(count == 2'b10 && addr0 == 6'b111111) begin
-            done <= 1'b1;
         end
     end
 endmodule
