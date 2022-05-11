@@ -1,5 +1,5 @@
 //RAM module modified from quartus template
-module conv1_mem ( input [7:0] address_a, address_b, 
+module p1_mem ( input [7:0] address_a, address_b, 
 				   input clock,
 				   input [15:0] data_a, data_b, 
 				   input wren_a, wren_b, 
