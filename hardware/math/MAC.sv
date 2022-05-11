@@ -20,7 +20,6 @@ module MAC (input logic clk, enable, reset,
 			end
 			else begin
 				MAC_out <= MAC_out + (A * B); //does the MAC thing
-				out <= 32'b00000000000000000000000000000000;
 				count <= count + 1'b1;
 			end
 		end
