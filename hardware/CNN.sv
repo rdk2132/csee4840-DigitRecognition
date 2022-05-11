@@ -49,15 +49,15 @@ CNN_ctrl CNN_ctrl(.*);
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 
 logic signed [15:0] img_mem_0_q_a, img_mem_0_q_b, img_mem_1_q_a, img_mem_1_q_b;
-logic [9:0] img_mem_addr0_read, img_mem_addr0, img_mem_addr1, img_mem_addr2_read, img_mem_addr2, img_mem_addr3;
+logic [9:0] img_mem_addr0_read, img_mem_addr1_read, img_mem_addr2_read, img_mem_addr3_read, img_mem_addrw0r, img_mem_addrw2r;
 
-img_mem_read img_mem_read(.clk(clk), .reset(img_mem_read_reset), .enable(Conv1_layer), .addr0(img_mem_addr0_read), .addr1(img_mem_addr1), .addr2(img_mem_addr2_read), .addr3(img_mem_addr3), .done(img_mem_read_done));
-mux_2to1 #(10) img_mem_addr_mux_0(.data_in_0(img_mem_addr_write), .data_in_1(img_mem_addr0_read), .sel(Conv1_layer), .data_out(img_mem_addr0));
-mux_2to1 #(10) img_mem_addr_mux_1(.data_in_0(img_mem_addr_write), .data_in_1(img_mem_addr2_read), .sel(Conv1_layer), .data_out(img_mem_addr2));
+img_mem_read img_mem_read(.clk(clk), .reset(img_mem_read_reset), .enable(Conv1_layer), .addr0(img_mem_addr0_read), .addr1(img_mem_addr1_read), .addr2(img_mem_addr2_read), .addr3(img_mem_addr3_read), .done(img_mem_read_done));
+mux_2to1 #(10) img_mem_addr_mux_0(.data_in_0(img_mem_addr_write), .data_in_1(img_mem_addr0_read), .sel(Conv1_layer), .data_out(img_mem_addrw0r));
+mux_2to1 #(10) img_mem_addr_mux_1(.data_in_0(img_mem_addr_write), .data_in_1(img_mem_addr2_read), .sel(Conv1_layer), .data_out(img_mem_addrw2r));
 
 //image memory. They are redundant to allow for 4 accesses
-img_mem img_mem_0(.address_a(img_mem_addr0), .address_b(img_mem_addr1), .clock(clk), .data_a(img_data), .data_b(16'b0000000000000000), .wren_a(img_load), .wren_b(1'b0), .q_a(img_mem_0_q_a), .q_b(img_mem_0_q_b));
-img_mem img_mem_1(.address_a(img_mem_addr2), .address_b(img_mem_addr3), .clock(clk), .data_a(img_data), .data_b(16'b0000000000000000), .wren_a(img_load), .wren_b(1'b0), .q_a(img_mem_1_q_a), .q_b(img_mem_1_q_b));
+img_mem img_mem_0(.address_a(img_mem_addrw0r), .address_b(img_mem_addr1_read), .clock(clk), .data_a(img_data), .data_b(16'b0000000000000000), .wren_a(img_load), .wren_b(1'b0), .q_a(img_mem_0_q_a), .q_b(img_mem_0_q_b));
+img_mem img_mem_1(.address_a(img_mem_addrw2r), .address_b(img_mem_addr3_read), .clock(clk), .data_a(img_data), .data_b(16'b0000000000000000), .wren_a(img_load), .wren_b(1'b0), .q_a(img_mem_1_q_a), .q_b(img_mem_1_q_b));
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 //
