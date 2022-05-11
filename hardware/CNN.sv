@@ -127,9 +127,9 @@ logic[5:0] conv1_k_mem_addr0_read, conv1_k_mem_addr1_read;
 conv1_k_mem_read conv1_k_mem_read(.clk(clk), .reset(conv1_k_mem_read_reset), .enable(Conv1_layer), .addr0(conv1_k_mem_addr0_read), .addr1(conv1_k_mem_addr1_read), .done(conv1_k_mem_read_done));
 
 //Memories for conv1 kernels. Each holds 2 25x25 kernels.
-conv1_k_g0_mem conv1_k_g0_mem(.address_a(conv1_k_mem_addr0_read), .address_b(conv1_k_mem_addr1_read), .clock(clk), .rden_a(Conv1_layer), .rden_b(Conv1_layer), .q_a(conv1_k_g0_mem_q_a), .q_b(conv1_k_g0_mem_q_b));
-conv1_k_g1_mem conv1_k_g1_mem(.address_a(conv1_k_mem_addr0_read), .address_b(conv1_k_mem_addr1_read), .clock(clk), .rden_a(Conv1_layer), .rden_b(Conv1_layer), .q_a(conv1_k_g1_mem_q_a), .q_b(conv1_k_g1_mem_q_b));
-conv1_k_g2_mem conv1_k_g2_mem(.address_a(conv1_k_mem_addr0_read), .address_b(conv1_k_mem_addr1_read), .clock(clk), .rden_a(Conv1_layer), .rden_b(Conv1_layer), .q_a(conv1_k_g2_mem_q_a), .q_b(conv1_k_g2_mem_q_b));
+conv1_k_g0_mem conv1_k_g0_mem(.address_a(conv1_k_mem_addr0_read), .address_b(conv1_k_mem_addr1_read), .clock(clk), .q_a(conv1_k_g0_mem_q_a), .q_b(conv1_k_g0_mem_q_b));
+conv1_k_g1_mem conv1_k_g1_mem(.address_a(conv1_k_mem_addr0_read), .address_b(conv1_k_mem_addr1_read), .clock(clk), .q_a(conv1_k_g1_mem_q_a), .q_b(conv1_k_g1_mem_q_b));
+conv1_k_g2_mem conv1_k_g2_mem(.address_a(conv1_k_mem_addr0_read), .address_b(conv1_k_mem_addr1_read), .clock(clk), .q_a(conv1_k_g2_mem_q_a), .q_b(conv1_k_g2_mem_q_b));
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -236,18 +236,18 @@ logic signed [15:0] conv2_k_g0_mem_q_a, conv2_k_g0_mem_q_b, conv2_k_g1_mem_q_a, 
                     conv2_k_g8_mem_q_a, conv2_k_g8_mem_q_b, conv2_k_g9_mem_q_a, conv2_k_g9_mem_q_b, 
                     conv2_k_g10_mem_q_a, conv2_k_g10_mem_q_b, conv2_k_g11_mem_q_a, conv2_k_g11_mem_q_b;
 //Memories for conv2 kernels. Each holds 6 25x25 kernels.
-conv2_k_g0_mem conv2_k_g0_mem(.address_a(conv2_k_mem_addr0_read), .address_b(conv2_k_mem_addr1_read), .clock(clk), .rden_a(Conv2_layer), .rden_b(Conv2_layer), .q_a(conv2_k_g0_mem_q_a), .q_b(conv2_k_g0_mem_q_b));
-conv2_k_g1_mem conv2_k_g1_mem(.address_a(conv2_k_mem_addr0_read), .address_b(conv2_k_mem_addr1_read), .clock(clk), .rden_a(Conv2_layer), .rden_b(Conv2_layer), .q_a(conv2_k_g1_mem_q_a), .q_b(conv2_k_g1_mem_q_b));
-conv2_k_g2_mem conv2_k_g2_mem(.address_a(conv2_k_mem_addr0_read), .address_b(conv2_k_mem_addr1_read), .clock(clk), .rden_a(Conv2_layer), .rden_b(Conv2_layer), .q_a(conv2_k_g2_mem_q_a), .q_b(conv2_k_g2_mem_q_b));
-conv2_k_g3_mem conv2_k_g3_mem(.address_a(conv2_k_mem_addr0_read), .address_b(conv2_k_mem_addr1_read), .clock(clk), .rden_a(Conv2_layer), .rden_b(Conv2_layer), .q_a(conv2_k_g3_mem_q_a), .q_b(conv2_k_g3_mem_q_b));
-conv2_k_g4_mem conv2_k_g4_mem(.address_a(conv2_k_mem_addr0_read), .address_b(conv2_k_mem_addr1_read), .clock(clk), .rden_a(Conv2_layer), .rden_b(Conv2_layer), .q_a(conv2_k_g4_mem_q_a), .q_b(conv2_k_g4_mem_q_b));
-conv2_k_g5_mem conv2_k_g5_mem(.address_a(conv2_k_mem_addr0_read), .address_b(conv2_k_mem_addr1_read), .clock(clk), .rden_a(Conv2_layer), .rden_b(Conv2_layer), .q_a(conv2_k_g5_mem_q_a), .q_b(conv2_k_g5_mem_q_b));
-conv2_k_g6_mem conv2_k_g6_mem(.address_a(conv2_k_mem_addr0_read), .address_b(conv2_k_mem_addr1_read), .clock(clk), .rden_a(Conv2_layer), .rden_b(Conv2_layer), .q_a(conv2_k_g6_mem_q_a), .q_b(conv2_k_g6_mem_q_b));
-conv2_k_g7_mem conv2_k_g7_mem(.address_a(conv2_k_mem_addr0_read), .address_b(conv2_k_mem_addr1_read), .clock(clk), .rden_a(Conv2_layer), .rden_b(Conv2_layer), .q_a(conv2_k_g7_mem_q_a), .q_b(conv2_k_g7_mem_q_b));
-conv2_k_g8_mem conv2_k_g8_mem(.address_a(conv2_k_mem_addr0_read), .address_b(conv2_k_mem_addr1_read), .clock(clk), .rden_a(Conv2_layer), .rden_b(Conv2_layer), .q_a(conv2_k_g8_mem_q_a), .q_b(conv2_k_g8_mem_q_b));
-conv2_k_g9_mem conv2_k_g9_mem(.address_a(conv2_k_mem_addr0_read), .address_b(conv2_k_mem_addr1_read), .clock(clk), .rden_a(Conv2_layer), .rden_b(Conv2_layer), .q_a(conv2_k_g9_mem_q_a), .q_b(conv2_k_g9_mem_q_b));
-conv2_k_g10_mem conv2_k_g10_mem(.address_a(conv2_k_mem_addr0_read), .address_b(conv2_k_mem_addr1_read), .clock(clk), .rden_a(Conv2_layer), .rden_b(Conv2_layer), .q_a(conv2_k_g10_mem_q_a), .q_b(conv2_k_g10_mem_q_b));
-conv2_k_g11_mem conv2_k_g11_mem(.address_a(conv2_k_mem_addr0_read), .address_b(conv2_k_mem_addr1_read), .clock(clk), .rden_a(Conv2_layer), .rden_b(Conv2_layer), .q_a(conv2_k_g11_mem_q_a), .q_b(conv2_k_g11_mem_q_b));
+conv2_k_g0_mem conv2_k_g0_mem(.address_a(conv2_k_mem_addr0_read), .address_b(conv2_k_mem_addr1_read), .clock(clk), .q_a(conv2_k_g0_mem_q_a), .q_b(conv2_k_g0_mem_q_b));
+conv2_k_g1_mem conv2_k_g1_mem(.address_a(conv2_k_mem_addr0_read), .address_b(conv2_k_mem_addr1_read), .clock(clk), .q_a(conv2_k_g1_mem_q_a), .q_b(conv2_k_g1_mem_q_b));
+conv2_k_g2_mem conv2_k_g2_mem(.address_a(conv2_k_mem_addr0_read), .address_b(conv2_k_mem_addr1_read), .clock(clk), .q_a(conv2_k_g2_mem_q_a), .q_b(conv2_k_g2_mem_q_b));
+conv2_k_g3_mem conv2_k_g3_mem(.address_a(conv2_k_mem_addr0_read), .address_b(conv2_k_mem_addr1_read), .clock(clk), .q_a(conv2_k_g3_mem_q_a), .q_b(conv2_k_g3_mem_q_b));
+conv2_k_g4_mem conv2_k_g4_mem(.address_a(conv2_k_mem_addr0_read), .address_b(conv2_k_mem_addr1_read), .clock(clk), .q_a(conv2_k_g4_mem_q_a), .q_b(conv2_k_g4_mem_q_b));
+conv2_k_g5_mem conv2_k_g5_mem(.address_a(conv2_k_mem_addr0_read), .address_b(conv2_k_mem_addr1_read), .clock(clk), .q_a(conv2_k_g5_mem_q_a), .q_b(conv2_k_g5_mem_q_b));
+conv2_k_g6_mem conv2_k_g6_mem(.address_a(conv2_k_mem_addr0_read), .address_b(conv2_k_mem_addr1_read), .clock(clk), .q_a(conv2_k_g6_mem_q_a), .q_b(conv2_k_g6_mem_q_b));
+conv2_k_g7_mem conv2_k_g7_mem(.address_a(conv2_k_mem_addr0_read), .address_b(conv2_k_mem_addr1_read), .clock(clk), .q_a(conv2_k_g7_mem_q_a), .q_b(conv2_k_g7_mem_q_b));
+conv2_k_g8_mem conv2_k_g8_mem(.address_a(conv2_k_mem_addr0_read), .address_b(conv2_k_mem_addr1_read), .clock(clk), .q_a(conv2_k_g8_mem_q_a), .q_b(conv2_k_g8_mem_q_b));
+conv2_k_g9_mem conv2_k_g9_mem(.address_a(conv2_k_mem_addr0_read), .address_b(conv2_k_mem_addr1_read), .clock(clk), .q_a(conv2_k_g9_mem_q_a), .q_b(conv2_k_g9_mem_q_b));
+conv2_k_g10_mem conv2_k_g10_mem(.address_a(conv2_k_mem_addr0_read), .address_b(conv2_k_mem_addr1_read), .clock(clk), .q_a(conv2_k_g10_mem_q_a), .q_b(conv2_k_g10_mem_q_b));
+conv2_k_g11_mem conv2_k_g11_mem(.address_a(conv2_k_mem_addr0_read), .address_b(conv2_k_mem_addr1_read), .clock(clk), .q_a(conv2_k_g11_mem_q_a), .q_b(conv2_k_g11_mem_q_b));
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -296,11 +296,11 @@ logic [8:0] fc_mem_addr0_read, fc_mem_addr1_read;
 fc_mem_read fc_mem_read(.clk(clk), .reset(fc_mem_read_reset), .enable(FC_layer), .addr0(fc_mem_addr0_read), .addr1(fc_mem_addr1_read), .done(fc_mem_read_done));
 
 //Memories for FC weights. Each holds 2 neurons's 192 weights(384 in total)
-fc_g0_mem fc_g0_mem(.address_a(fc_mem_addr0_read), .address_b(fc_mem_addr1_read), .clock(clk), .rden_a(FC_layer), .rden_b(FC_layer), .q_a(fc_g0_mem_q_a), .q_b(fc_g0_mem_q_b));
-fc_g1_mem fc_g1_mem(.address_a(fc_mem_addr0_read), .address_b(fc_mem_addr1_read), .clock(clk), .rden_a(FC_layer), .rden_b(FC_layer), .q_a(fc_g1_mem_q_a), .q_b(fc_g1_mem_q_b));
-fc_g2_mem fc_g2_mem(.address_a(fc_mem_addr0_read), .address_b(fc_mem_addr1_read), .clock(clk), .rden_a(FC_layer), .rden_b(FC_layer), .q_a(fc_g2_mem_q_a), .q_b(fc_g2_mem_q_b));
-fc_g3_mem fc_g3_mem(.address_a(fc_mem_addr0_read), .address_b(fc_mem_addr1_read), .clock(clk), .rden_a(FC_layer), .rden_b(FC_layer), .q_a(fc_g3_mem_q_a), .q_b(fc_g3_mem_q_b));
-fc_g4_mem fc_g4_mem(.address_a(fc_mem_addr0_read), .address_b(fc_mem_addr1_read), .clock(clk), .rden_a(FC_layer), .rden_b(FC_layer), .q_a(fc_g4_mem_q_a), .q_b(fc_g4_mem_q_b));
+fc_g0_mem fc_g0_mem(.address_a(fc_mem_addr0_read), .address_b(fc_mem_addr1_read), .clock(clk), .q_a(fc_g0_mem_q_a), .q_b(fc_g0_mem_q_b));
+fc_g1_mem fc_g1_mem(.address_a(fc_mem_addr0_read), .address_b(fc_mem_addr1_read), .clock(clk), .q_a(fc_g1_mem_q_a), .q_b(fc_g1_mem_q_b));
+fc_g2_mem fc_g2_mem(.address_a(fc_mem_addr0_read), .address_b(fc_mem_addr1_read), .clock(clk), .q_a(fc_g2_mem_q_a), .q_b(fc_g2_mem_q_b));
+fc_g3_mem fc_g3_mem(.address_a(fc_mem_addr0_read), .address_b(fc_mem_addr1_read), .clock(clk), .q_a(fc_g3_mem_q_a), .q_b(fc_g3_mem_q_b));
+fc_g4_mem fc_g4_mem(.address_a(fc_mem_addr0_read), .address_b(fc_mem_addr1_read), .clock(clk), .q_a(fc_g4_mem_q_a), .q_b(fc_g4_mem_q_b));
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------------------
