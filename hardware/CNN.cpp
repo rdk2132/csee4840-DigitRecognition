@@ -32,6 +32,13 @@ void write_img_data(VCNN* dut, signed short data) {
   memcpy(&dut->writedata, &data, sizeof(signed short));
 }
 
+void get_return_ctrl(VCNN* dut) {
+  dut->address = 1;
+  dut->write = 0;
+  dut->read = 1;
+  dut->writedata = 0;
+}
+
 void dummy_op(VCNN* dut) {
   dut->address = 0;
   dut->write = 0;
@@ -84,21 +91,21 @@ int main(int argc, const char ** argv, const char ** env) {
   unsigned image_pos = 0;
   unsigned set_addr = 0;
   bool last_clk = true;
-  for (gtime = 0 ; gtime < 100000 ; gtime += 10) {
+  for (gtime = 0 ; gtime < 400000 ; gtime += 10) {
     dut->clk = ((gtime % 20) >= 10) ? 1 : 0; // Simulate a 50 MHz clock
     if (gtime == 20) dut->reset = 1; // Pulse "reset" for two cycles
     if (gtime == 60) dut->reset = 0;
     if (gtime == 80) {
         increment_control(dut);
     }
-    if (gtime > 80) {
+    else if (gtime > 80 && image_pos < 28 * 28) {
         if (set_addr == 0 && gtime % 20 == 0) {
             write_img_address(dut, image_pos);
             set_addr = 1;
         }
         else if (gtime % 20 == 0) {
             write_img_data(dut, image_data[image_pos]);
-            std::cout << image_data[image_pos] << std::endl;
+            //std::cout << image_data[image_pos] << std::endl;
             image_pos++;
             set_addr = 0;
         }
@@ -107,11 +114,19 @@ int main(int argc, const char ** argv, const char ** env) {
         }
         if (image_pos == 28 * 28) {
             increment_control(dut);
-            break;
         }
-        if (image_pos == 28 * 28) {
-            //stop writing and stuff
-        }
+    }
+    else if (gtime % 20 == 0) {
+      if (dut->readdata == ctrl && ctrl < 6) {
+        increment_control(dut);
+      }
+      else if (dut->readdata == ctrl && ctrl == 6) {
+        //we are done, read output
+        dummy_op(dut);
+      }
+      else {
+        get_return_ctrl(dut);
+      }
     }
 
     dut->eval();     // Run the simulation for a cycle
