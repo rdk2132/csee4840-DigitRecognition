@@ -434,28 +434,28 @@ mux_12to1 data_mux_12to1_23(.data_in_0(P2_mem_0_q), .data_in_1(P2_mem_1_q), .dat
 
 //Muxes to control the inputs to the MACs based on layer
 mux_3to1 data_mux_3to1_0(.data_in_0(img_mem_0_q_a), .data_in_1(p1_mem_0_q_a), .data_in_2(FC_in_data_0), .sel(MAC_layer), .data_out(MAC_in_data_0));
-mux_3to1 data_mux_3to1_1(.data_in_0(img_mem_0_q_b), .data_in_1(p1_mem_1_q_a), .data_in_2(FC_in_data_1), .sel(MAC_layer), .data_out(MAC_in_data_1));
-mux_3to1 data_mux_3to1_2(.data_in_0(img_mem_1_q_a), .data_in_1(p1_mem_2_q_a), .data_in_2(FC_in_data_2), .sel(MAC_layer), .data_out(MAC_in_data_2));
-mux_3to1 data_mux_3to1_3(.data_in_0(img_mem_1_q_b), .data_in_1(p1_mem_3_q_a), .data_in_2(FC_in_data_3), .sel(MAC_layer), .data_out(MAC_in_data_3));
+mux_3to1 data_mux_3to1_1(.data_in_0(img_mem_0_q_a), .data_in_1(p1_mem_1_q_a), .data_in_2(FC_in_data_1), .sel(MAC_layer), .data_out(MAC_in_data_1));
+mux_3to1 data_mux_3to1_2(.data_in_0(img_mem_0_q_a), .data_in_1(p1_mem_2_q_a), .data_in_2(FC_in_data_2), .sel(MAC_layer), .data_out(MAC_in_data_2));
+mux_3to1 data_mux_3to1_3(.data_in_0(img_mem_0_q_a), .data_in_1(p1_mem_3_q_a), .data_in_2(FC_in_data_3), .sel(MAC_layer), .data_out(MAC_in_data_3));
 mux_3to1 data_mux_3to1_4(.data_in_0(img_mem_0_q_a), .data_in_1(p1_mem_4_q_a), .data_in_2(FC_in_data_4), .sel(MAC_layer), .data_out(MAC_in_data_4));
-mux_3to1 data_mux_3to1_5(.data_in_0(img_mem_0_q_b), .data_in_1(p1_mem_5_q_a), .data_in_2(FC_in_data_5), .sel(MAC_layer), .data_out(MAC_in_data_5));
-mux_3to1 data_mux_3to1_6(.data_in_0(img_mem_1_q_a), .data_in_1(p1_mem_0_q_a), .data_in_2(FC_in_data_6), .sel(MAC_layer), .data_out(MAC_in_data_6));
-mux_3to1 data_mux_3to1_7(.data_in_0(img_mem_1_q_b), .data_in_1(p1_mem_1_q_a), .data_in_2(FC_in_data_7), .sel(MAC_layer), .data_out(MAC_in_data_7));
-mux_3to1 data_mux_3to1_8(.data_in_0(img_mem_0_q_a), .data_in_1(p1_mem_2_q_a), .data_in_2(FC_in_data_8), .sel(MAC_layer), .data_out(MAC_in_data_8));
+mux_3to1 data_mux_3to1_5(.data_in_0(img_mem_0_q_a), .data_in_1(p1_mem_5_q_a), .data_in_2(FC_in_data_5), .sel(MAC_layer), .data_out(MAC_in_data_5));
+mux_3to1 data_mux_3to1_6(.data_in_0(img_mem_0_q_b), .data_in_1(p1_mem_0_q_a), .data_in_2(FC_in_data_6), .sel(MAC_layer), .data_out(MAC_in_data_6));
+mux_3to1 data_mux_3to1_7(.data_in_0(img_mem_0_q_b), .data_in_1(p1_mem_1_q_a), .data_in_2(FC_in_data_7), .sel(MAC_layer), .data_out(MAC_in_data_7));
+mux_3to1 data_mux_3to1_8(.data_in_0(img_mem_0_q_b), .data_in_1(p1_mem_2_q_a), .data_in_2(FC_in_data_8), .sel(MAC_layer), .data_out(MAC_in_data_8));
 mux_3to1 data_mux_3to1_9(.data_in_0(img_mem_0_q_b), .data_in_1(p1_mem_3_q_a), .data_in_2(FC_in_data_9), .sel(MAC_layer), .data_out(MAC_in_data_9));
-mux_3to1 data_mux_3to1_10(.data_in_0(img_mem_1_q_a), .data_in_1(p1_mem_4_q_a), .data_in_2(FC_in_data_10), .sel(MAC_layer), .data_out(MAC_in_data_10));
-mux_3to1 data_mux_3to1_11(.data_in_0(img_mem_1_q_b), .data_in_1(p1_mem_5_q_a), .data_in_2(FC_in_data_11), .sel(MAC_layer), .data_out(MAC_in_data_11));
-mux_3to1 data_mux_3to1_12(.data_in_0(img_mem_0_q_a), .data_in_1(p1_mem_0_q_a), .data_in_2(FC_in_data_12), .sel(MAC_layer), .data_out(MAC_in_data_12));
-mux_3to1 data_mux_3to1_13(.data_in_0(img_mem_0_q_b), .data_in_1(p1_mem_1_q_a), .data_in_2(FC_in_data_13), .sel(MAC_layer), .data_out(MAC_in_data_13));
+mux_3to1 data_mux_3to1_10(.data_in_0(img_mem_0_q_b), .data_in_1(p1_mem_4_q_a), .data_in_2(FC_in_data_10), .sel(MAC_layer), .data_out(MAC_in_data_10));
+mux_3to1 data_mux_3to1_11(.data_in_0(img_mem_0_q_b), .data_in_1(p1_mem_5_q_a), .data_in_2(FC_in_data_11), .sel(MAC_layer), .data_out(MAC_in_data_11));
+mux_3to1 data_mux_3to1_12(.data_in_0(img_mem_1_q_a), .data_in_1(p1_mem_0_q_a), .data_in_2(FC_in_data_12), .sel(MAC_layer), .data_out(MAC_in_data_12));
+mux_3to1 data_mux_3to1_13(.data_in_0(img_mem_1_q_a), .data_in_1(p1_mem_1_q_a), .data_in_2(FC_in_data_13), .sel(MAC_layer), .data_out(MAC_in_data_13));
 mux_3to1 data_mux_3to1_14(.data_in_0(img_mem_1_q_a), .data_in_1(p1_mem_2_q_a), .data_in_2(FC_in_data_14), .sel(MAC_layer), .data_out(MAC_in_data_14));
-mux_3to1 data_mux_3to1_15(.data_in_0(img_mem_1_q_b), .data_in_1(p1_mem_3_q_a), .data_in_2(FC_in_data_15), .sel(MAC_layer), .data_out(MAC_in_data_15));
-mux_3to1 data_mux_3to1_16(.data_in_0(img_mem_0_q_a), .data_in_1(p1_mem_4_q_a), .data_in_2(FC_in_data_16), .sel(MAC_layer), .data_out(MAC_in_data_16));
-mux_3to1 data_mux_3to1_17(.data_in_0(img_mem_0_q_b), .data_in_1(p1_mem_5_q_a), .data_in_2(FC_in_data_17), .sel(MAC_layer), .data_out(MAC_in_data_17));
-mux_3to1 data_mux_3to1_18(.data_in_0(img_mem_1_q_a), .data_in_1(p1_mem_0_q_a), .data_in_2(FC_in_data_18), .sel(MAC_layer), .data_out(MAC_in_data_18));
+mux_3to1 data_mux_3to1_15(.data_in_0(img_mem_1_q_a), .data_in_1(p1_mem_3_q_a), .data_in_2(FC_in_data_15), .sel(MAC_layer), .data_out(MAC_in_data_15));
+mux_3to1 data_mux_3to1_16(.data_in_0(img_mem_1_q_a), .data_in_1(p1_mem_4_q_a), .data_in_2(FC_in_data_16), .sel(MAC_layer), .data_out(MAC_in_data_16));
+mux_3to1 data_mux_3to1_17(.data_in_0(img_mem_1_q_a), .data_in_1(p1_mem_5_q_a), .data_in_2(FC_in_data_17), .sel(MAC_layer), .data_out(MAC_in_data_17));
+mux_3to1 data_mux_3to1_18(.data_in_0(img_mem_1_q_b), .data_in_1(p1_mem_0_q_a), .data_in_2(FC_in_data_18), .sel(MAC_layer), .data_out(MAC_in_data_18));
 mux_3to1 data_mux_3to1_19(.data_in_0(img_mem_1_q_b), .data_in_1(p1_mem_1_q_a), .data_in_2(FC_in_data_19), .sel(MAC_layer), .data_out(MAC_in_data_19));
-mux_3to1 data_mux_3to1_20(.data_in_0(img_mem_0_q_a), .data_in_1(p1_mem_2_q_a), .data_in_2(FC_in_data_20), .sel(MAC_layer), .data_out(MAC_in_data_20));
-mux_3to1 data_mux_3to1_21(.data_in_0(img_mem_0_q_b), .data_in_1(p1_mem_3_q_a), .data_in_2(FC_in_data_21), .sel(MAC_layer), .data_out(MAC_in_data_21));
-mux_3to1 data_mux_3to1_22(.data_in_0(img_mem_1_q_a), .data_in_1(p1_mem_4_q_a), .data_in_2(FC_in_data_22), .sel(MAC_layer), .data_out(MAC_in_data_22));
+mux_3to1 data_mux_3to1_20(.data_in_0(img_mem_1_q_b), .data_in_1(p1_mem_2_q_a), .data_in_2(FC_in_data_20), .sel(MAC_layer), .data_out(MAC_in_data_20));
+mux_3to1 data_mux_3to1_21(.data_in_0(img_mem_1_q_b), .data_in_1(p1_mem_3_q_a), .data_in_2(FC_in_data_21), .sel(MAC_layer), .data_out(MAC_in_data_21));
+mux_3to1 data_mux_3to1_22(.data_in_0(img_mem_1_q_b), .data_in_1(p1_mem_4_q_a), .data_in_2(FC_in_data_22), .sel(MAC_layer), .data_out(MAC_in_data_22));
 mux_3to1 data_mux_3to1_23(.data_in_0(img_mem_1_q_b), .data_in_1(p1_mem_5_q_a), .data_in_2(FC_in_data_23), .sel(MAC_layer), .data_out(MAC_in_data_23));
 
 //Muxes to make sure proper input parameter based on the correct ROM. 1 for conv1, 1 for conv2, 1 for fc.

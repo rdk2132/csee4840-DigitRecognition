@@ -67,7 +67,7 @@ void conv_layer(fixed_t *src, fixed_t *dst, const fixed_t *bias, const fixed_t *
                         //Doing multiplication, need to divide by scaling factor twice
                         >> FIXED_SCALE_LOG);
                     if (in == 0 && out == 0) {
-                      fprintf(stderr, "pre-bias output: %d\n", output[dst_index]);
+                      fprintf(stderr, "pre-bias output %d %d: %d\n", i, j, output[dst_index]);
                     }
                 }
             }
@@ -83,6 +83,9 @@ void conv_layer(fixed_t *src, fixed_t *dst, const fixed_t *bias, const fixed_t *
         for (int i = 0; i < dst_size * dst_size; i++) {
             // Activation (ReLU function), easier to implement than sigmoid
             output[i] = MAX(0, output[i] + bi);
+            if (out == 0) {
+              fprintf(stderr, "post-bias output %d: %d\n", i, output[i]);
+            }
         }
     }
 }
