@@ -95,7 +95,7 @@ module CNN_ctrl(input logic reset, img_mem_read_done, conv1_mem_write_done, conv
         else if(ctrl == 8'b00000011) begin //pool1
             img_load = 1'b0;
             MAC_layer = 2'b00;
-            pooling_layer = 1'b1;
+            pooling_layer = 1'b0;
             rMAC = 1'b1;
             MAC_enable = 1'b0;
             Conv1_layer = 1'b0;
