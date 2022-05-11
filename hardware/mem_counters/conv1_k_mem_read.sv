@@ -5,18 +5,18 @@ module conv1_k_mem_read (input logic clk, reset, enable,
 
     logic [3:0] delay;
     //TODO
-    logic [5:0] count;
+    logic [7:0] count;
     always_ff @(posedge clk or posedge reset) begin
         if (reset == 1'b1) begin
             addr0 <= 6'b000000;
             addr1 <= 6'b011001;
             delay <= 4'b0000;
-            count <= 6'b000000;
+            count <= 8'b000000;
         end
         else if (enable == 1'b1 && done == 1'b0) begin
             if(delay == 4'b0000) begin
                 if (addr1 == 6'b110001) begin
-                  count <= count + 6'b000001;
+                  count <= count + 8'b00000001;
                   addr0 <= 0;
                   addr1 <= 6'b011001;
                 end
@@ -32,7 +32,8 @@ module conv1_k_mem_read (input logic clk, reset, enable,
     end
 
     always_comb begin
-        if(count == 6'b111111 && addr1 == 6'b110001) begin
+    //TODO TODO
+        if(count >= 8'b10001111 || (count == 8'b10001111 && addr1 == 6'b110001)) begin
             done = 1'b1;
         end
         else begin

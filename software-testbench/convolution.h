@@ -66,6 +66,9 @@ void conv_layer(fixed_t *src, fixed_t *dst, const fixed_t *bias, const fixed_t *
                         image[src_index + 4 * src_size + 3] * weight[23] + image[src_index + 4 * src_size + 4] * weight[24])
                         //Doing multiplication, need to divide by scaling factor twice
                         >> FIXED_SCALE_LOG);
+                    if (in == 0 && out == 0) {
+                      fprintf(stderr, "pre-bias output: %d\n", output[dst_index]);
+                    }
                 }
             }
         }
