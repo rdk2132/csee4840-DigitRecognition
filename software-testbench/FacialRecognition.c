@@ -28,8 +28,12 @@ unsigned classify(unsigned char* in_image, struct weights* w) {
 
   for (int i = 0; i < IMAGE_SIZE; i++) {
     in_matrix[i] = ((fixed_t)in_image[i]) * FIXED_SCALE;
+    fprintf(stderr, "in_matrix [%d]: %d\n", i, in_matrix[i]);
   }
   conv_layer(in_matrix, conv1_out, w->conv1_bias, w->conv1_weights, 1, NUM_KERNELS_1, IMAGE_WIDTH);
+  for (int i = 0; i < 24 * 24; i++) {
+    fprintf(stderr, "conv1 output [%d]: %d\n", i, conv1_out[i]);
+  }
   avg_pool(conv1_out, pool1_out, NUM_KERNELS_1 * CONV1_OUT_SIZE, CONV1_OUT_WIDTH);
   conv_layer(pool1_out, conv2_out, w->conv2_bias, w->conv2_weights, NUM_KERNELS_1, NUM_KERNELS_2, CONV1_OUT_WIDTH / 2);
   avg_pool(conv2_out, pool2_out, NUM_KERNELS_2 * CONV2_OUT_SIZE, CONV2_OUT_WIDTH);
@@ -137,6 +141,12 @@ int main() {
       }
     }
   }
+  for (int i = 0; i < 6; i++) {
+    fprintf(stderr, "conv1_bias[%d] = %d\n", i, wt.conv1_bias[i]);
+  }
+  for (int i = 0; i < 25; i++) {
+    fprintf(stderr, "conv1 kernel 0 [%d] = %d\n", i, wt.conv1_weights[i]);
+  }
 
   //Should not be needed as long as weights are stable.
 #if 0
@@ -155,7 +165,7 @@ int main() {
   fill("../mnist/t10k-images-idx3-ubyte", (void*)in_image, (NUM_IMAGES * IMAGE_SIZE + IMAGE_METADATA_OFFSET) / sizeof(float));
   fill("../mnist/t10k-labels-idx1-ubyte", (void*)in_labels, (NUM_IMAGES + LABEL_METADATA_OFFSET) / sizeof(float));
   unsigned correct_classifications = 0;
-  for (int i = 0; i < NUM_IMAGES; i++) {
+  for (int i = 0; i < 1; i++) {
 #ifdef USE_FPGA
     unsigned prediction = classify_fpga(fpga_io, &(in_image[i * IMAGE_SIZE + IMAGE_METADATA_OFFSET]));
 #else
@@ -167,7 +177,7 @@ int main() {
     printf("Actual label: %u\n", in_labels[i + LABEL_METADATA_OFFSET]);
     correct_classifications += (in_labels[i + LABEL_METADATA_OFFSET] == prediction);
   }
-  fprintf(stderr, "Correct classifications: %u / %u\n", correct_classifications, NUM_IMAGES);
+  fprintf(stderr, "Correct classifications: %u / %u\n", correct_classifications, 1);
 
 #ifdef USE_FPGA
   close(fpga_io);

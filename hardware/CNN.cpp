@@ -51,6 +51,7 @@ int main(int argc, const char ** argv, const char ** env) {
   //Verilated::debug(1);
   gtime = 0;
 
+  unsigned char raw_image[28 * 28];
   signed short image_data[28 * 28];
   FILE* fp = fopen("../mnist/t10k-images-idx3-ubyte", "rb");
   if (!fp) {
@@ -59,9 +60,18 @@ int main(int argc, const char ** argv, const char ** env) {
   }
 
   //dummy read, needed because of file format
-  fread(image_data, 1, IMAGE_METADATA_OFFSET, fp);
-  fread(image_data, 2, 28 * 28, fp);
+  fread(raw_image, 1, IMAGE_METADATA_OFFSET, fp);
+  fread(raw_image, 1, 28 * 28, fp);
   fclose(fp);
+
+
+  for (int i = 0; i < 768; i++) {
+    image_data[i] = raw_image[i] * 16;
+    fprintf(stderr, "image_data[%d] = %d\n", i, image_data[i]);
+  }
+  /*for (int i = 0; i < 768; i++) {
+    image_data[i] = i;
+  }*/
   // Treat the argument on the command-line as the place to start
   //int n;
   //if (argc > 1 && argv[1][0] != '+') n = atoi(argv[1]);
@@ -109,7 +119,10 @@ int main(int argc, const char ** argv, const char ** env) {
             set_addr = 0;
         }
     }
-    else if (gtime % 20 == 0) {
+    else if (image_pos == 28 * 28 && ctrl == 1) {
+      increment_control(dut);
+    }
+    else if (image_pos >= 28 * 28 && gtime % 20 == 0) {
       if (dut->readdata == ctrl && ctrl < 6) {
         increment_control(dut);
       }

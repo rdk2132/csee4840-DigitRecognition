@@ -58,10 +58,11 @@ module CNN_ctrl(input logic reset, img_mem_read_done, conv1_mem_write_done, conv
             P2_mem_read_reset = 1'b1;
             fc_mem_read_reset = 1'b1;
             //TODO: Need mem read done
-            if(img_mem_read_done == 1'b1) begin
-                return_ctrl = 8'b00000001;
-            end
-            else return_ctrl = 0;
+            //if(img_mem_read_done == 1'b1) begin
+            //    return_ctrl = 8'b00000001;
+            //end
+            //else return_ctrl = 0;
+            return_ctrl = 0;
         end
         else if(ctrl == 8'b00000010) begin //conv1
             img_load = 1'b0;
