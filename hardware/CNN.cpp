@@ -67,7 +67,9 @@ int main(int argc, const char ** argv, const char ** env) {
 
   for (int i = 0; i < 768; i++) {
     image_data[i] = raw_image[i] * 16;
-    fprintf(stderr, "image_data[%d] = %d\n", i, image_data[i]);
+    if (image_data[i] > 0) {
+      fprintf(stderr, "image_data[%d] = %d\n", i, image_data[i]);
+    }
   }
   /*for (int i = 0; i < 768; i++) {
     image_data[i] = i;
