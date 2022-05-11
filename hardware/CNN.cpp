@@ -103,7 +103,7 @@ int main(int argc, const char ** argv, const char ** env) {
   unsigned image_pos = 0;
   unsigned set_addr = 0;
   bool last_clk = true;
-  for (gtime = 0 ; gtime < 200000 ; gtime += 10) {
+  for (gtime = 0 ; gtime < 400000 ; gtime += 10) {
     dut->clk = ((gtime % 20) >= 10) ? 1 : 0; // Simulate a 50 MHz clock
     if (gtime == 20) dut->reset = 1; // Pulse "reset" for two cycles
     if (gtime == 60) dut->reset = 0;
