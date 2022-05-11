@@ -65,13 +65,13 @@ int main(int argc, const char ** argv, const char ** env) {
   fclose(fp);
 
 
-  for (int i = 0; i < 768; i++) {
+  for (int i = 0; i < 784; i++) {
     image_data[i] = raw_image[i] * 16;
     if (image_data[i] > 0) {
       fprintf(stderr, "image_data[%d] = %d\n", i, image_data[i]);
     }
   }
-  /*for (int i = 0; i < 768; i++) {
+  /*for (int i = 0; i < 784; i++) {
     image_data[i] = i;
   }*/
   // Treat the argument on the command-line as the place to start
