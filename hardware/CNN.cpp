@@ -91,7 +91,7 @@ int main(int argc, const char ** argv, const char ** env) {
   unsigned image_pos = 0;
   unsigned set_addr = 0;
   bool last_clk = true;
-  for (gtime = 0 ; gtime < 400000 ; gtime += 10) {
+  for (gtime = 0 ; gtime < 200000 ; gtime += 10) {
     dut->clk = ((gtime % 20) >= 10) ? 1 : 0; // Simulate a 50 MHz clock
     if (gtime == 20) dut->reset = 1; // Pulse "reset" for two cycles
     if (gtime == 60) dut->reset = 0;
@@ -105,15 +105,8 @@ int main(int argc, const char ** argv, const char ** env) {
         }
         else if (gtime % 20 == 0) {
             write_img_data(dut, image_data[image_pos]);
-            //std::cout << image_data[image_pos] << std::endl;
             image_pos++;
             set_addr = 0;
-        }
-        else if (gtime % 20 == 0) {
-            dummy_op(dut);
-        }
-        if (image_pos == 28 * 28) {
-            increment_control(dut);
         }
     }
     else if (gtime % 20 == 0) {
@@ -121,7 +114,7 @@ int main(int argc, const char ** argv, const char ** env) {
         increment_control(dut);
       }
       else if (dut->readdata == ctrl && ctrl == 6) {
-        //we are done, read output
+        //TODO: we are done, read output
         dummy_op(dut);
       }
       else {
@@ -135,16 +128,6 @@ int main(int argc, const char ** argv, const char ** env) {
     last_clk = dut->clk;
   }
 
-  //std::cout << std::endl;
-
-  // Once "done" is received, run a few more clock cycles
-  
-  /*for (int k = 0 ; k < 1000 ; k++, time += 10) {
-    dut->clk = ((time % 20) >= 10) ? 1 : 0;
-      dut->eval();
-      tfp->dump(time);
-  }*/
-  
   tfp->close(); // Stop dumping the VCD file
   delete tfp;
 
