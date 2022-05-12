@@ -8,12 +8,14 @@ module P1_mem_read (input logic clk, reset, enable,
     //counter for position within image row
     logic [2:0] i_count;
     logic [3:0] delay;
+    logic [1:0] count;
 
     always_ff @(posedge clk or posedge reset) begin
         if (reset == 1'b1) begin
             addr0 <= 8'b00000000;
             i_count <= 3'b000;
             delay <= 4'b0000;
+            count <= 0;
         end
         else if (enable == 1'b1 && done == 1'b0) begin
             if (delay == 4'b0000) begin
@@ -42,6 +44,10 @@ module P1_mem_read (input logic clk, reset, enable,
                     addr0 <= addr0 + 8'b00000001;
                     columncount <= columncount + 3'b001;
                 end
+                if (add0 == 8'b10001111) begin
+                    count <= count + 1;
+                    addr0 <= 0;
+                end
             end
             else begin
                 delay <= delay + 1;
@@ -49,7 +55,7 @@ module P1_mem_read (input logic clk, reset, enable,
         end
     end
     always_comb begin
-        if(addr0 == 8'b10001111) begin
+        if(addr0 == 8'b10001111 && count == 2'b10) begin
             done = 1'b1;
         end
         else begin
