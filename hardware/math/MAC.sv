@@ -5,23 +5,37 @@ module MAC (input logic clk, enable, reset,
 	
 	reg signed [31:0] MAC_out;
 	reg [7:0] count;
-
+  logic [3:0] delay;
+  logic [1:0] prev_MAC_layer;
 	always_ff @(posedge clk or posedge reset) begin
 		if(reset == 1'b1) begin
 			MAC_out <= 32'b00000000000000000000000000000000;
 			out <= 32'b00000000000000000000000000000000;
 			count <= 8'b00000000;
-		end
+      prev_MAC_layer <= 2'b0;
+      //if (1) begin
+        //delay <= 4'b111;
+      //end
+      //else begin
+        delay <= 4'b000;
+    end
 		else if (enable == 1'b1) begin
-			if((count == 8'b00011000 && (MAC_layer == 2'b00 || MAC_layer == 2'b01)) || (count == 8'b11000000 && MAC_layer == 2'b10)) begin //if finished with a conv(count = 25) or one of the FC(count = 192) outputs the result
+			prev_MAC_layer <= MAC_layer;
+      if (prev_MAC_layer == 2'b0 && MAC_layer == 2'b1) begin
+        delay <= 4'b1111;
+      end
+      if((count == 8'b00011000 && MAC_layer == 2'b00) || ( count == 8'b00011001 && MAC_layer == 2'b01) || (count == 8'b11000000 && MAC_layer == 2'b10)) begin //if finished with a conv(count = 25) or one of the FC(count = 192) outputs the result
 				out <= MAC_out;
 				MAC_out <= 32'b00000000000000000000000000000000;
 				count <= 8'b00000000;
 			end
-			else begin
+			else if (delay == 4'b000) begin
 				MAC_out <= MAC_out + (A * B); //does the MAC thing
 				count <= count + 1'b1;
 			end
+      else begin 
+        delay <= delay + 4'b001;
+      end
 		end
 	end
 endmodule
