@@ -5,7 +5,7 @@ module fc_mem_read (input logic clk, reset, enable,
 
     logic [3:0] delay;
 
-    always_ff @(posedge clk or posedge reset) begin
+    always_ff @(negedge clk or posedge reset) begin
         if (reset == 1'b1) begin
             addr0 <= 9'b000000000;
             addr1 <= 9'b011000000;

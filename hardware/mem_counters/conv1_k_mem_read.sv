@@ -6,7 +6,7 @@ module conv1_k_mem_read (input logic clk, reset, enable,
     logic [3:0] delay;
     //TODO
     logic [7:0] count;
-    always_ff @(posedge clk or posedge reset) begin
+    always_ff @(negedge clk or posedge reset) begin
         if (reset == 1'b1) begin
             addr0 <= 6'b000000;
             addr1 <= 6'b011001;

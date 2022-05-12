@@ -9,7 +9,7 @@ module conv2_k_mem_read (input logic clk, reset, enable,
     logic [7:0] addrcount;
     logic [7:0] offset;
 
-    always_ff @(posedge clk or posedge reset) begin
+    always_ff @(negedge clk or posedge reset) begin
         if (reset == 1'b1) begin
             delay <= 4'b0000;
             addrcount <= 8'b00000000;
