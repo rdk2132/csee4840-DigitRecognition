@@ -20,9 +20,9 @@ module conv2_k_mem_read (input logic clk, reset, enable,
 
             //when address reaches 24, count
             if(addrcount == 8'd24) begin
-                addrcount <= 1'b0;
+                addrcount <= 8'b00000000;
                 if(count == 6'd63) begin
-                    count <= 5'd0;
+                    count <= 6'd0;
                     if(offset == 8'b00000000) begin
                         offset <= 8'd25;
                     end
@@ -31,7 +31,7 @@ module conv2_k_mem_read (input logic clk, reset, enable,
                     end
                 end
                 else begin
-                    count <= count + 5'd1;
+                    count <= count + 6'd1;
                 end
             end
 

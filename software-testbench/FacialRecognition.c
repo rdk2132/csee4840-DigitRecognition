@@ -29,7 +29,7 @@ unsigned classify(unsigned char* in_image, struct weights* w) {
   for (int i = 0; i < IMAGE_SIZE; i++) {
     in_matrix[i] = ((fixed_t)in_image[i]) * FIXED_SCALE;
     if (in_matrix[i] > 0) {
-      fprintf(stderr, "in_matrix [%d]: %d\n", i, in_matrix[i]);
+      //fprintf(stderr, "in_matrix [%d]: %d\n", i, in_matrix[i]);
     }
   }
   conv_layer(in_matrix, conv1_out, w->conv1_bias, w->conv1_weights, 1, NUM_KERNELS_1, IMAGE_WIDTH);
@@ -39,6 +39,11 @@ unsigned classify(unsigned char* in_image, struct weights* w) {
     }
   }
   avg_pool(conv1_out, pool1_out, NUM_KERNELS_1 * CONV1_OUT_SIZE, CONV1_OUT_WIDTH);
+  for (int i = 0; i < 12 * 12; i++) {
+    if (pool1_out[i] > 0) {
+      fprintf(stderr, "pool1 output [%d]: %d\n", i % (12 * 12), pool1_out[i]);
+    }
+  }
   conv_layer(pool1_out, conv2_out, w->conv2_bias, w->conv2_weights, NUM_KERNELS_1, NUM_KERNELS_2, CONV1_OUT_WIDTH / 2);
   for (int i = 0; i < 8 * 8; i++) {
     if (conv2_out[i] > 0) {

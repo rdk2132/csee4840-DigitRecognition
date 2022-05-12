@@ -1,79 +1,48 @@
 [*]
 [*] GTKWave Analyzer v3.3.107 (w)1999-2020 BSI
-[*] Wed May 11 17:59:18 2022
+[*] Thu May 12 08:45:17 2022
 [*]
 [dumpfile] "/Users/felixhanau/Downloads/csee4840-FacialRecognition/hardware/CNN.vcd"
-[dumpfile_mtime] "Wed May 11 17:28:34 2022"
-[dumpfile_size] 6953703
+[dumpfile_mtime] "Thu May 12 08:35:52 2022"
+[dumpfile_size] 19965028
 [savefile] "/Users/felixhanau/Downloads/csee4840-FacialRecognition/hardware/CNN.gtkw"
-[timestart] 94210
-[size] 1559 822
+[timestart] 104040
+[size] 1495 858
 [pos] -1 -1
-*-12.000000 102990 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-8.000000 104575 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.CNN.
 [sst_width] 193
-[signals_width] 363
+[signals_width] 319
 [sst_expanded] 1
-[sst_vpaned_height] 232
+[sst_vpaned_height] 397
 @22
 TOP.CNN.ctrl[7:0]
-@28
-TOP.CNN.conv1_mem_write_done
-TOP.CNN.conv1_k_mem_read_done
-@22
-TOP.CNN.after_MAC_0.out_0[15:0]
+@24
+TOP.CNN.conv1_mem_0_0.data_b[15:0]
+TOP.CNN.conv1_mem_0_0_data_b[15:0]
+TOP.CNN.after_MAC_1_out_0[15:0]
 TOP.CNN.after_MAC_1.out_0[15:0]
-TOP.CNN.after_MAC_2.out_0[15:0]
-TOP.CNN.after_MAC_3.out_0[15:0]
-TOP.CNN.img_mem_0_q_a[15:0]
-TOP.CNN.MAC_0.A[15:0]
-@c00023
-TOP.CNN.MAC_0.out[31:0]
-@29
-(0)TOP.CNN.MAC_0.out[31:0]
-(1)TOP.CNN.MAC_0.out[31:0]
-(2)TOP.CNN.MAC_0.out[31:0]
-(3)TOP.CNN.MAC_0.out[31:0]
-(4)TOP.CNN.MAC_0.out[31:0]
-(5)TOP.CNN.MAC_0.out[31:0]
-(6)TOP.CNN.MAC_0.out[31:0]
-(7)TOP.CNN.MAC_0.out[31:0]
-(8)TOP.CNN.MAC_0.out[31:0]
-(9)TOP.CNN.MAC_0.out[31:0]
-(10)TOP.CNN.MAC_0.out[31:0]
-(11)TOP.CNN.MAC_0.out[31:0]
-(12)TOP.CNN.MAC_0.out[31:0]
-(13)TOP.CNN.MAC_0.out[31:0]
-(14)TOP.CNN.MAC_0.out[31:0]
-(15)TOP.CNN.MAC_0.out[31:0]
-(16)TOP.CNN.MAC_0.out[31:0]
-(17)TOP.CNN.MAC_0.out[31:0]
-(18)TOP.CNN.MAC_0.out[31:0]
-(19)TOP.CNN.MAC_0.out[31:0]
-(20)TOP.CNN.MAC_0.out[31:0]
-(21)TOP.CNN.MAC_0.out[31:0]
-(22)TOP.CNN.MAC_0.out[31:0]
-(23)TOP.CNN.MAC_0.out[31:0]
-(24)TOP.CNN.MAC_0.out[31:0]
-(25)TOP.CNN.MAC_0.out[31:0]
-(26)TOP.CNN.MAC_0.out[31:0]
-(27)TOP.CNN.MAC_0.out[31:0]
-(28)TOP.CNN.MAC_0.out[31:0]
-(29)TOP.CNN.MAC_0.out[31:0]
-(30)TOP.CNN.MAC_0.out[31:0]
-(31)TOP.CNN.MAC_0.out[31:0]
-@1401201
--group_end
 @22
-TOP.CNN.img_mem_addr1[9:0]
-TOP.CNN.img_mem_0_q_b[15:0]
-TOP.CNN.img_mem_addr0[9:0]
-TOP.writedata[15:0]
-TOP.CNN.img_mem_addr2[9:0]
-TOP.CNN.img_mem_1_q_a[15:0]
-TOP.CNN.img_mem_1_q_b[15:0]
-TOP.CNN.img_mem_0.data_a[15:0]
-TOP.CNN.img_data[15:0]
+TOP.CNN.MAC_out_6[31:0]
+@24
+TOP.CNN.conv1_mem_0_0.address_b[8:0]
+TOP.CNN.conv1_addr1w1r[8:0]
+TOP.CNN.conv1_addr1_write[8:0]
+TOP.CNN.conv1_mem_0_0.debug195[15:0]
+TOP.CNN.pooling_0_out[15:0]
+@22
+TOP.CNN.pooling_0_a0[15:0]
+TOP.CNN.pooling_0_a1[15:0]
+@24
+TOP.CNN.pooling_1_a0[15:0]
+@25
+TOP.CNN.pooling_1_a1[15:0]
+@24
+TOP.CNN.conv1_mem_0_0.debug196[15:0]
+TOP.CNN.conv1_mem_0_0.debug197[15:0]
+TOP.CNN.conv1_mem_0_0.debug198[15:0]
+TOP.CNN.conv1_mem_0_0.debug199[15:0]
+TOP.CNN.conv1_mem_0_0.debug200[15:0]
 [pattern_trace] 1
 [pattern_trace] 0
