@@ -47,7 +47,7 @@ module conv2_k_mem_read (input logic clk, reset, enable,
     end
 
     always_comb begin
-        if(offset == 8'd50 && count == 6'd63 &&) begin
+        if(offset == 8'd50 && count == 6'd63) begin
             done = 1'b1;
         end
         else begin
