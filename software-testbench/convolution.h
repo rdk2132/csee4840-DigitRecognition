@@ -2,7 +2,7 @@
 #define _CONVOLUTION_H_
 
 #include "Parameters.h"
-
+#include<string>
 #define MAX(a, b) (a > b ? a : b)
 
 /*
@@ -19,6 +19,44 @@ void conv_layer(fixed_t *src, fixed_t *dst, const fixed_t *bias, const fixed_t *
 {
     int dst_size =  src_size - 4;
     int dst_index, src_index;
+    int is_conv_2 = num_dst == 12;
+
+    FILE* f_pointers[12];
+    if (is_conv_2) {
+      for (int i = 0; i < 12; i++) {
+        std::string fname = "conv2_k_g" + std::to_string(i) + ".txt";
+        f_pointers[i] = fopen(fname.c_str(), "wb");
+      }
+
+
+      for (unsigned file = 0; file < 12; file++) {
+        for (unsigned location = 0; location < 150; location += 25) {
+          unsigned out_layer =0;
+          unsigned in_layer = 0;
+          unsigned succ = 0;
+          for (unsigned i = 0; i < 12; i++) {
+            for (unsigned j = 0; j < 6; j++) {
+                unsigned location0 = 75 * (j & 1) + 25 * (i / 4);
+                unsigned file0 = 3 * (i % 4) + ((j % 6) / 2);
+                  //printf("Success! %d %d\n", file0, location0);
+                if (file0 == file && location0 == location && 1) {
+                  //printf("Success! %d %d\n", file, location);
+                  succ++;
+                  out_layer = i;
+                  in_layer = j;
+                }
+            }
+          }
+          printf("Succ %d\n", succ);
+          unsigned read_pos = (in_layer * num_dst + out_layer) * CONV_KERNEL_SIZE;
+          for (int k = 0; k < 25; k++) {
+            unsigned short value;
+            memcpy(&value, &weights[read_pos + k], 2);
+            fprintf(f_pointers[file], "%04x\n", value);
+          }
+        }
+      }
+    }
 
     for(int in = 0; in < num_src; in++)
     {
@@ -27,6 +65,7 @@ void conv_layer(fixed_t *src, fixed_t *dst, const fixed_t *bias, const fixed_t *
 
         for(int out = 0; out < num_dst; out++)
         {
+
             // Pointer to where to store the output image
             fixed_t *output = &dst[out * dst_size * dst_size];
 
@@ -45,6 +84,7 @@ void conv_layer(fixed_t *src, fixed_t *dst, const fixed_t *bias, const fixed_t *
 
                     // starting index for source value
                     src_index = ((i - 2)*src_size) + j - 2;
+                    fixed_t tmp = output[dst_index];
                     output[dst_index] += 
                         //Row 1
                         ((image[src_index] * weight[0] + image[src_index + 1] * weight[1] + image[src_index + 2] * weight[2] + image[src_index + 3] * weight[3] + image[src_index + 4] * weight[4] +
@@ -66,8 +106,13 @@ void conv_layer(fixed_t *src, fixed_t *dst, const fixed_t *bias, const fixed_t *
                         image[src_index + 4 * src_size + 3] * weight[23] + image[src_index + 4 * src_size + 4] * weight[24])
                         //Doing multiplication, need to divide by scaling factor twice
                         >> FIXED_SCALE_LOG);
-                    if (in == 0 && out == 0) {
-                      //fprintf(stderr, "pre-bias output %d %d: %d\n", i, j, output[dst_index]);
+                    if (out == 0 && i == 2 && j == 2) {
+                      //fprintf(stderr, "pre-bias output %d %d: %d\n", i, j, output[dst_index] - tmp);
+                      for (int a0 = 0; a0 < 5; a0++) {
+                        for (int a1 = 0; a1 < 5; a1++) {
+                          //fprintf(stderr, "inputs: %d %d %d\n", image[src_index + a1 + src_size * a0], weight[a0 * 5 + a1], image[src_index + a1 + src_size * a0] * weight[a0 * 5 + a1]);
+                        }
+                      }
                     }
                 }
             }
@@ -84,7 +129,7 @@ void conv_layer(fixed_t *src, fixed_t *dst, const fixed_t *bias, const fixed_t *
             // Activation (ReLU function), easier to implement than sigmoid
             output[i] = MAX(0, output[i] + bi);
             if (out == 0) {
-              //fprintf(stderr, "post-bias output %d: %d\n", i, output[i]);
+              fprintf(stderr, "post-bias output %d: %d %d\n", i, output[i], bi);
             }
         }
     }

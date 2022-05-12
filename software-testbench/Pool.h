@@ -71,7 +71,7 @@ void avg_pool(fixed_t* in, fixed_t* out, int src_size, int src_row_size) {
         for (int l = 0; l < POOL_SIZE; l++) {
           sum += in[(i * POOL_SIZE + k) * (src_row_size) + j * POOL_SIZE + l];
           if (in[(i * POOL_SIZE + k) * (src_row_size) + j * POOL_SIZE + l] > 0) {
-            fprintf(stderr, "pool %d %d: %d\n", i * (src_row_size / POOL_SIZE) + j, (i * POOL_SIZE + k) * (src_row_size) + j * POOL_SIZE + l, in[(i * POOL_SIZE + k) * (src_row_size) + j * POOL_SIZE + l]);
+            //fprintf(stderr, "pool %d %d: %d\n", i * (src_row_size / POOL_SIZE) + j, (i * POOL_SIZE + k) * (src_row_size) + j * POOL_SIZE + l, in[(i * POOL_SIZE + k) * (src_row_size) + j * POOL_SIZE + l]);
           }
         }
       }

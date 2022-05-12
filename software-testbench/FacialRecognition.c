@@ -35,7 +35,7 @@ unsigned classify(unsigned char* in_image, struct weights* w) {
   conv_layer(in_matrix, conv1_out, w->conv1_bias, w->conv1_weights, 1, NUM_KERNELS_1, IMAGE_WIDTH);
   for (int i = 0; i < 24 * 24; i++) {
     if (conv1_out[i] > 0) {
-      fprintf(stderr, "conv1 output [%d]: %d\n", i, conv1_out[i]);
+      //fprintf(stderr, "conv1 output [%d]: %d\n", i, conv1_out[i]);
     }
   }
   avg_pool(conv1_out, pool1_out, NUM_KERNELS_1 * CONV1_OUT_SIZE, CONV1_OUT_WIDTH);

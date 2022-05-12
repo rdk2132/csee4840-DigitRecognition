@@ -6,7 +6,8 @@ module conv2_mem ( input [5:0] address_a, address_b,
 				   output reg [15:0] q_a, q_b);
 
 	reg [15:0] ram[63:0];
-
+  logic [15:0] debug_23, debug_24, debug_25, debug_26, debug_27, debug_28;
+  
 	// Port A 
 	always @ (posedge clock)
 	begin
@@ -24,6 +25,12 @@ module conv2_mem ( input [5:0] address_a, address_b,
 	// Port B 
 	always @ (posedge clock)
 	begin
+    debug_23 <= ram[23];
+    debug_24 <= ram[24];
+    debug_25 <= ram[25];
+    debug_26 <= ram[26];
+    debug_27 <= ram[27];
+    debug_28 <= ram[28];
 		if (wren_b) 
 		begin
 			ram[address_b] <= data_b;
