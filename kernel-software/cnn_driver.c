@@ -16,7 +16,6 @@
 #include <linux/of_address.h>
 #include <linux/fs.h>
 #include <linux/uaccess.h>
-#include <linux/delay.h>
 
 #include "../software-testbench/Parameters.h"
 
@@ -40,7 +39,6 @@ static void send_image(fixed_t *image)
     for (i = 0; i < IMAGE_SIZE; i++){
         iowrite16(i, INPUT_ADDR_REG(dev.virtbase));
         iowrite16(image[i], INPUT_DATA_REG(dev.virtbase));
-	mdelay(1);
     }
 }
 
