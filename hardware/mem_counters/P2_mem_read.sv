@@ -6,7 +6,7 @@ module P2_mem_read (input logic clk, reset, enable,
 
     logic [3:0] delay;
 
-    always_ff @(negedge clk or posedge reset) begin
+    always_ff @(posedge clk or posedge reset) begin
         if (reset == 1'b1) begin
             count <= 4'b0000;
             addr0 <= 4'b0000;
