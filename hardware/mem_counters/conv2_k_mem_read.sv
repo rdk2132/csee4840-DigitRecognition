@@ -23,7 +23,7 @@ module conv2_k_mem_read (input logic clk, reset, enable,
             if(addrcount == 8'd24) begin
                 addrcount <= 1'b0;
                 if(count == 5'd63) begin
-                    count = 5'd0;
+                    count <= 5'd0;
                     if(offset == 8'b00000000) begin
                         offset <= 8'd25;
                     end
