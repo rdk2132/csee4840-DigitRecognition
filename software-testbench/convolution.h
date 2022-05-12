@@ -22,7 +22,7 @@ void conv_layer(fixed_t *src, fixed_t *dst, const fixed_t *bias, const fixed_t *
     int is_conv_2 = num_dst == 12;
 
     FILE* f_pointers[12];
-    if (is_conv_2) {
+    if (is_conv_2 && 0) {
       for (int i = 0; i < 12; i++) {
         std::string fname = "conv2_k_g" + std::to_string(i) + ".txt";
         f_pointers[i] = fopen(fname.c_str(), "wb");
@@ -47,7 +47,7 @@ void conv_layer(fixed_t *src, fixed_t *dst, const fixed_t *bias, const fixed_t *
                 }
             }
           }
-          printf("Succ %d\n", succ);
+          //printf("Succ %d\n", succ);
           unsigned read_pos = (in_layer * num_dst + out_layer) * CONV_KERNEL_SIZE;
           for (int k = 0; k < 25; k++) {
             unsigned short value;
@@ -84,7 +84,7 @@ void conv_layer(fixed_t *src, fixed_t *dst, const fixed_t *bias, const fixed_t *
 
                     // starting index for source value
                     src_index = ((i - 2)*src_size) + j - 2;
-                    fixed_t tmp = output[dst_index];
+                    //fixed_t tmp = output[dst_index];
                     output[dst_index] += 
                         //Row 1
                         ((image[src_index] * weight[0] + image[src_index + 1] * weight[1] + image[src_index + 2] * weight[2] + image[src_index + 3] * weight[3] + image[src_index + 4] * weight[4] +
@@ -128,8 +128,8 @@ void conv_layer(fixed_t *src, fixed_t *dst, const fixed_t *bias, const fixed_t *
         for (int i = 0; i < dst_size * dst_size; i++) {
             // Activation (ReLU function), easier to implement than sigmoid
             output[i] = MAX(0, output[i] + bi);
-            if (out == 0) {
-              fprintf(stderr, "post-bias output %d: %d %d\n", i, output[i], bi);
+            if (output[i] > 0) {
+              //fprintf(stderr, "post-bias output %d(%d): %d %d\n", i, out, output[i], bi);
             }
         }
     }

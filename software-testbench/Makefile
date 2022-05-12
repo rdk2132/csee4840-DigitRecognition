@@ -2,8 +2,8 @@ CC = g++
 CXX = g++
 INCLUDES =
 #TODO add back -DUSE_FPGA
-CFLAGS = -g -std=gnu++11 -W -Wall $(INCLUDES)
-CXXFLAGS = -g -W -Wall $(INCLUDES)
+CFLAGS = -g -std=gnu++11 -W -Wall -Wno-constant-logical-operand $(INCLUDES)
+CXXFLAGS = -g -W -Wall -Wno-constant-logical-operand $(INCLUDES)
 LDFLAGS = -lm
 
 .PHONY: default

@@ -39,11 +39,11 @@ unsigned classify(unsigned char* in_image, struct weights* w) {
     }
   }
   avg_pool(conv1_out, pool1_out, NUM_KERNELS_1 * CONV1_OUT_SIZE, CONV1_OUT_WIDTH);
-  for (int i = 0; i < 12 * 12; i++) {
+  /*for (int i = 0; i < 12 * 12; i++) {
     if (pool1_out[i] > 0) {
       fprintf(stderr, "pool1 output [%d]: %d\n", i % (12 * 12), pool1_out[i]);
     }
-  }
+  }*/
   conv_layer(pool1_out, conv2_out, w->conv2_bias, w->conv2_weights, NUM_KERNELS_1, NUM_KERNELS_2, CONV1_OUT_WIDTH / 2);
   for (int i = 0; i < 8 * 8; i++) {
     if (conv2_out[i] > 0) {
@@ -51,6 +51,11 @@ unsigned classify(unsigned char* in_image, struct weights* w) {
     }
   }
  avg_pool(conv2_out, pool2_out, NUM_KERNELS_2 * CONV2_OUT_SIZE, CONV2_OUT_WIDTH);
+  for (int i = 0; i < 12 * 4 * 4; i++) {
+    if (pool2_out[i] > 0) {
+      fprintf(stderr, "pool2 output %d [%d]: %d\n", i / 16, i % (4 * 4), pool2_out[i]);
+    }
+  }
   fully_connected(pool2_out, classification_vector, w->fc_weights, NUM_KERNELS_2 * CONV2_OUT_SIZE / POOL_SIZE / POOL_SIZE, NUM_CLASSES);
 
   fixed_t max = FIXED_MIN;
@@ -156,10 +161,10 @@ int main() {
     }
   }
   for (int i = 0; i < 6; i++) {
-    fprintf(stderr, "conv1_bias[%d] = %d\n", i, wt.conv1_bias[i]);
+    //fprintf(stderr, "conv1_bias[%d] = %d\n", i, wt.conv1_bias[i]);
   }
   for (int i = 0; i < 25; i++) {
-    fprintf(stderr, "conv1 kernel 0 [%d] = %d\n", i, wt.conv1_weights[i]);
+    //fprintf(stderr, "conv1 kernel 0 [%d] = %d\n", i, wt.conv1_weights[i]);
   }
 
   //Should not be needed as long as weights are stable.

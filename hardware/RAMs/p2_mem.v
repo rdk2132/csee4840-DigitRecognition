@@ -6,17 +6,16 @@ module p2_mem ( input [3:0] address,
 				   output [15:0] q);
 
 	reg [15:0] ram[15:0];
-    reg[3:0] address_reg;
 
 	always @ (posedge clock)
 	begin
 		if (wren) 
 		begin
 			ram[address] <= data;
-            address_reg <= address;
+
 		end
 	end
     
-    assign q = ram[address_reg];
+    assign q = ram[address];
 
 endmodule
