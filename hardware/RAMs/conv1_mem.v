@@ -6,7 +6,6 @@ module conv1_mem ( input [8:0] address_a, address_b,
 				   output reg [15:0] q_a, q_b);
 
 	reg [15:0] ram[511:0];
-  logic [15:0] debug195, debug196, debug197, debug198, debug199, debug200, debug229, debug231;
   logic [8:0] prev_addra, pprev_addra;
   logic [8:0] prev_addrb, pprev_addrb;
 	// Port A 
@@ -30,14 +29,6 @@ module conv1_mem ( input [8:0] address_a, address_b,
 	begin
     pprev_addrb <= address_b;
     prev_addrb <= pprev_addrb;
-		debug195 <= ram[195];
-		debug196 <= ram[196];
-		debug197 <= ram[197];
-		debug198 <= ram[198];
-		debug199 <= ram[199];
-		debug200 <= ram[200];
-		debug229 <= ram[229];
-		debug231 <= ram[231];
     if (wren_b) 
 		begin
 			ram[prev_addrb] <= data_b;
