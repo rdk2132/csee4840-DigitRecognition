@@ -3,7 +3,7 @@ module p2_mem ( input [3:0] address,
 				   input clock,
 				   input [15:0] data,
 				   input wren,
-				   output [15:0] q);
+				   output reg [15:0] q);
 
 	reg [15:0] ram[15:0];
 
@@ -14,8 +14,8 @@ module p2_mem ( input [3:0] address,
 			ram[address] <= data;
 
 		end
+    q <= ram[address];
 	end
     
-    assign q = ram[address];
 
 endmodule
