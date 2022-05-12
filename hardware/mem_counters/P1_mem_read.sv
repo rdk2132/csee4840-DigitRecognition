@@ -44,7 +44,7 @@ module P1_mem_read (input logic clk, reset, enable,
                     addr0 <= addr0 + 8'b00000001;
                     columncount <= columncount + 3'b001;
                 end
-                if (add0 == 8'b10001111) begin
+                if (addr0 == 8'b10001111) begin
                     count <= count + 1;
                     addr0 <= 0;
                 end
