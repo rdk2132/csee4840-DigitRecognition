@@ -8,7 +8,7 @@ module conv2_mem_write (input logic clk, reset, enable,
     logic [4:0] clk_counter;
     logic [3:0] delay;
 
-    always_ff @(posedge clk or posedge reset) begin
+    always_ff @(negedge clk or posedge reset) begin
         if (reset == 1'b1) begin
             addr0 <= 6'b000000;
             count <= 2'b00;
